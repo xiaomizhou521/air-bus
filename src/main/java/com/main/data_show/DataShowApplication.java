@@ -7,6 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class DataShowApplication {
 
     public static void main(String[] args) {
+        System.out.println(12345);
         SpringApplication.run(DataShowApplication.class, args);
     }
 
