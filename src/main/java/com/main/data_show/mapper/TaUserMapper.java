@@ -12,9 +12,9 @@ import java.util.List;
 @Repository
 public interface  TaUserMapper {
 
-    @Select("select * from user")
+    @Select("select * from ta_user")
     List<TaUser> findAll();
 
-    @Insert("insert into user(userId,userName,nickName)values(#{userId},#{userName},#{nickName}")
+    @Insert("insert into ta_user(user_id,user_name,nick_name)values(#{userId},#{userName},#{nickName}")
     public int add(TaUser user);
 }

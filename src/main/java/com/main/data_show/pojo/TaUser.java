@@ -5,32 +5,35 @@ import jdk.nashorn.internal.objects.annotations.Setter;
 
 public class TaUser {
 
-    private int userId;
-    private String userName;
-    private String nickName;
+    private int user_id;
+    private String user_name;
+    private String nick_name;
 
 
-    public int getUserId() {
-        return userId;
+
+
+
+    public int getUser_id() {
+        return user_id;
     }
 
-    public void setUserId(int userId) {
-        this.userId = userId;
+    public void setUser_id(int user_id) {
+        this.user_id = user_id;
     }
 
-    public String getUserName() {
-        return userName;
+    public String getUser_name() {
+        return user_name;
     }
 
-    public void setUserName(String userName) {
-        this.userName = userName;
+    public void setUser_name(String user_name) {
+        this.user_name = user_name;
     }
 
-    public String getNickName() {
-        return nickName;
+    public String getNick_name() {
+        return nick_name;
     }
 
-    public void setNickName(String nickName) {
-        this.nickName = nickName;
+    public void setNick_name(String nick_name) {
+        this.nick_name = nick_name;
     }
 }
