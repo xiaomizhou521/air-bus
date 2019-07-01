@@ -1,5 +1,8 @@
 package com.main.data_show.pojo;
 
+import jdk.nashorn.internal.objects.annotations.Getter;
+import jdk.nashorn.internal.objects.annotations.Setter;
+
 public class TaUser {
 
     private int userId;
