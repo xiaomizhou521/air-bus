@@ -25,6 +25,9 @@
                <tr>
                    <td colspan="2"><input type="submit" class="btn form-control" value="登陆"></td>
                </tr>
+               <tr>
+                   <td colspan="2">${message}</td>
+               </tr>
            </table>
        </form>
    </div>
