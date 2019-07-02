@@ -3,11 +3,16 @@ package com.main.data_show.pojo;
 import jdk.nashorn.internal.objects.annotations.Getter;
 import jdk.nashorn.internal.objects.annotations.Setter;
 
+import java.util.Date;
+
 public class TaUser {
 
     private int user_id;
     private String user_name;
     private String nick_name;
+    private String pass_word;
+    private String salt;
+    private Date init_date;
 
 
 
@@ -35,5 +40,29 @@ public class TaUser {
 
     public void setNick_name(String nick_name) {
         this.nick_name = nick_name;
+    }
+
+    public String getPass_word() {
+        return pass_word;
+    }
+
+    public void setPass_word(String pass_word) {
+        this.pass_word = pass_word;
+    }
+
+    public String getSalt() {
+        return salt;
+    }
+
+    public void setSalt(String salt) {
+        this.salt = salt;
+    }
+
+    public Date getInit_date() {
+        return init_date;
+    }
+
+    public void setInit_date(Date init_date) {
+        this.init_date = init_date;
     }
 }

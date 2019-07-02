@@ -19,6 +19,10 @@ public class TaUserService {
         return userMapper.findAll();
     }
 
+    public TaUser findUserByUserName(String userName){
+        return userMapper.findUserByUserName(userName);
+    }
+
     public int add(TaUser user){
         return userMapper.add(user);
 

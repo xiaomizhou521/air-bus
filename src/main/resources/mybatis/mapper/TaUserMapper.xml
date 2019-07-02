@@ -6,4 +6,8 @@
     <select id="findAll" resultType="com.main.data_show.pojo.TaUser">
         select * from ta_user
     </select>
+
+    <select id="findUserByUserName" resultType="com.main.data_show.pojo.TaUser">
+        select * from ta_user where user_name = #{user_name}
+    </select>
 </mapper>
