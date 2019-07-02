@@ -6,22 +6,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.List;
 
 @Service
 public class TaUserService {
 
-    @Autowired
+    @Resource
     private TaUserMapper userMapper;
 
     public List<TaUser> findAll(){
-
-
         return userMapper.findAll();
     }
 
     public int add(TaUser user){
-
         return userMapper.add(user);
 
     }
