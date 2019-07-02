@@ -1,5 +1,6 @@
 package com.main.data_show;
 
+import cn.com.enorth.utility.Beans;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
