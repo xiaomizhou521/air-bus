@@ -6,11 +6,17 @@
   To change this template use File | Settings | File Templates.
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<html>
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <!-- Bootstrap core CSS -->
-    <link href="asserts/css/bootstrap.min.css" th:href="@{/webjars/bootstrap/4.0.0/css/bootstrap.css}" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="../static/js/bootstrap/css/bootstrap.css">
+    <script type="text/javascript" src="../static/js/bootstrap/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../static/js/jquery/jquery-1.11.1.js" ></script>
     <title>登陆页面</title>
+    <script>
+        $(function () {
+alert(11);
+        })
+    </script>
 </head>
 <body>
    <div>
