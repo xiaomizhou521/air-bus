@@ -14,13 +14,13 @@
     <title>登陆页面</title>
     <script>
         $(function () {
-alert(11);
+
         })
     </script>
 </head>
 <body>
    <div>
-       <form action="/air-bus/loginDo" method="post">
+       <form action="/loginDo" method="post">
            <table class=" table">
                <tr>
                    <td>用户名</td><td><input type="text" class ="form-control" placeholder="" id="userName" name="userName" value=""/></td>
