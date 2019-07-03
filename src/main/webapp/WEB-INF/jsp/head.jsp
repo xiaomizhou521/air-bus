@@ -48,7 +48,7 @@
             </div>
         </div>
     </div>
-    <script type="text/javascript" src="/js/head.js"></script>
+    <script type="text/javascript" src="../static/js/layui/head.js"></script>
 </header>
 </body>
 </html>
