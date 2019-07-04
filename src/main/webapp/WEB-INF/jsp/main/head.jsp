@@ -11,15 +11,15 @@
             </a>
             <ul class="layui-nav layui-layout-right">
                 <li class="layui-nav-item">
-                    <a href="javascript:;">
+                 <%--   <a href="javascript:;">
                         <img src="/images/logo.jpg" class="layui-nav-img"></img>
                         <shiro:principal property="sysUserName"></shiro:principal>
-                    </a>
-                    <dl class="layui-nav-child">
+                    </a>--%>
+                 <%--   <dl class="layui-nav-child">
                         <dd id="updUsePwdDd" class="layui-this"><a href="javascript:;" onclick="updateUsePwd();">修改密码</a></dd>
-                    </dl>
+                    </dl>--%>
                 </li>
-                <li class="layui-nav-item"><a href="/logout">退出</a></li>
+                <li class="layui-nav-item"><a href="/toLogOut">退出</a></li>
             </ul>
         </div>
 
@@ -29,9 +29,9 @@
                     <li class="layui-nav-item layui-nav-itemed">
                         <a href="javascript:;">系统管理</a>
                         <dl class="layui-nav-child">
-                            <dd><a href="/user/userManage">账号管理</a></dd>
-                            <dd><a href="/role/roleManage">角色管理</a></dd>
-                            <dd><a href="/permission/permissionManage">权限管理</a></dd>
+                            <dd><a href="/work/exportExcel">账号管理</a></dd>
+                            <dd><a href="/work/exportExcel">角色管理</a></dd>
+                            <dd><a href="/work/exportExcel">权限管理</a></dd>
                         </dl>
                     </li>
                     <li class="layui-nav-item">

@@ -15,7 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-@WebFilter(filterName="firstFilter", urlPatterns="/login/*")
+@WebFilter(filterName="firstFilter", urlPatterns="/work/*")
 public class LoginFilter implements Filter {
 
     @Autowired
@@ -34,7 +34,7 @@ public class LoginFilter implements Filter {
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
-  /*      HttpServletRequest checkRequest = (HttpServletRequest) request;
+        HttpServletRequest checkRequest = (HttpServletRequest) request;
         HttpServletResponse checkResponse = (HttpServletResponse) response;
         try {
             TaUser curUser = loginHelper.getCurUser(checkRequest);
@@ -45,7 +45,6 @@ public class LoginFilter implements Filter {
             }
         } catch (Exception e) {
             e.printStackTrace();
-        }*/
-        chain.doFilter(request, response);
+        }
     }
 }

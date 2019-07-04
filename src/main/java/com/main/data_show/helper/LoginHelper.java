@@ -7,6 +7,7 @@ import com.main.data_show.consts.LoginConst;
 import com.main.data_show.pojo.TaUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.Cookie;
@@ -15,6 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.sql.SQLException;
 
 @Service
 public class LoginHelper {
@@ -44,6 +46,22 @@ public class LoginHelper {
             }
         }*/
         return userId;
+    }
+
+    /*
+     * 登录信息存入session
+     *
+     * @author ljg
+     *
+     */
+    public LoginUserVo saveLoginInfoToSession(HttpServletRequest request,TaUser userVo) throws SQLException, Exception {
+        //用户信息存入session中
+        LoginUserVo users=new LoginUserVo();
+        users.setUserId(userVo.getUser_id());
+        users.setUserName(userVo.getUser_name());
+        users.setRealName(userVo.getNick_name());
+        request.getSession().setAttribute(LoginConst.CURRENT_LOGIN_USER, users);
+        return users;
     }
 
     /**
@@ -135,5 +153,8 @@ public class LoginHelper {
             }
         }
         return cookiesValue;
+    }
+    public void logOut(HttpServletRequest request){
+        request.getSession().setAttribute(LoginConst.CURRENT_LOGIN_USER, null);
     }
 }

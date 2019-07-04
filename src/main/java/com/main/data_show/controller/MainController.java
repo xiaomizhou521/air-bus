@@ -37,8 +37,14 @@ public class MainController {
             return JspPageConst.LOGIN_JSP_REDIRECT;
         }else{
             //去主页面
-            return JspPageConst.MAIN_JSP_REDIRECT;
+            return JspPageConst.REDIRECT_MAIN_JSP_REDIRECT;
         }
+    }
+
+    @RequestMapping(value = "/toLogOut")
+    public String toLogOut(HttpServletRequest request) throws Exception {
+       loginHelper.logOut(request);
+       return JspPageConst.LOGIN_JSP_REDIRECT;
     }
 
     @RequestMapping(value = "/login/loginDo")
@@ -60,8 +66,20 @@ public class MainController {
             logger.info("userName:"+userName+",登陆失败，用户名或密码错误!");
             return JspPageConst.LOGIN_JSP_REDIRECT;
         }
+        //保存登陆信息到session中
+        loginHelper.saveLoginInfoToSession(request,userByUserName);
         //去主页面
+        return JspPageConst.REDIRECT_MAIN_JSP_REDIRECT;
+    }
+
+    @RequestMapping(value = "work/redirect")
+    public String redirectMain(HttpServletRequest request) {
         return JspPageConst.MAIN_JSP_REDIRECT;
+    }
+
+    @RequestMapping(value = "work/exportExcel")
+    public String exportExcel(HttpServletRequest request) {
+        return JspPageConst.EXPORT_EXCEL_JSP_REDIRECT;
     }
 
     @RequestMapping(value = "/sesion_error")

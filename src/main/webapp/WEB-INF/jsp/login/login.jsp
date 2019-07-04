@@ -16,6 +16,20 @@
         $(function () {
 
         })
+
+        function checkSubumit(){
+            var userName = $("#userName").val().trim();
+            if(userName == null||userName == ""){
+                $("#messageId").text("请输入用户名!");
+                return false;
+            }
+            var passWord = $("#passWord").val().trim();
+            if(passWord == null||passWord == ""){
+                $("#messageId").text("请输入密码!");
+                return false;
+            }
+            return true;
+        }
     </script>
 </head>
 <body>
@@ -29,10 +43,10 @@
                    <td>密码</td><td><input type="text" class ="form-control" placeholder="" id="passWord" name="passWord" value=""/></td>
                </tr>
                <tr>
-                   <td colspan="2"><input type="submit" class="btn form-control" value="登陆"></td>
+                   <td colspan="2"><input type="submit" onclick="return checkSubumit();" class="btn form-control" value="登陆"></td>
                </tr>
                <tr>
-                   <td colspan="2">${message}</td>
+                   <td colspan="2" style="color:red;" id="messageId">${message}</td>
                </tr>
            </table>
        </form>

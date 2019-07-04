@@ -15,9 +15,8 @@
         <div class="layui-container">
             <div class="layui-row">
                 <div class="layui-col-xs9">
-                    &nbsp;
-                    <h1 style="padding-top:50px;line-height:2.0;"><shiro:principal property="sysUserName"></shiro:principal>欢迎登录
-                        <span style="font-weight: bold;font-size:28px;">后台管理系统</span></a></h1>
+                   <jsp:include page="../work/excelExport.jsp" />
+
                 </div>
             </div>
         </div>
