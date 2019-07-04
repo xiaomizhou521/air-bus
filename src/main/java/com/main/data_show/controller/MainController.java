@@ -1,5 +1,6 @@
 package com.main.data_show.controller;
 
+import com.main.data_show.consts.JspPageConst;
 import com.main.data_show.helper.LoginHelper;
 import com.main.data_show.helper.ToolHelper;
 import com.main.data_show.helper.UserHelper;
@@ -33,10 +34,10 @@ public class MainController {
         TaUser curUser = loginHelper.getCurUser(request);
         if(curUser == null){
             //去登陆页面
-            return "login";
+            return JspPageConst.LOGIN_JSP_REDIRECT;
         }else{
             //去主页面
-            return "main";
+            return JspPageConst.MAIN_JSP_REDIRECT;
         }
     }
 
@@ -57,15 +58,15 @@ public class MainController {
              //去登陆页面
             request.setAttribute("message", "用户名或密码错误！");
             logger.info("userName:"+userName+",登陆失败，用户名或密码错误!");
-            return "login";
+            return JspPageConst.LOGIN_JSP_REDIRECT;
         }
         //去主页面
-        return "main";
+        return JspPageConst.MAIN_JSP_REDIRECT;
     }
 
     @RequestMapping(value = "/sesion_error")
     public String showSesionError(HttpServletRequest request) {
-        return "sesion_error";
+        return JspPageConst.SESSION_ERR_JSP_REDIRECT;
     }
 
     @RequestMapping(value = "findAll")
