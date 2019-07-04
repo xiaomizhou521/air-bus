@@ -5,6 +5,15 @@
 <head th:include="layout :: htmlhead" th:with="title='海韵后台管理'">
     <jsp:include page="layout.jsp"/>
 </head>
+<script>
+    $(function(){
+        $(".menuClass").bind("click",function(){
+            var url = $(this).attr("url");
+            $("#iframeId").attr("src",url);
+        })
+    })
+
+</script>
 <body class="layui-layout-body">
 <div class="layui-layout layui-layout-admin">
     <!--头-->
@@ -15,7 +24,7 @@
         <div class="layui-container">
             <div class="layui-row">
                 <div class="layui-col-xs9">
-                   <jsp:include page="../work/excelExport.jsp" />
+                    <iframe id="iframeId" src="/work/exportExcel" ></iframe>
 
                 </div>
             </div>

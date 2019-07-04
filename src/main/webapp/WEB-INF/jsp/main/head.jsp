@@ -1,6 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html  xmlns:th="http://www.thymeleaf.org">
 <body>
+
 <header th:fragment="header">
     <div class="layui-layout layui-layout-admin">
         <div class="layui-header">
@@ -29,7 +30,7 @@
                     <li class="layui-nav-item layui-nav-itemed">
                         <a href="javascript:;">系统管理</a>
                         <dl class="layui-nav-child">
-                            <dd><a href="/work/exportExcel">账号管理</a></dd>
+                            <dd><a class="menuClass" href="javaScript:void(0);" url="/work/exportExcel">账号管理</a></dd>
                             <dd><a href="/work/exportExcel">角色管理</a></dd>
                             <dd><a href="/work/exportExcel">权限管理</a></dd>
                         </dl>
