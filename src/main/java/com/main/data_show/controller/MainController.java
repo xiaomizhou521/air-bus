@@ -1,11 +1,8 @@
 package com.main.data_show.controller;
 
-import cn.com.enorth.utility.Beans;
-import com.main.data_show.DataShowApplication;
 import com.main.data_show.helper.LoginHelper;
 import com.main.data_show.helper.ToolHelper;
 import com.main.data_show.helper.UserHelper;
-import com.main.data_show.mapper.TaUserMapper;
 import com.main.data_show.pojo.TaUser;
 import com.main.data_show.service.TaUserService;
 import org.slf4j.Logger;
@@ -18,8 +15,8 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @Controller
-public class TaUserController {
-    private static Logger logger = LoggerFactory.getLogger(TaUserController.class);
+public class MainController {
+    private static Logger logger = LoggerFactory.getLogger(MainController.class);
     @Autowired
     private TaUserService userService;
 
@@ -31,7 +28,7 @@ public class TaUserController {
     @Autowired
     private ToolHelper toolHelper;
 
-    @RequestMapping(value = "toLogin")
+    @RequestMapping(value = "/toLogin")
     public String toLogin(HttpServletRequest request) throws Exception {
         TaUser curUser = loginHelper.getCurUser(request);
         if(curUser == null){
@@ -43,7 +40,7 @@ public class TaUserController {
         }
     }
 
-    @RequestMapping(value = "loginDo")
+    @RequestMapping(value = "/login/loginDo")
     public String loginDo(HttpServletRequest request) throws Exception {
         String userName = request.getParameter("userName");
         String passWord = request.getParameter("passWord");
@@ -66,10 +63,16 @@ public class TaUserController {
         return "main";
     }
 
+    @RequestMapping(value = "/sesion_error")
+    public String showSesionError(HttpServletRequest request) {
+        return "sesion_error";
+    }
+
     @RequestMapping(value = "findAll")
     public String findAll(HttpServletRequest request) {
         List<TaUser> list = userService.findAll();
         request.setAttribute("userlist", list);
         return "user_list";
     }
+
 }

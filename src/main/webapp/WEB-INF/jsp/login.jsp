@@ -20,7 +20,7 @@
 </head>
 <body>
    <div>
-       <form action="/loginDo" method="post">
+       <form action="/login/loginDo" method="post">
            <table class=" table">
                <tr>
                    <td>用户名</td><td><input type="text" class ="form-control" placeholder="" id="userName" name="userName" value=""/></td>
