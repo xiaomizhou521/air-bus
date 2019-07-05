@@ -20,11 +20,11 @@
     <%--<div th:replace="fragments/head :: header">111</div>--%>
     <jsp:include page="head.jsp"/>
     <!--主体区域-->
-    <div class="layui-body">
-        <div class="layui-container">
-            <div class="layui-row">
-                <div class="layui-col-xs9">
-                    <iframe id="iframeId" src="/work/exportExcel" ></iframe>
+    <div class="layui-body" style="width:100%;height:100%">
+        <div class="layui-container" style="width:100%;height:100%">
+            <div class="layui-row" style="width:100%;height:100%">
+                <div class="layui-col-xs9" style="width:100%;height:100%">
+                    <iframe id="iframeId" src="/work/exportExcel" style="width:100%;height:100%" ></iframe>
 
                 </div>
             </div>
