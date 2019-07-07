@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.main.data_show.mapper.TaPonitMapper">
+    <insert id="insertTaPoint" keyProperty="pointId" parameterType="com.main.data_show.pojo.TaPoint"  useGeneratedKeys="true">
+        INSERT INTO ta_point (point_name, remarks_name, point_type, point_unit, block_no, state, init_date, init_user, mod_date, mod_user)
+        VALUES (#{pointName}, #{remarksName}, #{pointType}, #{pointUnit}, #{blockNo}, #{state}, now(), #{initUser}, now(), #{modUser});
+    </insert>
+
+    <select id="findPointByPointName" resultType="com.main.data_show.pojo.TaPoint">
+        select * from ta_point where point_name = #{point_name}
+    </select>
+</mapper>

@@ -35,7 +35,7 @@
                             <dd><a href="/work/exportExcel">权限管理</a></dd>
                         </dl>
                     </li>
-                    <li class="layui-nav-item">
+                  <%--  <li class="layui-nav-item">
                         <a href="javascript:;">基本设置</a>
                         <dl class="layui-nav-child">
                             <dd><a href="/goodsCategory/goodsCategoryManage">服务类目管理 </a></dd>
@@ -44,7 +44,7 @@
                             <dd><a href="/bank/bankManage">银行管理</a></dd>
                             <dd><a href="/position/positionManage">省市区管理</a></dd>
                         </dl>
-                    </li>
+                    </li>--%>
                 </ul>
             </div>
         </div>

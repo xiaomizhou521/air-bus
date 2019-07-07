@@ -7,47 +7,47 @@ import java.util.Date;
 
 public class TaUser {
 
-    private int user_id;
-    private String user_name;
-    private String nick_name;
-    private String pass_word;
+    private int userId;
+    private String userName;
+    private String nickName;
+    private String passWord;
     private String salt;
-    private Date init_date;
+    private Date initDate;
+    private int initUser;
+    private Date modDate;
+    private int modUser;
 
 
-
-
-
-    public int getUser_id() {
-        return user_id;
+    public int getUserId() {
+        return userId;
     }
 
-    public void setUser_id(int user_id) {
-        this.user_id = user_id;
+    public void setUserId(int userId) {
+        this.userId = userId;
     }
 
-    public String getUser_name() {
-        return user_name;
+    public String getUserName() {
+        return userName;
     }
 
-    public void setUser_name(String user_name) {
-        this.user_name = user_name;
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
 
-    public String getNick_name() {
-        return nick_name;
+    public String getNickName() {
+        return nickName;
     }
 
-    public void setNick_name(String nick_name) {
-        this.nick_name = nick_name;
+    public void setNickName(String nickName) {
+        this.nickName = nickName;
     }
 
-    public String getPass_word() {
-        return pass_word;
+    public String getPassWord() {
+        return passWord;
     }
 
-    public void setPass_word(String pass_word) {
-        this.pass_word = pass_word;
+    public void setPassWord(String passWord) {
+        this.passWord = passWord;
     }
 
     public String getSalt() {
@@ -58,11 +58,35 @@ public class TaUser {
         this.salt = salt;
     }
 
-    public Date getInit_date() {
-        return init_date;
+    public Date getInitDate() {
+        return initDate;
     }
 
-    public void setInit_date(Date init_date) {
-        this.init_date = init_date;
+    public void setInitDate(Date initDate) {
+        this.initDate = initDate;
+    }
+
+    public int getInitUser() {
+        return initUser;
+    }
+
+    public void setInitUser(int initUser) {
+        this.initUser = initUser;
+    }
+
+    public Date getModDate() {
+        return modDate;
+    }
+
+    public void setModDate(Date modDate) {
+        this.modDate = modDate;
+    }
+
+    public int getModUser() {
+        return modUser;
+    }
+
+    public void setModUser(int modUser) {
+        this.modUser = modUser;
     }
 }

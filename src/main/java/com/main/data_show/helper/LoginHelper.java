@@ -57,9 +57,9 @@ public class LoginHelper {
     public LoginUserVo saveLoginInfoToSession(HttpServletRequest request,TaUser userVo) throws SQLException, Exception {
         //用户信息存入session中
         LoginUserVo users=new LoginUserVo();
-        users.setUserId(userVo.getUser_id());
-        users.setUserName(userVo.getUser_name());
-        users.setRealName(userVo.getNick_name());
+        users.setUserId(userVo.getUserId());
+        users.setUserName(userVo.getUserName());
+        users.setRealName(userVo.getNickName());
         request.getSession().setAttribute(LoginConst.CURRENT_LOGIN_USER, users);
         return users;
     }
