@@ -16,9 +16,9 @@ public class ExcelImportTask {
     @Resource
     private CSVHelper csvHelper;
 
-    @Scheduled(fixedRate = 50000)
+ /*   @Scheduled(fixedRate = 50000)
     public void importExcelStart(){
-        csvHelper.readCSV();
+       // csvHelper.readCSV();
         System.out.println("开始导入excel");
     }
 
@@ -26,5 +26,5 @@ public class ExcelImportTask {
     public void exportExcelStart() throws Exception {
         System.out.println("------------------开始导出excel");
         throw new Exception("异常啦---------------");
-    }
+    }*/
 }

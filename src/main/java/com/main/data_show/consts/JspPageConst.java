@@ -12,5 +12,7 @@ public class JspPageConst {
 
     public static String EXPORT_EXCEL_JSP_REDIRECT = "work/excelExport";
 
+    public static String TO_POINT_LIST_JSP_REDIRECT = "work/point_list";
+
 
 }

@@ -11,4 +11,8 @@
     <select id="findPointByPointName" resultType="com.main.data_show.pojo.TaPoint">
         select * from ta_point where point_name = #{point_name}
     </select>
+
+    <select id="getPointsByPage" resultType="com.main.data_show.pojo.TaPoint">
+        select * from ta_point
+    </select>
 </mapper>

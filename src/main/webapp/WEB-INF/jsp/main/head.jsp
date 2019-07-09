@@ -30,9 +30,9 @@
                     <li class="layui-nav-item layui-nav-itemed">
                         <a href="javascript:;">系统管理</a>
                         <dl class="layui-nav-child">
-                            <dd><a class="menuClass" href="javaScript:void(0);" url="/work/exportExcel">账号管理</a></dd>
-                            <dd><a href="/work/exportExcel">角色管理</a></dd>
-                            <dd><a href="/work/exportExcel">权限管理</a></dd>
+                            <dd><a class="menuClass" href="javaScript:void(0);" url="/work/toPointList">点列表</a></dd>
+                            <dd><a class="menuClass" href="javaScript:void(0);" url="/work/exportExcel">导出数据记录</a></dd>
+                            <dd><a class="menuClass" href="javaScript:void(0);" url="/work/exportExcel">导出用量报告</a></dd>
                         </dl>
                     </li>
                   <%--  <li class="layui-nav-item">
