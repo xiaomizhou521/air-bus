@@ -31,7 +31,7 @@
                         <a href="javascript:;">系统管理</a>
                         <dl class="layui-nav-child">
                             <dd><a class="menuClass" href="javaScript:void(0);" url="/work/toPointList">点列表</a></dd>
-                            <dd><a class="menuClass" href="javaScript:void(0);" url="/work/exportExcel">导出数据记录</a></dd>
+                            <dd><a class="menuClass" href="javaScript:void(0);" url="/work/toExportDataRecode">导出数据记录</a></dd>
                             <dd><a class="menuClass" href="javaScript:void(0);" url="/work/exportExcel">导出用量报告</a></dd>
                         </dl>
                     </li>

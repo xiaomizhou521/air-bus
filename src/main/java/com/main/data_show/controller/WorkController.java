@@ -3,12 +3,14 @@ package com.main.data_show.controller;
 import com.github.pagehelper.PageInfo;
 import com.main.data_show.consts.JspPageConst;
 import com.main.data_show.helper.ToolHelper;
+import com.main.data_show.mapper.TaPonitMapper;
 import com.main.data_show.pojo.TaPoint;
 import com.main.data_show.service.TaPointService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
@@ -20,6 +22,9 @@ public class WorkController {
 
     @Autowired
     private ToolHelper toolHelper;
+
+    @Resource
+    private TaPonitMapper taPonitMapper;
 
     @RequestMapping(value = "work/toPointList")
     public String toPointList(HttpServletRequest request) {
@@ -41,5 +46,14 @@ public class WorkController {
         request.setAttribute("nextPage", pageInfo.getNextPage());
 
         return JspPageConst.TO_POINT_LIST_JSP_REDIRECT;
+    }
+
+
+    @RequestMapping(value = "work/toExportDataRecode")
+    public String toExportDataRecode(HttpServletRequest request) {
+        //取得所有点
+        List<TaPoint> pointList = taPonitMapper.getPointsByPage();
+        request.setAttribute("pointList",pointList);
+        return JspPageConst.EXPORT_DATA_RECODE_JSP_REDIRECT;
     }
 }

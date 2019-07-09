@@ -28,8 +28,8 @@
     </tr>
 </c:forEach>
     <tr style="line-height: 10px;">
-        <td colspan="5">
-            <ul class="pagination" style="width: 100%;">
+        <td colspan="6">
+            <ul class="pagination" style="width: 100%;margin:0px">
                 <li class=""><a href="/work/toPointList?pageNo=0">首页</a></li>
                 <li class=""><a href="/work/toPointList?pageNo=${pageNum-1}">上一页</a></li>
                 <li class=""><a href="/work/toPointList?pageNo=${pageNum+1}">下一页</a></li>

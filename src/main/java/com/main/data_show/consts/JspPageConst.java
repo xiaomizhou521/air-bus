@@ -14,5 +14,7 @@ public class JspPageConst {
 
     public static String TO_POINT_LIST_JSP_REDIRECT = "work/point_list";
 
+    public static String EXPORT_DATA_RECODE_JSP_REDIRECT = "work/export_data_recode";
+
 
 }
