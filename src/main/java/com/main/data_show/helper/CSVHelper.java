@@ -7,9 +7,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.text.ParseException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import com.main.data_show.consts.SysConsts;
 import com.main.data_show.pojo.TaPoint;
@@ -31,6 +29,9 @@ public class CSVHelper {
 
     @Autowired
     private PointDataHelper pointDataHelper;
+
+    @Autowired
+    private ToolHelper toolHelper;
 
     /*public static void main(String[] args) {
         readCSV();
@@ -97,8 +98,49 @@ public class CSVHelper {
                 file.createNewFile();
             }
             CsvWriter csvWriter = new CsvWriter(file.getCanonicalPath(), ',', Charset.forName("GBK"));
-            csvWriter.writeRecord(new String[]{"张三", "aaa", "男"});
-            csvWriter.writeRecord(new String[]{"李四", "bbbb", "vn"});
+            csvWriter.writeRecord(new String[]{"Point list"});
+            csvWriter.writeRecord(new String[]{"Index", "Point name", "Type", "Unit", "Block No."});
+            csvWriter.writeRecord(new String[]{"序号", "点名", "类型", "计量单位", "栋号"});
+            int index = 1;
+            for(TaPoint pointvo : taPointList){
+                csvWriter.writeRecord(new String[]{String.valueOf(index), pointvo.getPointName(), pointvo.getPointType(), pointvo.getPointUnit(), pointvo.getBlockNo()});
+                index++;
+            }
+            csvWriter.writeRecord(new String[]{"   "});
+            csvWriter.writeRecord(new String[]{"Point log"});
+            //String[] pointLogTitle = new String[taPointList.size()+2];
+            ArrayList<String> pointLogTitle = new ArrayList<>();
+            pointLogTitle.add("<>Date");
+            pointLogTitle.add("Time");
+            for(TaPoint pointvo : taPointList){
+                pointLogTitle.add(pointvo.getPointName());
+            }
+            csvWriter.writeRecord(pointLogTitle.toArray(new String[pointLogTitle.size()]));
+        /*  数据格式 如下
+                               Row: 4, 2019-03-11 00:00:00.0, 2019/3/11, 0:00:00, 1049479.13
+                    <==        Row: 5, 2019-03-11 00:00:00.0, 2019/3/11, 0:00:00, 5421.92
+                    <==        Row: 6, 2019-03-11 00:00:00.0, 2019/3/11, 0:00:00, 405849.88
+                    <==        Row: 14, 2019-03-11 00:00:00.0, 2019/3/11, 0:00:00, 330458.09
+                    <==        Row: 4, 2019-03-11 01:00:00.0, 2019/3/11, 1:00:00, 1049556
+                    <==        Row: 5, 2019-03-11 01:00:00.0, 2019/3/11, 1:00:00, 5422.08
+                    <==        Row: 6, 2019-03-11 01:00:00.0, 2019/3/11, 1:00:00, 405867.94
+                    <==        Row: 14, 2019-03-11 01:00:00.0, 2019/3/11, 1:00:00, 330458.25*/
+            Map<Date,ArrayList> pointDateMap = new LinkedHashMap<>();
+            for(TaPointData dataVo : taPointDataList){
+                if(!pointDateMap.containsKey(dataVo.getCreateTime())){
+                    ArrayList<String> pointDataList = new ArrayList<>();
+                    pointDataList.add(dataVo.getDateShow());
+                    pointDataList.add(dataVo.getHourShow());
+                    pointDataList.add(dataVo.getPointData());
+                    pointDateMap.put(dataVo.getCreateTime(),pointDataList);
+                }else{
+                    pointDateMap.get(dataVo.getCreateTime()).add(dataVo.getPointData());
+                }
+            }
+            for(Map.Entry<Date,ArrayList> map : pointDateMap.entrySet()){
+                ArrayList<String> value = map.getValue();
+                csvWriter.writeRecord(value.toArray(new String[value.size()]));
+            }
             csvWriter.close();
 
             /*response.setContentType("application/csv; charset=utf-8");
