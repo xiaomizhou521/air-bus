@@ -15,4 +15,8 @@
     <select id="getPointsByPage" resultType="com.main.data_show.pojo.TaPoint">
         select * from ta_point
     </select>
+
+    <select id="getPointsByPointIds" resultType="com.main.data_show.pojo.TaPoint">
+        select * from ta_point where  point_id in (${pointIds}) order by point_id asc
+    </select>
 </mapper>

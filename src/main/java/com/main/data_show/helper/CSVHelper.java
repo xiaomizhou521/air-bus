@@ -8,9 +8,12 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.text.ParseException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.main.data_show.consts.SysConsts;
+import com.main.data_show.pojo.TaPoint;
+import com.main.data_show.pojo.TaPointData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
@@ -87,7 +90,7 @@ public class CSVHelper {
     }
 
 
-    public static void writeCSV(){
+    public void writeCSV(List<TaPoint> taPointList,List<TaPointData> taPointDataList){
         try {
             File file = new File("C:\\01work\\priv_work190415\\CSV_test\\test.csv");
             if(!file.exists()){

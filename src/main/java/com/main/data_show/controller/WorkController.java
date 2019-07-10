@@ -2,9 +2,12 @@ package com.main.data_show.controller;
 
 import com.github.pagehelper.PageInfo;
 import com.main.data_show.consts.JspPageConst;
+import com.main.data_show.helper.CSVHelper;
 import com.main.data_show.helper.ToolHelper;
+import com.main.data_show.mapper.TaPonitDataMapper;
 import com.main.data_show.mapper.TaPonitMapper;
 import com.main.data_show.pojo.TaPoint;
+import com.main.data_show.pojo.TaPointData;
 import com.main.data_show.service.TaPointService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -25,6 +28,12 @@ public class WorkController {
 
     @Resource
     private TaPonitMapper taPonitMapper;
+
+    @Resource
+    private TaPonitDataMapper taPonitDataMapper;
+
+    @Autowired
+    private CSVHelper csvHelper;
 
     @RequestMapping(value = "work/toPointList")
     public String toPointList(HttpServletRequest request) {
@@ -55,5 +64,34 @@ public class WorkController {
         List<TaPoint> pointList = taPonitMapper.getPointsByPage();
         request.setAttribute("pointList",pointList);
         return JspPageConst.EXPORT_DATA_RECODE_JSP_REDIRECT;
+    }
+
+    @RequestMapping(value = "work/exportDataRecodeDo")
+    public void exportDataRecodeDo(HttpServletRequest request) throws Exception {
+        String pointIds = request.getParameter("pointIds");
+        String startExpDate = request.getParameter("startExpDate");
+        String endExpDate = request.getParameter("endExpDate");
+        String pointsInStr = "";
+        if(toolHelper.isEmpty(pointIds)){
+            throw new Exception("请选择点信息");
+        }
+        if(toolHelper.isEmpty(startExpDate)){
+            throw new Exception("请选择导出开始时间");
+        }
+        if(toolHelper.isEmpty(endExpDate)){
+            throw new Exception("请选择导出结束时间");
+        }
+        for(String str : pointIds.split(";")){
+            if(toolHelper.isEmpty(pointsInStr)){
+                pointsInStr = str;
+            }else{
+                pointsInStr = pointsInStr+","+str;
+            }
+        }
+        //取点信息
+        List<TaPoint> taPointList = taPointService.getPointsByPointIds(pointsInStr);
+        //取点数据
+        List<TaPointData> taPointDataList = taPonitDataMapper.queryPointData(startExpDate, endExpDate, pointsInStr);
+        csvHelper.writeCSV(taPointList,taPointDataList);
     }
 }

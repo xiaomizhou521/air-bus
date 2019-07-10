@@ -27,6 +27,11 @@ public class TaPointService {
         return pointsByPage;
     }
 
+    public List<TaPoint> getPointsByPointIds(String pointIds){
+        List<TaPoint> pointsByPage = taPonitMapper.getPointsByPointIds(pointIds);
+        return pointsByPage;
+    }
+
     public TaPoint findPointByPointName(String pointName){
         return taPonitMapper.findPointByPointName(pointName);
     }

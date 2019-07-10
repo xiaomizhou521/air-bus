@@ -8,4 +8,8 @@
         VALUES (#{pointId}, #{createTime}, #{dateShow}, #{hourShow}, #{pointData});
     </insert>
 
+    <select id="queryPointData" resultType="com.main.data_show.pojo.TaPointData">
+        select * from ta_point_data where point_id in (${pointIds}) and create_time between date_format(#{startExpDate},'%Y%m%d')and date_format(#{endExpDate},'%Y%m%d') order by create_time asc,point_id asc
+    </select>
+
 </mapper>
