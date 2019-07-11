@@ -8,6 +8,7 @@ import com.main.data_show.mapper.TaPonitDataMapper;
 import com.main.data_show.mapper.TaPonitMapper;
 import com.main.data_show.pojo.TaPoint;
 import com.main.data_show.pojo.TaPointData;
+import com.main.data_show.service.TaPointDataService;
 import com.main.data_show.service.TaPointService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 public class WorkController {
@@ -31,6 +33,9 @@ public class WorkController {
 
     @Resource
     private TaPonitDataMapper taPonitDataMapper;
+
+    @Resource
+    private TaPointDataService taPointDataService;
 
     @Autowired
     private CSVHelper csvHelper;
@@ -92,6 +97,44 @@ public class WorkController {
         List<TaPoint> taPointList = taPointService.getPointsByPointIds(pointsInStr);
         //取点数据
         List<TaPointData> taPointDataList = taPonitDataMapper.queryPointData(startExpDate, endExpDate, pointsInStr);
-        csvHelper.writeCSV(taPointList,taPointDataList);
+        csvHelper.writeCSV1(taPointList,taPointDataList);
+    }
+
+    @RequestMapping(value = "work/toExportUsageRecode")
+    public String toExportUsageRecode(HttpServletRequest request) {
+        //取得电表或者水表的点
+        List<TaPoint> pointList = taPonitMapper.getPointsByPage();
+        request.setAttribute("pointList",pointList);
+        return JspPageConst.EXPORT_USEAGE_RECODE_JSP_REDIRECT;
+    }
+
+    @RequestMapping(value = "work/exportUsageRecodeDo")
+    public void exportUsageRecodeDo(HttpServletRequest request) throws Exception {
+        String pointIds = request.getParameter("pointIds");
+        String startExpDate = request.getParameter("startExpDate");
+        String endExpDate = request.getParameter("endExpDate");
+        String takeTime = request.getParameter("takeTime");
+        String pointsInStr = "";
+        if(toolHelper.isEmpty(pointIds)){
+            throw new Exception("请选择点信息");
+        }
+        if(toolHelper.isEmpty(startExpDate)){
+            throw new Exception("请选择导出开始时间");
+        }
+        if(toolHelper.isEmpty(endExpDate)){
+            throw new Exception("请选择导出结束时间");
+        }
+        for(String str : pointIds.split(";")){
+            if(toolHelper.isEmpty(pointsInStr)){
+                pointsInStr = str;
+            }else{
+                pointsInStr = pointsInStr+","+str;
+            }
+        }
+        //取点信息
+        List<TaPoint> taPointList = taPointService.getPointsByPointIds(pointsInStr);
+        //取点数据
+        List<TaPointData> taPointDataList = taPointDataService.queryPointDataSum(startExpDate, endExpDate, takeTime,pointsInStr);
+        csvHelper.writeCSV2(taPointList,taPointDataList,takeTime);
     }
 }

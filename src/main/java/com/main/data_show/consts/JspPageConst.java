@@ -16,5 +16,7 @@ public class JspPageConst {
 
     public static String EXPORT_DATA_RECODE_JSP_REDIRECT = "work/export_data_recode";
 
+    public static String EXPORT_USEAGE_RECODE_JSP_REDIRECT = "work/export_useage_recode";
+
 
 }

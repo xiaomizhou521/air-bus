@@ -5,4 +5,6 @@ public class SysConsts {
     public static int DEF_SYS_USER_ID = -1;
 
     public static String DATE_FORMAT = "yyyy/MM/dd HH:mm:ss";
+
+    public static String DATE_FORMAT_1 = "yyyy-MM-dd HH:mm:ss";
 }
