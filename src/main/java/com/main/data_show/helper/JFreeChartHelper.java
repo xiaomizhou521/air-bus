@@ -3,16 +3,26 @@ package com.main.data_show.helper;
 import com.main.data_show.consts.SysConsts;
 import com.main.data_show.pojo.TaPoint;
 import com.main.data_show.pojo.TaPointData;
-import org.jfree.chart.*;
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartFrame;
+import org.jfree.chart.ChartUtilities;
+import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.*;
+import org.jfree.chart.labels.ItemLabelAnchor;
+import org.jfree.chart.labels.ItemLabelPosition;
+import org.jfree.chart.labels.StandardCategoryItemLabelGenerator;
 import org.jfree.chart.plot.CategoryPlot;
+import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.renderer.category.BarRenderer;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
+import org.jfree.data.RangeType;
+import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.data.time.Hour;
-import org.jfree.data.time.Month;
 import org.jfree.data.time.TimeSeries;
 import org.jfree.data.time.TimeSeriesCollection;
 import org.jfree.ui.RectangleInsets;
+import org.jfree.ui.TextAnchor;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -21,8 +31,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,23 +42,24 @@ public class JFreeChartHelper {
     @Resource
     private ToolHelper toolHelper;
 
-    public static void main1(String[] args) {
-        // 步骤1：创建CategoryDataset对象（准备数据）
-        TimeSeriesCollection dataset = createDataset();
-        // 步骤2：根据Dataset 生成JFreeChart对象，以及做相应的设置
-        JFreeChart freeChart = createChart(dataset);
-        // 步骤3：将JFreeChart对象输出到文件，Servlet输出流等
-        saveAsFile(freeChart, "C:\\Users\\Administrator\\Desktop\\call\\testline.png", 500, 300);
-    }
-
-    //生成设备图表开始
+    //生成设备图表开始 折线图
     public void createDeviceChartStart(java.util.List<TaPoint> taPointList, List<TaPointData> taPointDataList){
          // 步骤1：创建CategoryDataset对象（准备数据）
         TimeSeriesCollection dataset = createDeviceChartDate(taPointList,taPointDataList);
         // 步骤2：根据Dataset 生成JFreeChart对象，以及做相应的设置
         JFreeChart freeChart = createChart(dataset);
         // 步骤3：将JFreeChart对象输出到文件，Servlet输出流等
-        saveAsFile(freeChart, "C:\\01work\\priv_work190415\\CSV_test\\testline.png", 1000, 500);
+        saveAsFile(freeChart, "C:\\01work\\priv_work190415\\CSV_test\\zhexin.png", 1000, 500);
+    }
+
+    //生成设备图表开始 柱形图
+    public void createUsageDeviceChartStart(java.util.List<TaPoint> taPointList, List<TaPointData> taPointDataList) throws IOException {
+        // 步骤1：创建CategoryDataset对象（准备数据）
+        DefaultCategoryDataset usageDeviceChartData = createUsageDeviceChartData(taPointList, taPointDataList);
+        // 步骤2：根据Dataset 生成JFreeChart对象，以及做相应的设置
+        JFreeChart freeChart = createUageChart(usageDeviceChartData);
+        // 步骤3：将JFreeChart对象输出到文件，Servlet输出流等
+        saveAsFile(freeChart, "C:\\01work\\priv_work190415\\CSV_test\\zhuxing.png", 1000, 500);
     }
 
     public TimeSeriesCollection createDeviceChartDate(java.util.List<TaPoint> taPointList, List<TaPointData> taPointDataList){
@@ -85,40 +96,22 @@ public class JFreeChartHelper {
         return lineDataset;
     }
 
-    // 创建TimeSeriesCollection对象
-    public static TimeSeriesCollection createDataset() {
-        TimeSeriesCollection lineDataset = new TimeSeriesCollection();
-        TimeSeries timeSeries = new TimeSeries("统计",Month.class);
-        timeSeries.add(new Month(1, 2007), 11200);
-        timeSeries.add(new Month(2, 2007), 9000);
-        timeSeries.add(new Month(3, 2007), 6200);
-        timeSeries.add(new Month(4, 2007), 8200);
-        timeSeries.add(new Month(5, 2007), 8200);
-        timeSeries.add(new Month(6, 2007), 12200);
-        timeSeries.add(new Month(7, 2007), 13200);
-        timeSeries.add(new Month(8, 2007), 8300);
-        timeSeries.add(new Month(9, 2007), 12400);
-        timeSeries.add(new Month(10, 2007), 12500);
-        timeSeries.add(new Month(11, 2007), 13600);
-        timeSeries.add(new Month(12, 2007), 12500);
-
-        TimeSeries timeSeries1 = new TimeSeries("统计1",Month.class);
-        timeSeries1.add(new Month(1, 2007), 112001);
-        timeSeries1.add(new Month(2, 2007), 90001);
-        timeSeries1.add(new Month(3, 2007), 62001);
-        timeSeries1.add(new Month(4, 2007), 82001);
-        timeSeries1.add(new Month(5, 2007), 82001);
-        timeSeries1.add(new Month(6, 2007), 122001);
-        timeSeries1.add(new Month(7, 2007), 132001);
-        timeSeries1.add(new Month(8, 2007), 83001);
-        timeSeries1.add(new Month(9, 2007), 124001);
-        timeSeries1.add(new Month(10, 2007), 125001);
-        timeSeries1.add(new Month(11, 2007), 136001);
-        timeSeries1.add(new Month(12, 2007), 125001);
-
-        lineDataset.addSeries(timeSeries);
-        lineDataset.addSeries(timeSeries1);
-        return lineDataset;
+    public DefaultCategoryDataset createUsageDeviceChartData(java.util.List<TaPoint> taPointList, List<TaPointData> taPointDataList){
+        Map<Integer,String> ponitMap = new HashMap<>();
+        for(TaPoint pointVo : taPointList){
+            ponitMap.put(pointVo.getPointId(),"点名："+pointVo.getPointName()+"("+pointVo.getRemarksName()+")"+",类型："+pointVo.getPointType()+",单位："+pointVo.getPointUnit());
+        }
+        DefaultCategoryDataset dateSet = new DefaultCategoryDataset();
+        dateSet.setValue(100,"好","苹果");
+        //创造图标数据
+        for(TaPointData pointDateVo : taPointDataList){
+            if(toolHelper.isNumeric(pointDateVo.getPointData())){
+                dateSet.setValue(Double.valueOf(pointDateVo.getPointData()),ponitMap.get(pointDateVo.getPointId()),pointDateVo.getDateShow()+pointDateVo.getHourShow());
+            }else{
+                dateSet.setValue(0,ponitMap.get(pointDateVo.getPointId()),pointDateVo.getDateShow()+pointDateVo.getHourShow());
+            }
+        }
+        return dateSet;
     }
 
     // 根据CategoryDataset生成JFreeChart对象
@@ -177,16 +170,6 @@ public class JFreeChartHelper {
         return jfreechart;
     }
 
-    // 本地测试
-    public static void main(String[] args) {
-        // 步骤1：创建CategoryDataset对象（准备数据）
-        TimeSeriesCollection dataset = createDataset();
-//		// 步骤2：根据Dataset 生成JFreeChart对象，以及做相应的设置
-//		JFreeChart freeChart = createChart(dataset);
-        ChartFrame cf = new ChartFrame("Test", createChart(dataset));
-        cf.pack();
-        cf.setVisible(true);
-    }
 
     // 保存为文件
     public static void saveAsFile(JFreeChart chart, String outputPath,
@@ -218,5 +201,45 @@ public class JFreeChartHelper {
         }
     }
 
+    public JFreeChart createUageChart(DefaultCategoryDataset dateSet) throws IOException {
+        JFreeChart chart = ChartFactory.createBarChart("柱状图",//标题
+                "水果",//目录轴的显示标签
+                "单位:百万",//数值的显示标签
+                dateSet,//数据
+                PlotOrientation.VERTICAL,//图标方向  水平/垂直
+                true,//是否显示图例
+                false,//是否生成工具
+                false); //是否生成URL链接
+
+        CategoryPlot categoryPlot = chart.getCategoryPlot();//图部分
+        CategoryAxis domainAxis = categoryPlot.getDomainAxis();//X轴
+
+        domainAxis.setCategoryLabelPositions(CategoryLabelPositions.DOWN_90);//X轴下标  90°显示
+        domainAxis.setMaximumCategoryLabelLines(10);//自动换行    最多显示多少行
+        domainAxis.setLabelFont(new Font("黑体",Font.BOLD,20));//下标
+        domainAxis.setTickLabelFont(new Font("宋体",Font.BOLD,20));//X轴标题
+        ValueAxis rangeAxis = categoryPlot.getRangeAxis();//Y轴
+        rangeAxis.setLabelFont(new Font("黑体",Font.BOLD,20));//下标
+        rangeAxis.setTickLabelFont(new Font("宋体",Font.BOLD,20));//Y轴标题
+
+        NumberAxis numberAxis = (NumberAxis) categoryPlot.getRangeAxis();
+        numberAxis.setAutoTickUnitSelection(false);//取消自动设置Y轴刻度
+        numberAxis.setTickUnit(new NumberTickUnit(10));//刻度大小
+        numberAxis.setAutoRangeStickyZero(true);//和下面一行搭配使用   设置Y轴都是正数
+        numberAxis.setRangeType(RangeType.POSITIVE);
+        numberAxis.setNumberFormatOverride(new DecimalFormat("0.00"));//设置Y轴上的数值精度
+
+        chart.getLegend().setItemFont( new Font("黑体",Font.BOLD,20));//图标字体
+        chart.getTitle().setFont( new Font("黑体",Font.BOLD,20));
+        BarRenderer renderer = (BarRenderer) categoryPlot.getRenderer();//图形修改
+      //  renderer.setDefaultItemLabelGenerator(new StandardCategoryItemLabelGenerator("{2}",new DecimalFormat("0.00")));//设置柱状图上的数值精度
+        renderer.setItemMargin(0);//设置柱子之间的距离
+        renderer.setPositiveItemLabelPositionFallback(new ItemLabelPosition(ItemLabelAnchor.OUTSIDE12, TextAnchor.BOTTOM_CENTER));
+       // renderer.setDefaultItemLabelFont(new Font("黑体",Font.BOLD,20));
+        renderer.setDrawBarOutline(false);
+        renderer.setMaximumBarWidth(0.4); //设置柱子宽度
+        renderer.setMinimumBarLength(0.00); //设置柱子高度
+        return chart;
+    }
 
 }

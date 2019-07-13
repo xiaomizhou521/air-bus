@@ -50,7 +50,7 @@
         <div style="width:1100px;margin:auto;margin-top:20px;">
             <table>
                 <tr>
-                <td style="width: 200px">请选择要导出图表的点:</td>
+                <td style="width: 200px">请选择要生成图表的点:</td>
                 <td>
                     <ul class="pagination" style="width: 100%;margin:0px">
                         <c:forEach items="${pointList}" var="res" varStatus="index">

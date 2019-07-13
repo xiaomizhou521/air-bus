@@ -1,6 +1,7 @@
 package com.main.data_show.helper;
 
 import com.main.data_show.consts.SysConsts;
+import org.apache.catalina.startup.Catalina;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 
@@ -85,7 +86,20 @@ public class ToolHelper {
     }
 
     public static void main(String[] args) throws ParseException {
-      //  System.out.println(makeDateByDateAndHour("2019/3/11","2:00:00\n"));
+        System.out.println(getWeekMonday(2019,30));
+    }
+
+    //取得某年某周的 周一 0点的时间
+    public static Date getWeekMonday(int year,int week){
+        Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.YEAR, year); // 2016年
+        cal.set(Calendar.WEEK_OF_YEAR, week); // 设置为2016年的第10周
+        cal.set(Calendar.DAY_OF_WEEK, 1); // 1表示周日，2表示周一，7表示周六
+        cal.set(Calendar.HOUR_OF_DAY,0);
+        cal.set(Calendar.MINUTE,0);
+        cal.set(Calendar.SECOND,0);
+        Date date = cal.getTime();
+        return date;
     }
 
 }

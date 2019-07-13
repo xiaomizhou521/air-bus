@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.jsp.JspPage;
 import java.util.List;
 import java.util.Map;
 
@@ -66,6 +67,18 @@ public class WorkController {
         return JspPageConst.TO_POINT_LIST_JSP_REDIRECT;
     }
 
+    @RequestMapping(value = "work/toEditPoint")
+    public String toEditPoint(HttpServletRequest request) {
+        String pointId = request.getParameter("pointId");
+
+        return JspPageConst.TO_EDIT_POINT_JSP_REDIRECT;
+    }
+
+    @RequestMapping(value = "work/editPointDo")
+    public String editPointDo(HttpServletRequest request) {
+
+        return JspPageConst.REDIRECT_TO_POINT_LIST_JSP_REDIRECT;
+    }
 
     @RequestMapping(value = "work/toExportDataRecode")
     public String toExportDataRecode(HttpServletRequest request) {
@@ -180,5 +193,15 @@ public class WorkController {
         List<TaPointData> taPointDataList = taPointDataService.queryPointDeviceChart(startExpDate, endExpDate,pointsInStr);
 
         jFreeChartHelper.createDeviceChartStart(taPointList,taPointDataList);
+
+        jFreeChartHelper.createUsageDeviceChartStart(taPointList,taPointDataList);
+    }
+
+    @RequestMapping(value = "work/toExportUsageDeviceChart")
+    public String toExportUsageDeviceChart(HttpServletRequest request) throws Exception {
+        //取得非 电表水表的点
+        List<TaPoint> pointList = taPonitMapper.getPointsByPage();
+        request.setAttribute("pointList",pointList);
+        return JspPageConst.EXPORT_USAGE_DEVICE_CHAER_JSP_REDIRECT;
     }
 }

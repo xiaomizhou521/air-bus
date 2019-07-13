@@ -13,20 +13,23 @@
     <link rel="stylesheet" type="text/css" href="../static/js/bootstrap/css/bootstrap.css">
     <script type="text/javascript" src="../static/js/bootstrap/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="../static/js/jquery/jquery-1.11.1.js" ></script>
+    <script>
+
+    </script>
 </head>
 <body>
 <table class="table table-bordered table-striped table-condensed" >
     <tr><th style="width:50px;">点ID</th><th>点名</th><th>点别名</th><th>点单位</th><th>楼号</th><th>操作</th></tr>
-<c:forEach items="${pointList}" var="res">
-    <tr>
-         <td>${res.pointId}</td>
-         <td>${res.pointName}</td>
-         <td>${res.remarksName}</td>
-         <td>${res.pointUnit}</td>
-         <td>${res.blockNo}</td>
-         <td><a href="javaScript:void(0);" onclick="toEditPoint('${res.pointName}');">修改</a></td>
-    </tr>
-</c:forEach>
+    <c:forEach items="${pointList}" var="res">
+        <tr>
+             <td>${res.pointId}</td>
+             <td>${res.pointName}</td>
+             <td>${res.remarksName}</td>
+             <td>${res.pointUnit}</td>
+             <td>${res.blockNo}</td>
+             <td><a href="/work/toEditPoint?pointId=${res.pointId}" >修改</a></td>
+        </tr>
+    </c:forEach>
     <tr style="line-height: 10px;">
         <td colspan="6">
             <ul class="pagination" style="width: 100%;margin:0px">
