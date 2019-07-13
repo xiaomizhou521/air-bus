@@ -1,25 +1,36 @@
 package com.main.data_show.helper;
 
-import org.jfree.chart.ChartFactory;
-import org.jfree.chart.ChartFrame;
-import org.jfree.chart.ChartUtilities;
-import org.jfree.chart.JFreeChart;
-import org.jfree.chart.axis.DateAxis;
+import com.main.data_show.consts.SysConsts;
+import com.main.data_show.pojo.TaPoint;
+import com.main.data_show.pojo.TaPointData;
+import org.jfree.chart.*;
+import org.jfree.chart.axis.*;
+import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
+import org.jfree.data.time.Hour;
 import org.jfree.data.time.Month;
 import org.jfree.data.time.TimeSeries;
 import org.jfree.data.time.TimeSeriesCollection;
 import org.jfree.ui.RectangleInsets;
+import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.awt.*;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
+@Service
 public class JFreeChartHelper {
+    @Resource
+    private ToolHelper toolHelper;
 
     public static void main1(String[] args) {
         // 步骤1：创建CategoryDataset对象（准备数据）
@@ -28,6 +39,50 @@ public class JFreeChartHelper {
         JFreeChart freeChart = createChart(dataset);
         // 步骤3：将JFreeChart对象输出到文件，Servlet输出流等
         saveAsFile(freeChart, "C:\\Users\\Administrator\\Desktop\\call\\testline.png", 500, 300);
+    }
+
+    //生成设备图表开始
+    public void createDeviceChartStart(java.util.List<TaPoint> taPointList, List<TaPointData> taPointDataList){
+         // 步骤1：创建CategoryDataset对象（准备数据）
+        TimeSeriesCollection dataset = createDeviceChartDate(taPointList,taPointDataList);
+        // 步骤2：根据Dataset 生成JFreeChart对象，以及做相应的设置
+        JFreeChart freeChart = createChart(dataset);
+        // 步骤3：将JFreeChart对象输出到文件，Servlet输出流等
+        saveAsFile(freeChart, "C:\\01work\\priv_work190415\\CSV_test\\testline.png", 1000, 500);
+    }
+
+    public TimeSeriesCollection createDeviceChartDate(java.util.List<TaPoint> taPointList, List<TaPointData> taPointDataList){
+        Map<Integer,String> ponitMap = new HashMap<>();
+        for(TaPoint pointVo : taPointList){
+            ponitMap.put(pointVo.getPointId(),"点名："+pointVo.getPointName()+"("+pointVo.getRemarksName()+")"+",类型："+pointVo.getPointType()+",单位："+pointVo.getPointUnit());
+        }
+        Map<Integer,TimeSeries> pointDateMap = new HashMap<>();
+        //创造图标数据
+        for(TaPointData pointDateVo : taPointDataList){
+            TimeSeries timeSeries = null;
+            if(pointDateMap.containsKey(pointDateVo.getPointId())){
+                 timeSeries = pointDateMap.get(pointDateVo.getPointId());
+                if(toolHelper.isNumeric(pointDateVo.getPointData())){
+                    timeSeries.add(new Hour(pointDateVo.getCreateTime()), Double.valueOf(pointDateVo.getPointData()));
+                }else{
+                    timeSeries.add(new Hour(pointDateVo.getCreateTime()), 0);
+                }
+            }else{
+                 timeSeries = new TimeSeries(ponitMap.get(pointDateVo.getPointId()), Hour.class);
+                if(toolHelper.isNumeric(pointDateVo.getPointData())){
+                    timeSeries.add(new Hour(pointDateVo.getCreateTime()), Double.valueOf(pointDateVo.getPointData()));
+                }else{
+                    timeSeries.add(new Hour(pointDateVo.getCreateTime()), 0);
+                }
+                pointDateMap.put(pointDateVo.getPointId(),timeSeries);
+            }
+        }
+        //遍历 map 每个都是一条时间折线
+        TimeSeriesCollection lineDataset = new TimeSeriesCollection();
+        for(Map.Entry<Integer,TimeSeries> map : pointDateMap.entrySet()){
+            lineDataset.addSeries(map.getValue());
+        }
+        return lineDataset;
     }
 
     // 创建TimeSeriesCollection对象
@@ -69,14 +124,13 @@ public class JFreeChartHelper {
     // 根据CategoryDataset生成JFreeChart对象
     public static JFreeChart createChart(TimeSeriesCollection lineDataset) {
         JFreeChart jfreechart = ChartFactory.createTimeSeriesChart(
-                "统计", 		// 标题
-                "月份", 		// categoryAxisLabel （category轴，横轴，X轴的标签）
-                "访问量", 	// valueAxisLabel（value轴，纵轴，Y轴的标签）
+                "设备图表", 		// 标题
+                "时间", 		// categoryAxisLabel （category轴，横轴，X轴的标签）
+                "值", 	// valueAxisLabel（value轴，纵轴，Y轴的标签）
                 lineDataset,// dataset
                 true, 		// legend
                 true, 		// tooltips
                 true); 		// URLs
-
 
         // 配置字体（解决中文乱码的通用方法）
         Font xfont = new Font("宋体", Font.PLAIN, 16); // X轴
@@ -86,16 +140,16 @@ public class JFreeChartHelper {
 
         jfreechart.setBackgroundPaint(Color.white);
         XYPlot xyplot = (XYPlot) jfreechart.getPlot(); // 获得 plot：XYPlot！
-
         xyplot.getDomainAxis().setLabelFont(xfont);
         xyplot.getRangeAxis().setLabelFont(yfont);
         jfreechart.getLegend().setItemFont(kfont);
         jfreechart.getTitle().setFont(titleFont);
-
-        //设置时间格式，同时也解决了乱码问题
+        //设置时间格式，及间隔,同时也解决了乱码问题
         DateAxis dateaxis = (DateAxis)xyplot.getDomainAxis();
-        SimpleDateFormat sfd = new SimpleDateFormat("yy-MM");
+        SimpleDateFormat sfd = new SimpleDateFormat(SysConsts.DATE_FORMAT_2);
         dateaxis.setDateFormatOverride(sfd);
+        dateaxis.setTickUnit(new DateTickUnit(DateTickUnit.HOUR, 1, new SimpleDateFormat(SysConsts.DATE_FORMAT_2)));
+        dateaxis.setVerticalTickLabels(true);
         xyplot.setDomainAxis(dateaxis);
 
         // 以下的设置可以由用户定制，也可以省略
@@ -145,7 +199,7 @@ public class JFreeChartHelper {
             }
             out = new FileOutputStream(outputPath);
             // 保存为PNG文件
-            ChartUtilities.writeChartAsPNG(out, chart, 600, 350);
+            ChartUtilities.writeChartAsPNG(out, chart, weight, height);
             // 保存为JPEG文件
             //ChartUtilities.writeChartAsJPEG(out, chart, 500, 400);
             out.flush();

@@ -40,4 +40,10 @@ public class TaPointDataService {
         return taPonitDataMapper.queryPointDataSum(subStartExp,endExp,pointIds);
     }
 
+    public List<TaPointData> queryPointDeviceChart(String startExpDate, String endExpDate,String pointIds) throws ParseException {
+        Date startExp = toolHelper.makeStrToDate(startExpDate, SysConsts.DATE_FORMAT_1);
+        Date endExp = toolHelper.makeStrToDate(endExpDate, SysConsts.DATE_FORMAT_1);
+        return taPonitDataMapper.queryPointDeviceChart(startExp,endExp,pointIds);
+    }
+
 }

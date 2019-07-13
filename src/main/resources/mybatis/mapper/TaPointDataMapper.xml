@@ -24,4 +24,13 @@
                  group by t.point_id,t.create_time]]>
     </select>
 
+    <!--这是非电量，水量的其他点一段时间的折线图-->
+    <select id="queryPointDeviceChart" resultType="com.main.data_show.pojo.TaPointData">
+        <![CDATA[select * from ta_point_data t
+                  where t.point_id in (${pointIds})
+                 and t.create_time >= #{startExpDate}
+                 and t.create_time <= #{endExpDate}
+                  order by t.point_id asc,t.create_time asc]]>
+    </select>
+
 </mapper>

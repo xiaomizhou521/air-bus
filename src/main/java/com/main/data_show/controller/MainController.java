@@ -175,11 +175,4 @@ public class MainController {
         return dataset;
     }
 
-    @RequestMapping(value = "findAll")
-    public String findAll(HttpServletRequest request) {
-        List<TaUser> list = userService.findAll();
-        request.setAttribute("userlist", list);
-        return "user_list";
-    }
-
 }

@@ -7,4 +7,6 @@ public class SysConsts {
     public static String DATE_FORMAT = "yyyy/MM/dd HH:mm:ss";
 
     public static String DATE_FORMAT_1 = "yyyy-MM-dd HH:mm:ss";
+
+    public static String DATE_FORMAT_2 = "yy-MM-dd HH";
 }

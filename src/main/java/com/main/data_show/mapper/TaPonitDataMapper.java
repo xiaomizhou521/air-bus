@@ -16,4 +16,6 @@ public interface TaPonitDataMapper {
 
     public List<TaPointData> queryPointDataSum(Date startExpDate, Date endExpDate, @Param("pointIds") String pointIds);
 
+    public List<TaPointData> queryPointDeviceChart(Date startExpDate, Date endExpDate, @Param("pointIds") String pointIds);
+
 }
