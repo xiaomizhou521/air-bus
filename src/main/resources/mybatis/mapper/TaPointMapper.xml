@@ -8,8 +8,22 @@
         VALUES (#{pointName}, #{remarksName}, #{pointType}, #{pointUnit}, #{blockNo}, #{state}, now(), #{initUser}, now(), #{modUser});
     </insert>
 
+    <insert id="updateTaPointByPointID"  parameterType="com.main.data_show.pojo.TaPoint" >
+        <![CDATA[update ta_point set remarks_name =#{remarksName},
+                 point_type=#{pointType},
+                 point_unit=#{pointUnit},
+                 block_no=#{blockNo},
+                 mod_date=now(),
+                 mod_user = #{modUser}
+                 where point_id = #{pointId}]]>
+    </insert>
+
     <select id="findPointByPointName" resultType="com.main.data_show.pojo.TaPoint">
         select * from ta_point where point_name = #{point_name}
+    </select>
+
+    <select id="findPointByPointId" resultType="com.main.data_show.pojo.TaPoint">
+        <![CDATA[select * from ta_point where point_id = #{point_id}]]>
     </select>
 
     <select id="getPointsByPage" resultType="com.main.data_show.pojo.TaPoint">

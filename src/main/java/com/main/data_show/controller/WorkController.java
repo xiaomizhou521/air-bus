@@ -70,13 +70,27 @@ public class WorkController {
     @RequestMapping(value = "work/toEditPoint")
     public String toEditPoint(HttpServletRequest request) {
         String pointId = request.getParameter("pointId");
-
+        TaPoint pointVo = taPonitMapper.findPointByPointId(Integer.parseInt(pointId));
+        request.setAttribute("pointVo",pointVo);
         return JspPageConst.TO_EDIT_POINT_JSP_REDIRECT;
     }
 
     @RequestMapping(value = "work/editPointDo")
-    public String editPointDo(HttpServletRequest request) {
-
+    public String editPointDo(HttpServletRequest request) throws Exception {
+        String pointId = request.getParameter("pointId");
+        String remarksName = request.getParameter("remarksName");
+        String pointType = request.getParameter("pointType");
+        String pointUnit = request.getParameter("pointUnit");
+        String blockNo = request.getParameter("blockNo");
+        TaPoint pointVo = taPonitMapper.findPointByPointId(Integer.parseInt(pointId));
+        if(pointVo == null){
+            throw new Exception("点信息不存在");
+        }
+        pointVo.setRemarksName(remarksName);
+        pointVo.setPointType(pointType);
+        pointVo.setPointUnit(pointUnit);
+        pointVo.setBlockNo(blockNo);
+        taPointService.update(pointVo);
         return JspPageConst.REDIRECT_TO_POINT_LIST_JSP_REDIRECT;
     }
 
