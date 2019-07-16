@@ -10,9 +10,9 @@
 <html>
 <head>
     <title>点列表</title>
-    <link rel="stylesheet" type="text/css" href="../static/js/bootstrap/css/bootstrap.css">
-    <script type="text/javascript" src="../static/js/bootstrap/js/bootstrap.min.js"></script>
-    <script type="text/javascript" src="../static/js/jquery/jquery-1.11.1.js" ></script>
+    <link rel="stylesheet" type="text/css" href="../static/css/bootstrap/bootstrap.css">
+    <script type="text/javascript" src="../static/css/bootstrap/jquery-1.11.1.js" ></script>
+    <script type="text/javascript" src="../static/css/bootstrap/bootstrap.min.js"></script>
     <script>
 
     </script>

@@ -16,13 +16,14 @@ public class ExcelImportTask {
     @Resource
     private CSVHelper csvHelper;
 
- /*   @Scheduled(fixedRate = 50000)
-    public void importExcelStart(){
-       // csvHelper.readCSV();
-        System.out.println("开始导入excel");
+/*   @Scheduled(fixedRate = 50000)*/
+   @Scheduled(cron = "0 30 2 * * ?")
+   public void importExcelStart(){
+       System.out.println("开始导入excel");
+       csvHelper.exportPointBaseData();
     }
 
-    @Scheduled(fixedRate = 15000)
+ /*    @Scheduled(fixedRate = 15000)
     public void exportExcelStart() throws Exception {
         System.out.println("------------------开始导出excel");
         throw new Exception("异常啦---------------");

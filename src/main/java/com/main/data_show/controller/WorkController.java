@@ -1,5 +1,6 @@
 package com.main.data_show.controller;
 
+import cn.com.enorth.utility.Beans;
 import com.github.pagehelper.PageInfo;
 import com.main.data_show.consts.JspPageConst;
 import com.main.data_show.helper.CSVHelper;
@@ -11,15 +12,22 @@ import com.main.data_show.pojo.TaPoint;
 import com.main.data_show.pojo.TaPointData;
 import com.main.data_show.service.TaPointDataService;
 import com.main.data_show.service.TaPointService;
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+import net.sf.json.JsonConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.jsp.JspPage;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+
+import static org.apache.logging.log4j.message.MapMessage.MapFormat.JSON;
 
 @Controller
 public class WorkController {
@@ -44,6 +52,7 @@ public class WorkController {
 
     @Autowired
     private JFreeChartHelper jFreeChartHelper;
+
 
     @RequestMapping(value = "work/toPointList")
     public String toPointList(HttpServletRequest request) {
@@ -218,4 +227,47 @@ public class WorkController {
         request.setAttribute("pointList",pointList);
         return JspPageConst.EXPORT_USAGE_DEVICE_CHAER_JSP_REDIRECT;
     }
+
+    @RequestMapping(value = "work/toLoadPointSelect")
+    public String toLoadPointSelect(HttpServletRequest request) throws Exception {
+        String data_recode = request.getParameter("selectId");
+        request.setAttribute("selectId",data_recode);
+        //取得所有点
+        List<TaPoint> pointList = taPonitMapper.getPointsByPage();
+        request.setAttribute("pointList",pointList);
+        return JspPageConst.LOAD__POINT_SELECT_JSP_REDIRECT;
+    }
+
+    @RequestMapping(value = "work/findPoints")
+    public void findPoints(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        response.setCharacterEncoding(Beans.UTF_8);
+        JSONObject result = new JSONObject();
+        try {
+            String pointName = request.getParameter("pointName");
+            List<TaPoint> points = null;
+         /*   if(toolHelper.isEmpty(pointName)){*/
+                points = taPointService.likePointByPointName(pointName);
+           /* }else{
+                points = taPonitMapper.getPointsByPage();
+            }*/
+            JSONArray jsonarray = new JSONArray();
+            for(TaPoint vo : points){
+                JSONObject json = new JSONObject();
+                json.put("pointId",vo.getPointId());
+                json.put("pointName",vo.getPointName());
+                jsonarray.add(json);
+            }
+            result.put("code",1);
+            result.put("data",jsonarray);
+        } catch (Exception e) {
+            e.printStackTrace();
+            result.put("code",-1);
+            result.put("data",e.getMessage());
+        } finally {
+            response.getWriter().print(result);
+            response.getWriter().flush();
+            response.getWriter().close();
+        }
+    }
+
 }

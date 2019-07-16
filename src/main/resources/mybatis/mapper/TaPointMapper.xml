@@ -31,6 +31,12 @@
     </select>
 
     <select id="getPointsByPointIds" resultType="com.main.data_show.pojo.TaPoint">
-        select * from ta_point where  point_id in (${pointIds}) order by point_id asc
+        select * from ta_point where  point_id in (${pointIds}) order by point_name asc
+    </select>
+
+    <select id="likePointByPointName" resultType="com.main.data_show.pojo.TaPoint">
+        <![CDATA[select * from ta_point
+                 where point_name
+                 like CONCAT('%',#{point_name},'%') order by point_name asc]]>
     </select>
 </mapper>

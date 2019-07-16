@@ -40,6 +40,10 @@ public class TaPointService {
         return taPonitMapper.findPointByPointName(pointName);
     }
 
+    public List<TaPoint> likePointByPointName(String pointName){
+        return taPonitMapper.likePointByPointName(pointName);
+    }
+
     public TaPoint findPointByPointId(int pointId){
         return taPonitMapper.findPointByPointId(pointId);
     }

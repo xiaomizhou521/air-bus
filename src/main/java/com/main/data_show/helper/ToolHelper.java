@@ -32,6 +32,18 @@ public class ToolHelper {
         String md5 = DigestUtils.md5DigestAsHex(base.getBytes());
         return md5;
     }
+    //7/2/2019  变   2019/7/2
+    public String dateStrFormatStr(String dateStr) throws Exception {
+        String[] dateList = dateStr.split("/");
+        if(dateList.length!=3){
+           throw new Exception("日期字符串："+dateStr+",格式不正确");
+       }
+        StringBuffer sb = new StringBuffer();
+        sb.append(dateList[2]).append("/");
+        sb.append(dateList[0]).append("/");
+        sb.append(dateList[1]);
+        return sb.toString();
+    }
     //日期字符串和小时字符串拼成时间
     public Date makeDateByDateAndHour(String dateStr,String hourStr) throws ParseException {
         Date date = makeStrToDate(dateStr+" "+hourStr,SysConsts.DATE_FORMAT);

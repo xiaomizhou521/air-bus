@@ -26,5 +26,7 @@ public class JspPageConst {
 
     public static String EXPORT_USAGE_DEVICE_CHAER_JSP_REDIRECT = "work/export_useage_device_chart";
 
+    public static String LOAD__POINT_SELECT_JSP_REDIRECT = "common/point_select";
+
 
 }

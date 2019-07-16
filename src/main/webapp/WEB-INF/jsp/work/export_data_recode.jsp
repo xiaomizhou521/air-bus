@@ -1,20 +1,23 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%--
-  Created by IntelliJ IDEA.
-  User: xiaox
-  Date: 2019/7/9
-  Time: 22:08
-  To change this template use File | Settings | File Templates.
---%>
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
 <html>
 <head>
     <title>Title</title>
-    <link rel="stylesheet" type="text/css" href="../static/js/bootstrap/css/bootstrap.css">
-    <script type="text/javascript" src="../static/js/bootstrap/js/bootstrap.min.js"></script>
-    <script type="text/javascript" src="../static/js/jquery/jquery-1.11.1.js" ></script>
+    <link rel="stylesheet" type="text/css" href="../static/css/bootstrap/bootstrap.css">
+    <script type="text/javascript" src="../static/css/bootstrap/jquery-1.11.1.js" ></script>
+    <script type="text/javascript" src="../static/css/bootstrap/bootstrap.min.js"></script>
     <script type="text/javascript" src="../static/js/datepicker/WdatePicker.js" ></script>
+    <script type="text/javascript" src="../static/css/dist/js/bootstrap-select.js"></script>
+    <link rel="stylesheet" type="text/css" href="../static/css/dist/css/bootstrap-select.css">
     <script>
+        $(function () {
+            $("#pointId_Select").load("/work/toLoadPointSelect",{
+                selectId:'data-recode'
+            },function(){
+
+            })
+        })
+
         function makeReport(){
             var pointIds ='';
             $(".pointIdClass").each(function(){
@@ -52,11 +55,12 @@
                 <tr>
                 <td style="width: 200px">请选择要导出数据的点:</td>
                 <td>
-                    <ul class="pagination" style="width: 100%;margin:0px">
+                  <%--  <ul class="pagination" style="width: 100%;margin:0px">
                         <c:forEach items="${pointList}" var="res" varStatus="index">
                             <li class=""><input type="checkbox" class="pointIdClass" name="pointIds" id="pointIndex${index.index}"  value="${res.pointId}"><label for="pointIndex${index.index}">${res.pointName}</label></li>
                         </c:forEach>
-                    </ul>
+                    </ul>--%>
+                    <div id="pointId_Select"></div>
                 </td>
             </tr>
             <tr>
@@ -75,6 +79,7 @@
             <div><input type="button" class="btn btn-default btn-success" onclick="makeReport()" value="生成报告"></div>
         </div>
     </div>
+
 </form>
 </body>
 </html>

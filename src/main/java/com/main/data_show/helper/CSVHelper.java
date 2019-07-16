@@ -9,15 +9,22 @@ import java.nio.charset.Charset;
 import java.text.ParseException;
 import java.util.*;
 
+import com.main.data_show.consts.ApplicationConsts;
 import com.main.data_show.consts.SysConsts;
+import com.main.data_show.controller.MainController;
 import com.main.data_show.pojo.TaPoint;
 import com.main.data_show.pojo.TaPointData;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
+
 @Service
 public class CSVHelper {
+    private static Logger logger = LoggerFactory.getLogger(CSVHelper.class);
     @Autowired
     private Environment env;
 
@@ -33,60 +40,99 @@ public class CSVHelper {
     @Autowired
     private ToolHelper toolHelper;
 
-    /*public static void main(String[] args) {
-        readCSV();
-    }*/
-    public void readCSV(){
-        //env.getProperty("");
-        String filePath = "C:\\01work\\priv_work190415\\CSV_test\\";
+    //导入点的基础数据
+    //遍历文件夹读取所有文件
+    public  void exportPointBaseData(){
+        String readBasePath = env.getProperty(ApplicationConsts.SYS_DEMO_EXPORT_DATE_BASE_PATH);
+        File file=new File(readBasePath);
+        if(!file.isDirectory()){
+            //file不是文件夹
+            System.out.println(file.getName()+"不是一个文件夹");
+        }else{
+            traversalFile(readBasePath);
+        }
+    }
+
+    public  void traversalFile(String filePath){
+        File file=new File(filePath);
+        String[] fileList =file.list();
+        for(String fileName:fileList){
+            String chileFilePath="";
+            if(filePath.endsWith("/")){
+                chileFilePath=filePath+fileName;
+            }else{
+                chileFilePath=filePath+"/"+fileName;
+            }
+            File chilefile=new File(chileFilePath);
+            if(chilefile.isDirectory()){
+                traversalFile(chileFilePath);
+            }else{
+                if(checkCSV(fileName)){
+                    System.out.println("读取CSV文件:"+fileName+"开始");
+                    readCSV(chileFilePath);
+                }
+
+            }
+        }
+    }
+
+    public  Boolean checkCSV(String fileName){
+        //“.”和“|”都是转义字符,必须得加"\\"
+        String[] str=fileName.split("\\.");
+        String suffix=str[1];
+        if("CSV".equals(suffix)){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    public void readCSV(String filePath){
         try {
-            File file = new java.io.File(filePath); // 创建文件对象
-            String[] filelist = file.list();
-            for(String fileName : filelist){
-                CsvReader csvReader = new CsvReader(filePath + "/" + fileName, ',', Charset.forName("GBK"));
-                // 读表头
-               // csvReader.readHeaders();
-                //保存所有点信息 保持顺序
-                Map<Integer,Integer> resultMap = new HashMap<Integer,Integer>();
-                int pointIndexFlg = 1;
-                boolean dateIndexFlg = false;
-                // 读内容
-                while (csvReader.readRecord()) {
-                    // 读一整行
-                    int length = csvReader.getRawRecord().length();
-                    String result = csvReader.get(0);
-                    if(result.startsWith("Point_")){
-                        String pointName = csvReader.get(1);
-                        System.out.println("pointName:"+pointName);
-                        String[] split = pointName.split(":");
-                        //保存点到数据库库 pointName不存在才创建
-                        int pointId = pointHelper.savePoint(split[0], "normal", split[1], "#blockNo", SysConsts.DEF_SYS_USER_ID);
-                        resultMap.put(pointIndexFlg,pointId);
-                        pointIndexFlg++;
-                    }
-                    if(dateIndexFlg){
-                        //这里是数据部门
-                        String dateStr = csvReader.get(0);
-                        String hourStr = csvReader.get(1);
-                        int pointDataFlg = 2;
-                        for(Map.Entry<Integer,Integer> map : resultMap.entrySet()){
-                            int index = map.getKey();
-                            int ponitId = map.getValue();
-                            String ponitValue = csvReader.get(pointDataFlg);
-                            pointDataFlg ++;
-                            System.out.println("dateStr:"+dateStr+",hourStr:"+hourStr+"ponitId:"+ponitId+",ponitValue:"+ponitValue);
-                            pointDataHelper.insertPoint(ponitId,dateStr,hourStr,ponitValue);
-                        }
-                    }
-                    if("<>Date".equals(result)){
-                        dateIndexFlg = true;
+            CsvReader csvReader = new CsvReader(filePath, ',', Charset.forName("GBK"));
+            // 读表头
+           // csvReader.readHeaders();
+            //保存所有点信息 保持顺序
+            Map<Integer,Integer> resultMap = new HashMap<Integer,Integer>();
+            int pointIndexFlg = 1;
+            boolean dateIndexFlg = false;
+            // 读内容
+            while (csvReader.readRecord()) {
+                // 读一整行
+                int length = csvReader.getRawRecord().length();
+                String result = csvReader.get(0);
+                if(result.startsWith("Point_")){
+                    String pointName = csvReader.get(1);
+                    System.out.println("pointName:"+pointName);
+                    String[] split = pointName.split(":");
+                    //保存点到数据库库 pointName不存在才创建
+                    int pointId = pointHelper.savePoint(pointName, "normal", "unit", "#blockNo", SysConsts.DEF_SYS_USER_ID);
+                    resultMap.put(pointIndexFlg,pointId);
+                    pointIndexFlg++;
+                }
+                if(dateIndexFlg){
+                    //这里是数据部门
+                    String dateStr = csvReader.get(0);
+                    String hourStr = csvReader.get(1);
+                    int pointDataFlg = 2;
+                    for(Map.Entry<Integer,Integer> map : resultMap.entrySet()){
+                        int index = map.getKey();
+                        int ponitId = map.getValue();
+                        String ponitValue = csvReader.get(pointDataFlg);
+                        pointDataFlg ++;
+                        System.out.println("dateStr:"+dateStr+",hourStr:"+hourStr+"ponitId:"+ponitId+",ponitValue:"+ponitValue);
+                        //日期格式是 7/3/2019  变成   2019/7/3
+                        dateStr = toolHelper.dateStrFormatStr(dateStr);
+                        pointDataHelper.insertPoint(ponitId,dateStr,hourStr,ponitValue);
                     }
                 }
+                if("<>Date".equals(result)){
+                    dateIndexFlg = true;
+                }
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
-        } catch (ParseException e) {
-            e.printStackTrace();
+            logger.error("文件："+filePath+",导入时异常，原因："+e.getMessage());
         }
     }
 
