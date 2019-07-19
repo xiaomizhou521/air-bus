@@ -3,12 +3,25 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.main.data_show.mapper.TaUserMapper">
-    <select id="findAll" resultType="com.main.data_show.pojo.TaUser">
+    <resultMap type="com.main.data_show.pojo.TaUser" id="userResult">
+        <id property="userId" column="user_id" />
+        <result property="userName" column="user_name" />
+        <result property="nickName" column="nick_name" />
+        <result property="passWord" column="pass_word" />
+        <result property="salt" column="salt" />
+        <result property="state" column="state" />
+    </resultMap>
+    <select id="findAll" resultMap="userResult">
         select * from ta_user
     </select>
 
     <select id="findUserByUserName" resultType="com.main.data_show.pojo.TaUser">
-        select * from ta_user where user_name = #{user_name}
+        select user_id as userId,
+        user_name as userName,
+        nick_name as nickName,
+        pass_word as passWord,
+        salt
+        from ta_user where user_name = #{user_name}
     </select>
 
 </mapper>

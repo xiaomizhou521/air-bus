@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.main.data_show.mapper.TaUsagePonitDataMapper">
+    <insert id="insertTaInstantPointData"  parameterType="com.main.data_show.pojo.TaUsagePointData" >
+        INSERT INTO ta_usage_point_data (point_id,create_time_int, create_time, date_show, hour_show, point_data,point_usage)
+        VALUES (#{pointId},#{createTimeInt},#{createTime}, #{dateShow}, #{hourShow}, #{pointData},#{pointUsage});
+    </insert>
+</mapper>

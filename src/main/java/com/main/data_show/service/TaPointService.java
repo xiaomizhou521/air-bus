@@ -24,6 +24,10 @@ public class TaPointService {
          taPonitMapper.updateTaPointByPointID(taPoint);
     }
 
+    public void updateTapointByName(TaPoint taPoint){
+         taPonitMapper.updateTaPointByPointName(taPoint);
+    }
+
     public List<TaPoint> getPointsByPage(Integer pageNo, Integer limit){
         PageHelper.startPage(pageNo,limit);
         List<TaPoint> pointsByPage = taPonitMapper.getPointsByPage();
@@ -46,5 +50,11 @@ public class TaPointService {
 
     public TaPoint findPointByPointId(int pointId){
         return taPonitMapper.findPointByPointId(pointId);
+    }
+
+    public static void main(String[] args) {
+        for(int i=0;i<100;i++){
+            System.out.println(i%5);
+        }
     }
 }

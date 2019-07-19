@@ -14,7 +14,7 @@ public class PointHelper {
     public TaPointService taPointService;
 
     //pointName 重复不存在的时候新增
-    public int savePoint(String pointName,String pointType,String unit,String blockNo,int operUserId){
+    public TaPoint savePoint(String pointName,String pointType,String unit,String blockNo,int operUserId,String relativePath,String fileNamePrefix){
         TaPoint pointByUserName = taPointService.findPointByPointName(pointName);
         if(pointByUserName==null){
             //测试插入taPoint
@@ -29,10 +29,14 @@ public class PointHelper {
             point.setModDate(new Date());
             point.setInitUser(operUserId);
             point.setModUser(operUserId);
-            return taPointService.insert(point);
+            point.setFileRelativePath(relativePath);
+            point.setFilePrefixName(fileNamePrefix);
+            int newPointid = taPointService.insert(point);
+            point.setPointId(newPointid);
+            return point;
         }else{
             System.out.println("pointName:"+pointName+",已存在！");
-            return pointByUserName.getPointId();
+            return pointByUserName;
         }
     }
 }

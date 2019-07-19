@@ -3,38 +3,92 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.main.data_show.mapper.TaPonitMapper">
+   <resultMap type="com.main.data_show.pojo.TaPoint" id="pointResult">
+        <id property="pointId" column="point_id" />
+        <result property="pointName" column="point_name" />
+        <result property="remarksName" column="remarks_name" />
+        <result property="pointType" column="point_type" />
+        <result property="pointUnit" column="point_unit" />
+        <result property="blockNo" column="block_no" />
+        <result property="fileRelativePath" column="file_relative_path" />
+        <result property="filePrefixName" column="file_prefix_name" />
+    </resultMap>
+
     <insert id="insertTaPoint" keyProperty="pointId" parameterType="com.main.data_show.pojo.TaPoint"  useGeneratedKeys="true">
-        INSERT INTO ta_point (point_name, remarks_name, point_type, point_unit, block_no, state, init_date, init_user, mod_date, mod_user)
-        VALUES (#{pointName}, #{remarksName}, #{pointType}, #{pointUnit}, #{blockNo}, #{state}, now(), #{initUser}, now(), #{modUser});
+        INSERT INTO ta_point (point_name, remarks_name, point_type, point_unit, block_no,file_relative_path,file_prefix_name, state, init_date, init_user, mod_date, mod_user)
+        VALUES (#{pointName}, #{remarksName}, #{pointType}, #{pointUnit}, #{blockNo},#{fileRelativePath},#{filePrefixName}, #{state}, now(), #{initUser}, now(), #{modUser});
     </insert>
 
     <insert id="updateTaPointByPointID"  parameterType="com.main.data_show.pojo.TaPoint" >
-        <![CDATA[update ta_point set remarks_name =#{remarksName},
-                 point_type=#{pointType},
-                 point_unit=#{pointUnit},
-                 block_no=#{blockNo},
+        <![CDATA[update ta_point set
+                 <if test="pointName!=null and pointName!=''">
+                   point_name = #{pointName},
+                 </if>
+                 <if test="remarksName!=null and remarksName!=''">
+                   remarks_name = #{remarksName},
+                 </if>
+                 <if test="pointType!=null and pointType!=''">
+                   point_type = #{pointType},
+                 </if>
+                 <if test="pointUnit!=null and pointUnit!=''">
+                   point_unit = #{pointUnit},
+                 </if>
+                 <if test="blockNo!=null and blockNo!=''">
+                   block_no = #{blockNo},
+                 </if>
+                 <if test="fileRelativePath!=null and fileRelativePath!=''">
+                   file_relative_path = #{fileRelativePath},
+                 </if>
+                 <if test="filePrefixName!=null and filePrefixName!=''">
+                   file_prefix_name = #{filePrefixName},
+                 </if>
                  mod_date=now(),
                  mod_user = #{modUser}
                  where point_id = #{pointId}]]>
     </insert>
 
+    <insert id="updateTaPointByPointName"  parameterType="com.main.data_show.pojo.TaPoint" >
+        <![CDATA[update ta_point set
+                 remarks_name = #{remarksName},
+                 mod_date=now(),
+                 mod_user = #{modUser}
+                 where point_name =#{pointName}]]>
+    </insert>
+
     <select id="findPointByPointName" resultType="com.main.data_show.pojo.TaPoint">
-        select * from ta_point where point_name = #{point_name}
+        select point_id as pointId,
+        point_name as pointName,
+        remarks_name as remarksName,
+        point_type as pointType,
+        point_unit as pointUnit,
+        block_no as blockNo,
+        file_relative_path as fileRelativePath,
+        file_prefix_name as filePrefixName
+        from ta_point
+        where point_name = #{point_name}
     </select>
 
     <select id="findPointByPointId" resultType="com.main.data_show.pojo.TaPoint">
-        <![CDATA[select * from ta_point where point_id = #{point_id}]]>
+        <![CDATA[select  point_id as pointId,
+                point_name as pointName,
+                remarks_name as remarksName,
+                point_type as pointType,
+                point_unit as pointUnit,
+                block_no as blockNo,
+                file_relative_path as fileRelativePath,
+                file_prefix_name as filePrefixName
+                from ta_point where point_id = #{point_id}]]>
     </select>
 
-    <select id="getPointsByPage" resultType="com.main.data_show.pojo.TaPoint">
+    <select id="getPointsByPage" resultMap="pointResult">
         select * from ta_point
     </select>
 
-    <select id="getPointsByPointIds" resultType="com.main.data_show.pojo.TaPoint">
+    <select id="getPointsByPointIds" resultMap="pointResult" >
         select * from ta_point where  point_id in (${pointIds}) order by point_name asc
     </select>
 
-    <select id="likePointByPointName" resultType="com.main.data_show.pojo.TaPoint">
+    <select id="likePointByPointName" resultMap="pointResult">
         <![CDATA[select * from ta_point
                  where point_name
                  like CONCAT('%',#{point_name},'%') order by point_name asc]]>

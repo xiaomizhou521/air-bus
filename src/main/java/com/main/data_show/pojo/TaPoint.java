@@ -14,10 +14,29 @@ public class TaPoint {
     private int initUser;
     private Date modDate;
     private int modUser;
+    private String filePrefixName;
+    private String fileRelativePath;
 
     public int getPointId() {
         return pointId;
     }
+
+    public String getFileRelativePath() {
+        return fileRelativePath;
+    }
+
+    public void setFileRelativePath(String fileRelativePath) {
+        this.fileRelativePath = fileRelativePath;
+    }
+
+    public String getFilePrefixName() {
+        return filePrefixName;
+    }
+
+    public void setFilePrefixName(String filePrefixName) {
+        this.filePrefixName = filePrefixName;
+    }
+
 
     public void setPointId(int pointId) {
         this.pointId = pointId;

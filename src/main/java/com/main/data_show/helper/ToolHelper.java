@@ -33,7 +33,7 @@ public class ToolHelper {
         return md5;
     }
     //7/2/2019  变   2019/7/2
-    public String dateStrFormatStr(String dateStr) throws Exception {
+    public static String dateStrFormatStr(String dateStr) throws Exception {
         String[] dateList = dateStr.split("/");
         if(dateList.length!=3){
            throw new Exception("日期字符串："+dateStr+",格式不正确");
@@ -43,6 +43,11 @@ public class ToolHelper {
         sb.append(dateList[0]).append("/");
         sb.append(dateList[1]);
         return sb.toString();
+    }
+
+    public static void main(String[] args) throws Exception {
+        //7/6/2019
+        System.out.println(dateStrFormatStr("7/6/2019"));
     }
     //日期字符串和小时字符串拼成时间
     public Date makeDateByDateAndHour(String dateStr,String hourStr) throws ParseException {
@@ -97,12 +102,8 @@ public class ToolHelper {
         return String.valueOf(f1);
     }
 
-    public static void main(String[] args) throws ParseException {
-        System.out.println(getWeekMonday(2019,30));
-    }
-
     //取得某年某周的 周一 0点的时间
-    public static Date getWeekMonday(int year,int week){
+    public  Date getWeekMonday(int year,int week){
         Calendar cal = Calendar.getInstance();
         cal.set(Calendar.YEAR, year); // 2016年
         cal.set(Calendar.WEEK_OF_YEAR, week); // 设置为2016年的第10周
@@ -113,5 +114,13 @@ public class ToolHelper {
         Date date = cal.getTime();
         return date;
     }
+    //日期转成数字 例如  20190706010000
+    public long dateToNumDate(Date date){
+        SimpleDateFormat sdf=new SimpleDateFormat("yyyyMMddhhmmss");
+        String c=sdf.format(date);
+        long numDate = Long.parseLong(c);
+        return numDate;
+    }
+
 
 }

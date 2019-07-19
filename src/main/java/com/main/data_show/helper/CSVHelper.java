@@ -2,25 +2,23 @@ package com.main.data_show.helper;
 
 import com.csvreader.CsvReader;
 import com.csvreader.CsvWriter;
-
-import java.io.File;
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.text.ParseException;
-import java.util.*;
-
 import com.main.data_show.consts.ApplicationConsts;
 import com.main.data_show.consts.SysConsts;
-import com.main.data_show.controller.MainController;
+import com.main.data_show.enums.EnumPointTypeDefind;
 import com.main.data_show.pojo.TaPoint;
 import com.main.data_show.pojo.TaPointData;
+import com.main.data_show.service.TaPointService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.text.ParseException;
+import java.util.*;
 
 @Service
 public class CSVHelper {
@@ -38,22 +36,48 @@ public class CSVHelper {
     private PointDataHelper pointDataHelper;
 
     @Autowired
+    private AllPointDataHelper allPointDataHelper;
+
+    @Autowired
+    private InstantPointDataHelper instantPointDataHelper;
+
+    @Autowired
+    private UsagePointDataHelper usagePointDataHelper;
+
+    @Autowired
     private ToolHelper toolHelper;
+
+    @Autowired
+    private TaPointService taPointService;
 
     //导入点的基础数据
     //遍历文件夹读取所有文件
     public  void exportPointBaseData(){
-        String readBasePath = env.getProperty(ApplicationConsts.SYS_DEMO_EXPORT_DATE_BASE_PATH);
+        String readBasePath = env.getProperty(ApplicationConsts.SYS_DEMO_EXPORT_DATA_BASE_PATH);
         File file=new File(readBasePath);
         if(!file.isDirectory()){
             //file不是文件夹
             System.out.println(file.getName()+"不是一个文件夹");
         }else{
-            traversalFile(readBasePath);
+            traversalFile(readBasePath,readBasePath,"basePointDate");
+          //  exportPointBaseRemarkData();
         }
     }
 
-    public  void traversalFile(String filePath){
+    //导入点的备注信息
+    //遍历文件夹读取所有文件
+    public  void exportPointBaseRemarkData(){
+        String readBasePath = env.getProperty(ApplicationConsts.SYS_DEMO_EXPORT_DATA_REMARK_BASE_PATH);
+        File file=new File(readBasePath);
+        if(!file.isDirectory()){
+            //file不是文件夹
+            System.out.println(file.getName()+"不是一个文件夹");
+        }else{
+            traversalFile(readBasePath,readBasePath,"basePointRemark");
+        }
+    }
+//basePath第一次的根路径
+    public  void traversalFile(String filePath,String basePath,String readFileType){
         File file=new File(filePath);
         String[] fileList =file.list();
         for(String fileName:fileList){
@@ -65,11 +89,19 @@ public class CSVHelper {
             }
             File chilefile=new File(chileFilePath);
             if(chilefile.isDirectory()){
-                traversalFile(chileFilePath);
+                traversalFile(chileFilePath,basePath,readFileType);
             }else{
                 if(checkCSV(fileName)){
-                    System.out.println("读取CSV文件:"+fileName+"开始");
-                    readCSV(chileFilePath);
+                    if("basePointDate".equals(readFileType)){
+                        System.out.println("读取CSV文件:"+fileName+"开始");
+                        //点文件相对路径
+                        String relativePath = getPointRelativePath(filePath,basePath);
+                        //点文件名的前缀
+                        String fileNamePrefix = getPointRFilenNamePrefix(fileName);
+                        readCSV(chileFilePath,relativePath,fileNamePrefix);
+                    }else if("basePointRemark".equals(readFileType)){
+                        readPointRemarkCSV(chileFilePath);
+                    }
                 }
 
             }
@@ -87,13 +119,24 @@ public class CSVHelper {
         }
     }
 
-    public void readCSV(String filePath){
+    //取文件的相对路径
+    public String getPointRelativePath(String allPath,String basePath){
+        allPath = allPath.replace(basePath,"");
+        return allPath;
+    }
+
+    //取文件的前缀
+    public String getPointRFilenNamePrefix(String fileName){
+        String prefix = fileName.substring(0, fileName.length() - 12);
+        return prefix;
+    }
+
+//具体读取某个csv文件
+    public void readCSV(String filePath,String relativePath,String fileNamePrefix){
         try {
             CsvReader csvReader = new CsvReader(filePath, ',', Charset.forName("GBK"));
-            // 读表头
-           // csvReader.readHeaders();
             //保存所有点信息 保持顺序
-            Map<Integer,Integer> resultMap = new HashMap<Integer,Integer>();
+            Map<Integer,TaPoint> resultMap = new HashMap<Integer,TaPoint>();
             int pointIndexFlg = 1;
             boolean dateIndexFlg = false;
             // 读内容
@@ -103,31 +146,86 @@ public class CSVHelper {
                 String result = csvReader.get(0);
                 if(result.startsWith("Point_")){
                     String pointName = csvReader.get(1);
-                    System.out.println("pointName:"+pointName);
                     String[] split = pointName.split(":");
+                    //取当前点的类型 路径中包含 "REPORTS/POWER/KWH"的是 用量的点
+                    String pointType = EnumPointTypeDefind.instant.toString();
+                    if(filePath.indexOf(SysConsts.POINT_USAGE_DEF_FILE_PATH)>-1){
+                        pointType = EnumPointTypeDefind.usage.toString();
+                    }
                     //保存点到数据库库 pointName不存在才创建
-                    int pointId = pointHelper.savePoint(pointName, "normal", "unit", "#blockNo", SysConsts.DEF_SYS_USER_ID);
-                    resultMap.put(pointIndexFlg,pointId);
+                    TaPoint pointVo = pointHelper.savePoint(pointName, pointType, "none", "none", SysConsts.DEF_SYS_USER_ID,relativePath,fileNamePrefix);
+                    resultMap.put(pointIndexFlg,pointVo);
                     pointIndexFlg++;
                 }
                 if(dateIndexFlg){
                     //这里是数据部门
                     String dateStr = csvReader.get(0);
+                    dateStr = toolHelper.dateStrFormatStr(dateStr);
                     String hourStr = csvReader.get(1);
                     int pointDataFlg = 2;
-                    for(Map.Entry<Integer,Integer> map : resultMap.entrySet()){
+                    for(Map.Entry<Integer,TaPoint> map : resultMap.entrySet()){
                         int index = map.getKey();
-                        int ponitId = map.getValue();
+                        TaPoint ponitVo = map.getValue();
                         String ponitValue = csvReader.get(pointDataFlg);
                         pointDataFlg ++;
-                        System.out.println("dateStr:"+dateStr+",hourStr:"+hourStr+"ponitId:"+ponitId+",ponitValue:"+ponitValue);
                         //日期格式是 7/3/2019  变成   2019/7/3
-                        dateStr = toolHelper.dateStrFormatStr(dateStr);
-                        pointDataHelper.insertPoint(ponitId,dateStr,hourStr,ponitValue);
+                        System.out.println("dateStr:"+dateStr+",hourStr:"+hourStr+",ponitId:"+ponitVo.getPointId()+",ponitValue:"+ponitValue);
+                        //数据插入数据表中
+                       // insertToDateBase(ponitVo,ponitValue,dateStr,hourStr);
                     }
                 }
                 if("<>Date".equals(result)){
                     dateIndexFlg = true;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("文件："+filePath+",导入时异常，原因："+e.getMessage());
+        }
+    }
+
+    //读取csv数据后要放入到数据库中
+    public void insertToDateBase(TaPoint pointVo,String pointData,String dateStr,String hourStr) throws ParseException {
+           //点数据总表
+           allPointDataHelper.insertAllPoint(pointVo.getPointId(),dateStr,hourStr,pointData,0);
+           //点瞬时数据保存到 instantPointDate中
+           if(EnumPointTypeDefind.instant.toString().equals(pointVo.getPointType())){
+                instantPointDataHelper.insertAllPoint(pointVo.getPointId(),dateStr,hourStr,pointData,0);
+           }else if(EnumPointTypeDefind.usage.toString().equals(pointVo.getPointType())){
+               usagePointDataHelper.insertAllPoint(pointVo.getPointId(),dateStr,hourStr,pointData,0);
+           }else{
+               System.out.println("错误的点类型啊！！！！！！！");
+           }
+    }
+
+
+    //具体读取点的备注
+    public void readPointRemarkCSV(String filePath){
+        try {
+            CsvReader csvReader = new CsvReader(filePath, ',', Charset.forName("GBK"));
+            // 读表头
+            int pointIndexFlg = 1;
+            boolean dateIndexFlg = false;
+            // 读内容
+            while (csvReader.readRecord()) {
+                // 读一整行
+                int length = csvReader.getRawRecord().length();
+                String result = csvReader.get(0);
+                if(result.startsWith("Point_")){
+                    String pointName = csvReader.get(1);
+                    String pointRemark = csvReader.get(2);
+                    //保存点的备注到数据库  根据点名查找
+                    TaPoint tapoint = new TaPoint();
+                    tapoint.setPointType("");
+                    tapoint.setPointUnit("");
+                    tapoint.setBlockNo("");
+                    tapoint.setState(1);
+                    tapoint.setFileRelativePath("");
+                    tapoint.setFilePrefixName("");
+                    tapoint.setPointName(pointName);
+                    tapoint.setRemarksName(pointRemark);
+                    tapoint.setModUser(-1);
+                    taPointService.updateTapointByName(tapoint);
                 }
             }
         } catch (Exception e) {
@@ -283,3 +381,5 @@ public class CSVHelper {
         }
     }
 }
+
+
