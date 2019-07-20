@@ -116,10 +116,17 @@ public class ToolHelper {
     }
     //日期转成数字 例如  20190706010000
     public long dateToNumDate(Date date){
-        SimpleDateFormat sdf=new SimpleDateFormat("yyyyMMddhhmmss");
+        SimpleDateFormat sdf=new SimpleDateFormat("yyyyMMddHHmmss");
         String c=sdf.format(date);
         long numDate = Long.parseLong(c);
         return numDate;
+    }
+
+     //double减法
+    public double doubleSubtract(String v1,String v2){
+     BigDecimal b1 = new BigDecimal(v1);
+     BigDecimal b2 = new BigDecimal(v2);
+     return b1.subtract(b2).doubleValue();
     }
 
 

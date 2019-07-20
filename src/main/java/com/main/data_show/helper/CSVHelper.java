@@ -53,6 +53,7 @@ public class CSVHelper {
     //导入点的基础数据
     //遍历文件夹读取所有文件
     public  void exportPointBaseData(){
+        long startTime = System.currentTimeMillis();
         String readBasePath = env.getProperty(ApplicationConsts.SYS_DEMO_EXPORT_DATA_BASE_PATH);
         File file=new File(readBasePath);
         if(!file.isDirectory()){
@@ -62,6 +63,20 @@ public class CSVHelper {
             traversalFile(readBasePath,readBasePath,"basePointDate");
           //  exportPointBaseRemarkData();
         }
+        long endTime = System.currentTimeMillis();
+        long useTime = endTime-startTime;
+        System.out.println("---数据跑入共耗时："+ useTime+"毫秒");
+        System.out.println("---数据跑入共耗时："+ useTime+"毫秒");
+        System.out.println("---数据跑入共耗时："+ useTime+"毫秒");
+        System.out.println("---数据跑入共耗时："+ useTime+"毫秒");
+        System.out.println("---数据跑入共耗时："+ useTime+"毫秒");
+        System.out.println("---数据跑入共耗时："+ useTime+"毫秒");
+        System.out.println("---数据跑入共耗时："+ useTime+"毫秒");
+        System.out.println("---数据跑入共耗时："+ useTime+"毫秒");
+        System.out.println("---数据跑入共耗时："+ useTime+"毫秒");
+        System.out.println("---数据跑入共耗时："+ useTime+"毫秒");
+        System.out.println("---数据跑入共耗时："+ useTime+"毫秒");
+        System.out.println("---数据跑入共耗时："+ useTime+"毫秒");
     }
 
     //导入点的备注信息
@@ -134,6 +149,13 @@ public class CSVHelper {
 //具体读取某个csv文件
     public void readCSV(String filePath,String relativePath,String fileNamePrefix){
         try {
+            //取当前点的类型 路径中包含 "REPORTS/POWER/KWH"的是 用量的点
+            String pointType = EnumPointTypeDefind.instant.toString();
+            if(filePath.indexOf(SysConsts.POINT_USAGE_DEF_FILE_PATH)>-1){
+                pointType = EnumPointTypeDefind.usage.toString();
+            }
+            //用量的点 需要保存上一小时的用量算差值，文档第一条需要查数据库取得 上一小时的抄表数据。如果没有给0
+            Map<Integer,String> lastPointUsageMap = new HashMap<Integer,String>();
             CsvReader csvReader = new CsvReader(filePath, ',', Charset.forName("GBK"));
             //保存所有点信息 保持顺序
             Map<Integer,TaPoint> resultMap = new HashMap<Integer,TaPoint>();
@@ -144,14 +166,11 @@ public class CSVHelper {
                 // 读一整行
                 int length = csvReader.getRawRecord().length();
                 String result = csvReader.get(0);
+                if(result.indexOf("****")>-1){
+                    continue;
+                }
                 if(result.startsWith("Point_")){
                     String pointName = csvReader.get(1);
-                    String[] split = pointName.split(":");
-                    //取当前点的类型 路径中包含 "REPORTS/POWER/KWH"的是 用量的点
-                    String pointType = EnumPointTypeDefind.instant.toString();
-                    if(filePath.indexOf(SysConsts.POINT_USAGE_DEF_FILE_PATH)>-1){
-                        pointType = EnumPointTypeDefind.usage.toString();
-                    }
                     //保存点到数据库库 pointName不存在才创建
                     TaPoint pointVo = pointHelper.savePoint(pointName, pointType, "none", "none", SysConsts.DEF_SYS_USER_ID,relativePath,fileNamePrefix);
                     resultMap.put(pointIndexFlg,pointVo);
@@ -166,12 +185,35 @@ public class CSVHelper {
                     for(Map.Entry<Integer,TaPoint> map : resultMap.entrySet()){
                         int index = map.getKey();
                         TaPoint ponitVo = map.getValue();
+                        int pointId = ponitVo.getPointId();
                         String ponitValue = csvReader.get(pointDataFlg);
+                        //每个小时的用量
+                        double pointUsage = 0;
+                        //用量时 需要保存上一小时的结果 算当前小时的用量
+                        if(EnumPointTypeDefind.usage.toString().equals(pointType)){
+                            if(lastPointUsageMap.containsKey(pointId)){
+                                //取上一次的数据
+                                String lastHourData = lastPointUsageMap.get(pointId);
+                                if(toolHelper.isNumeric(ponitValue)&&toolHelper.isNumeric(lastHourData)){
+                                    pointUsage = toolHelper.doubleSubtract(ponitValue,lastHourData);
+                                }else{
+                                   logger.error("数据格式错误，ponitValue:"+ponitValue+",lastHourData:"+lastHourData);
+                                }
+                            }else{
+                                //如果没有 数据库查上次的时间
+                                pointUsage = 0;
+                            }
+                            //把这次读出来的数据 放入map 给下次计算用
+                            if(toolHelper.isNumeric(ponitValue)){
+                                lastPointUsageMap.put(pointId,ponitValue);
+                            }
+                        }
                         pointDataFlg ++;
-                        //日期格式是 7/3/2019  变成   2019/7/3
-                        System.out.println("dateStr:"+dateStr+",hourStr:"+hourStr+",ponitId:"+ponitVo.getPointId()+",ponitValue:"+ponitValue);
                         //数据插入数据表中
-                       // insertToDateBase(ponitVo,ponitValue,dateStr,hourStr);
+                        if(ponitVo.getPointId() == 585){
+                            System.out.println("------------pointId:"+ponitVo.getPointId()+",datestr:"+dateStr+",hourStr:"+hourStr);
+                        }
+                        insertToDateBase(ponitVo,ponitValue,dateStr,hourStr,pointUsage);
                     }
                 }
                 if("<>Date".equals(result)){
@@ -185,14 +227,15 @@ public class CSVHelper {
     }
 
     //读取csv数据后要放入到数据库中
-    public void insertToDateBase(TaPoint pointVo,String pointData,String dateStr,String hourStr) throws ParseException {
+    public void insertToDateBase(TaPoint pointVo,String pointData,String dateStr,String hourStr,double pointUsage) throws ParseException {
            //点数据总表
            allPointDataHelper.insertAllPoint(pointVo.getPointId(),dateStr,hourStr,pointData,0);
            //点瞬时数据保存到 instantPointDate中
            if(EnumPointTypeDefind.instant.toString().equals(pointVo.getPointType())){
                 instantPointDataHelper.insertAllPoint(pointVo.getPointId(),dateStr,hourStr,pointData,0);
+           //点用量数据保存到 usagePointDate中
            }else if(EnumPointTypeDefind.usage.toString().equals(pointVo.getPointType())){
-               usagePointDataHelper.insertAllPoint(pointVo.getPointId(),dateStr,hourStr,pointData,0);
+               usagePointDataHelper.insertAllPoint(pointVo.getPointId(),dateStr,hourStr,pointData,pointUsage);
            }else{
                System.out.println("错误的点类型啊！！！！！！！");
            }
