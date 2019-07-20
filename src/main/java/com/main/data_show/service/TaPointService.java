@@ -2,9 +2,11 @@ package com.main.data_show.service;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.main.data_show.helper.ToolHelper;
 import com.main.data_show.mapper.TaPonitMapper;
 import com.main.data_show.pojo.TaPoint;
 import com.main.data_show.pojo.TaUser;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -19,6 +21,9 @@ public class TaPointService {
     @Resource
     private TaPonitMapper taPonitMapper;
 
+    @Autowired
+    private ToolHelper toolHelper;
+
     public int insert(TaPoint taPoint){
         return taPonitMapper.insertTaPoint(taPoint);
     }
@@ -31,9 +36,9 @@ public class TaPointService {
          taPonitMapper.updateTaPointByPointName(taPoint);
     }
 
-    public List<TaPoint> getPointsByPage(Integer pageNo, Integer limit){
+    public List<TaPoint> getPointsByPage(Integer pageNo, Integer limit,String searchPointName,String searchRemarkName){
         PageHelper.startPage(pageNo,limit);
-        List<TaPoint> pointsByPage = taPonitMapper.getPointsByPage();
+        List<TaPoint> pointsByPage = taPonitMapper.getPointsByPage(searchPointName,searchRemarkName);
 
         return pointsByPage;
     }

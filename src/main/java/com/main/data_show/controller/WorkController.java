@@ -62,8 +62,10 @@ public class WorkController {
         if(!toolHelper.isEmpty(curPageNo)){
             pageNo = Integer.parseInt(curPageNo);
         }
+        String searchPointName = request.getParameter("pointName");
+        String searchRemarkName = request.getParameter("remarkName");
         //取所有点的列表
-        List<TaPoint> pointsByPage = taPointService.getPointsByPage(pageNo, pageSize);
+        List<TaPoint> pointsByPage = taPointService.getPointsByPage(pageNo, pageSize,searchPointName,searchRemarkName);
         PageInfo<TaPoint> pageInfo=new PageInfo<>(pointsByPage);
         request.setAttribute("pointList", pointsByPage);
         request.setAttribute("totalPage", pageInfo.getTotal());
@@ -72,6 +74,8 @@ public class WorkController {
         request.setAttribute("pageSize", pageInfo.getPageSize());
         request.setAttribute("firstPage", pageInfo.getFirstPage());
         request.setAttribute("nextPage", pageInfo.getNextPage());
+        request.setAttribute("searchPointName", searchPointName);
+        request.setAttribute("searchRemarkName", searchRemarkName);
 
         return JspPageConst.TO_POINT_LIST_JSP_REDIRECT;
     }
@@ -91,6 +95,8 @@ public class WorkController {
         String pointType = request.getParameter("pointType");
         String pointUnit = request.getParameter("pointUnit");
         String blockNo = request.getParameter("blockNo");
+        String fileRelativePath = request.getParameter("fileRelativePath");
+        String filePrefixName = request.getParameter("filePrefixName");
         TaPoint pointVo = taPonitMapper.findPointByPointId(Integer.parseInt(pointId));
         if(pointVo == null){
             throw new Exception("点信息不存在");
@@ -99,6 +105,8 @@ public class WorkController {
         pointVo.setPointType(pointType);
         pointVo.setPointUnit(pointUnit);
         pointVo.setBlockNo(blockNo);
+        pointVo.setFileRelativePath(fileRelativePath);
+        pointVo.setFilePrefixName(filePrefixName);
         taPointService.update(pointVo);
         return JspPageConst.REDIRECT_TO_POINT_LIST_JSP_REDIRECT;
     }
@@ -106,7 +114,7 @@ public class WorkController {
     @RequestMapping(value = "work/toExportDataRecode")
     public String toExportDataRecode(HttpServletRequest request) {
         //取得所有点
-        List<TaPoint> pointList = taPonitMapper.getPointsByPage();
+        List<TaPoint> pointList = taPonitMapper.getPointsByPage("","");
         request.setAttribute("pointList",pointList);
         return JspPageConst.EXPORT_DATA_RECODE_JSP_REDIRECT;
     }
@@ -143,7 +151,7 @@ public class WorkController {
     @RequestMapping(value = "work/toExportUsageRecode")
     public String toExportUsageRecode(HttpServletRequest request) {
         //取得电表或者水表的点
-        List<TaPoint> pointList = taPonitMapper.getPointsByPage();
+        List<TaPoint> pointList = taPonitMapper.getPointsByPage("","");
         request.setAttribute("pointList",pointList);
         return JspPageConst.EXPORT_USEAGE_RECODE_JSP_REDIRECT;
     }
@@ -182,7 +190,7 @@ public class WorkController {
     @RequestMapping(value = "work/toExportDeviceChart")
     public String toExportDeviceChart(HttpServletRequest request) throws Exception {
         //取得非 电表水表的点
-        List<TaPoint> pointList = taPonitMapper.getPointsByPage();
+        List<TaPoint> pointList = taPonitMapper.getPointsByPage("","");
         request.setAttribute("pointList",pointList);
         return JspPageConst.EXPORT_DEVICE_CHAER_JSP_REDIRECT;
     }
@@ -223,7 +231,7 @@ public class WorkController {
     @RequestMapping(value = "work/toExportUsageDeviceChart")
     public String toExportUsageDeviceChart(HttpServletRequest request) throws Exception {
         //取得非 电表水表的点
-        List<TaPoint> pointList = taPonitMapper.getPointsByPage();
+        List<TaPoint> pointList = taPonitMapper.getPointsByPage("","");
         request.setAttribute("pointList",pointList);
         return JspPageConst.EXPORT_USAGE_DEVICE_CHAER_JSP_REDIRECT;
     }
@@ -233,7 +241,7 @@ public class WorkController {
         String data_recode = request.getParameter("selectId");
         request.setAttribute("selectId",data_recode);
         //取得所有点
-        List<TaPoint> pointList = taPonitMapper.getPointsByPage();
+        List<TaPoint> pointList = taPonitMapper.getPointsByPage("","");
         request.setAttribute("pointList",pointList);
         return JspPageConst.LOAD__POINT_SELECT_JSP_REDIRECT;
     }

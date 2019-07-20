@@ -20,11 +20,11 @@
     <%--<div th:replace="fragments/head :: header">111</div>--%>
     <jsp:include page="head.jsp"/>
     <!--主体区域-->
-    <div class="layui-body" style="width:1400px;height:100%">
+    <div class="layui-body" style="height:100%">
         <div class="layui-container" style="width:100%;height:100%">
             <div class="layui-row" style="width:100%;height:100%">
                 <div class="layui-col-xs9" style="width:100%;height:100%">
-                    <iframe id="iframeId" src="/work/toPointList" style="width:100%;height:100%" ></iframe>
+                    <iframe id="iframeId" src="/work/toPointList" style="width:100%;height:90%" ></iframe>
 
                 </div>
             </div>

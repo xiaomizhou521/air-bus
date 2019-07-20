@@ -18,16 +18,54 @@
     </script>
 </head>
 <body>
-<table class="table table-bordered table-striped table-condensed" >
-    <tr><th style="width:50px;">点ID</th><th>点名</th><th>点别名</th><th>点单位</th><th>楼号</th><th>操作</th></tr>
+<div style="    margin-top: 20px;height: 60px;">
+    <form action="/work/toPointList" method="post">
+        <div class="input-group" style="float:left;margin-bottom: 10px;line-height: 35px;width: 10%;margin-left:5px;">
+            <span class="input-group-addon" style="width:1%;">点名称：</span>
+            <input type="text" style="width: 200px;height: 40px;"  class="global-text-right form-control"  id="pointName" name="pointName" value='${searchPointName}'/>
+        </div>
+        <div class="input-group" style="float:left;margin-bottom: 10px;line-height: 35px;width: 10%;margin-left:5px;">
+            <span class="input-group-addon" style="width:1%;">点别名：</span>
+            <input type="text" style="width: 200px;height: 40px;"  class="global-text-right form-control"  id="remarkName" name="remarkName" value='${searchRemarkName}'/>
+        </div>
+        <div style="float:left;width:5%;margin-left:5px;">
+            <input type="submit" class="btn btn-primary btn-sm" style="width:100px;height:35px;margin-bottom: 10px;" value="查询" />
+        </div>
+        <div style="float:left;width:5%;margin-left: 50px;">
+            <input type="button" class="btn btn-primary btn-sm" style="width:100px;height:35px;margin-bottom: 10px;" value="增加" onclick="toSearch()" />
+        </div>
+    </form>
+</div>
+<table class="table table-bordered table-striped table-condensed"  style="width: 99%;margin-left:6px;">
+    <tr>
+        <th style="width:50px;text-align: center">点ID</th>
+        <th style="text-align: center">点名称</th>
+        <th style="text-align: center">点别名</th>
+        <th style="width: 70px;text-align: center">点类型</th>
+        <th style="width: 70px;text-align: center">点单位</th>
+        <th style="width: 50px;text-align: center">楼号</th>
+        <th style="width: 300px;text-align: center">文件相对路径</th>
+        <th style="width: 120px;text-align: center">文件名前缀</th>
+        <th style="width: 100px;text-align: center">操作</th></tr>
     <c:forEach items="${pointList}" var="res">
         <tr>
              <td>${res.pointId}</td>
              <td>${res.pointName}</td>
              <td>${res.remarksName}</td>
+            <c:if test="${res.pointType eq 'instant'}">
+                <td>瞬时点</td>
+            </c:if>
+            <c:if test="${res.pointType eq 'usage'}">
+                <td>用量点</td>
+            </c:if>
              <td>${res.pointUnit}</td>
              <td>${res.blockNo}</td>
-             <td><a href="/work/toEditPoint?pointId=${res.pointId}" >修改</a></td>
+             <td>${res.fileRelativePath}</td>
+             <td>${res.filePrefixName}</td>
+             <td style="text-align: center">
+                 <a href="/work/toEditPoint?pointId=${res.pointId}" >修改</a>&nbsp;&nbsp;&nbsp;&nbsp;
+                 <a href="" >删除</a>
+             </td>
         </tr>
     </c:forEach>
     <tr style="line-height: 10px;">

@@ -19,7 +19,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 /*@SpringBootApplication*/
 @EnableAutoConfiguration(exclude={DataSourceAutoConfiguration.class})
 @EnableTransactionManagement(proxyTargetClass = true)
-/*@ServletComponentScan*/
+@ServletComponentScan
 @EnableScheduling
 @EnableConfigurationProperties
 @ComponentScan

@@ -13,6 +13,9 @@
     <script type="text/javascript" src="../static/css/bootstrap/bootstrap.min.js"></script>
     <title>修改点信息页面</title>
     <script>
+        $(function(){
+            $("#pointTypeId").val('${pointVo.pointType}');
+        })
         function goBack(){
             history.go(-1)
         }
@@ -25,7 +28,7 @@
         <div style="margin:auto;width:800px;margin-top:20px;">
          <table class="table table-bordered table-striped table-condensed" >
            <tr>
-              <td>点ID：</td>
+              <td style="width: 20%;">点ID：</td>
               <td>${pointVo.pointId}<input type="hidden" value="${pointVo.pointId}" name="pointId"/></td>
            </tr>
            <tr>
@@ -38,7 +41,12 @@
            </tr>
            <tr>
                <td>点类型：</td>
-               <td><input type="text" class="form-control" value="${pointVo.pointType}" name="pointType"/></td>
+               <td>
+                   <select  class="form-control" name="pointType" id="pointTypeId">
+                       <option value="instant">瞬时点</option>
+                       <option value="usage">用量点</option>
+                   </select>
+               </td>
            </tr>
            <tr>
                <td>点单位：</td>
@@ -49,9 +57,17 @@
                <td><input type="text" class="form-control" value="${pointVo.blockNo}" name="blockNo"/></td>
            </tr>
            <tr>
+               <td>点文件相对路径：</td>
+               <td><input type="text" class="form-control" value="${pointVo.fileRelativePath}" name="fileRelativePath"/></td>
+           </tr>
+           <tr>
+               <td>CSV文件名前缀：</td>
+               <td><input type="text" class="form-control" value="${pointVo.filePrefixName}" name="filePrefixName"/></td>
+           </tr>
+           <tr>
                <td colspan="2" style="text-align: center">
                    <input type="button" style="width:100px" class="btn form-control btn-default" onclick="goBack()" value="取消">
-                   <input type="submit" style="width:100px" class="btn form-control btn-default btn-light" value="确定">
+                   <input type="submit" style="width:100px" class="btn form-control btn-default btn-primary" value="确定">
                </td>
            </tr>
        </table>

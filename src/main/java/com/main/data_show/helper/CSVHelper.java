@@ -159,7 +159,7 @@ public class CSVHelper {
                 }
                 //计算文件名称
                 //String dateStr = toolHelper.dateToStrDate(new Date(), SysConsts.DATE_FORMAT_6);
-                String dateStr = "07-02-19";
+                String dateStr = "07-03-19";
                 String fileNamePrefix = pointVo.getFilePrefixName()+dateStr+".CSV";
                 String allPath = readBasePath + relativePath + fileNamePrefix;
                 logger.info("当前读取的文件名全路径为:"+allPath);
@@ -232,7 +232,7 @@ public class CSVHelper {
                         //总表 不做处理立马就插进来  为了保证数据的完成 不丢失 之后在做别的处理
                         Date dateTime = toolHelper.makeDateByDateAndHour(dateStr, hourStr);
                         long dateTimeInt = toolHelper.dateToNumDate(dateTime,SysConsts.DATE_FORMAT_3);
-                        allPointDataHelper.insertAllPoint(pointId,dateStr,hourStr,ponitValue,0,dateTime,dateTimeInt);
+                        //allPointDataHelper.insertAllPoint(pointId,dateStr,hourStr,ponitValue,0,dateTime,dateTimeInt);
                         //每个小时的用量
                         double pointUsage = 0;
                         //用量时 需要保存上一小时的结果 算当前小时的用量
@@ -248,7 +248,7 @@ public class CSVHelper {
                             }else{
                                 //如果没有 数据库查上次的时间
                                 TaUsagePointData lastUsagePointVo = usagePointDataHelper.getUsagePointDataByPointIdAndTime(pointId, dateTime);
-                                if(lastUsagePointVo!=null){
+                                if(lastUsagePointVo!=null&&toolHelper.isNumeric(ponitValue)&&toolHelper.isNumeric(lastUsagePointVo.getPointData())){
                                     pointUsage = toolHelper.doubleSubtract(ponitValue,lastUsagePointVo.getPointData());;
                                 }else{
                                     pointUsage = 0;
@@ -260,10 +260,6 @@ public class CSVHelper {
                             }
                         }
                         pointDataFlg ++;
-                        //数据插入数据表中
-                        if(ponitVo.getPointId() == 585){
-                            System.out.println("------------pointId:"+ponitVo.getPointId()+",datestr:"+dateStr+",hourStr:"+hourStr);
-                        }
                         insertToDateBase(ponitVo,ponitValue,dateStr,hourStr,pointUsage,dateTime,dateTimeInt);
                     }
                 }
@@ -286,7 +282,7 @@ public class CSVHelper {
                 instantPointDataHelper.insertAllPoint(pointVo.getPointId(),dateStr,hourStr,pointData,0,dateTime,dateTimeInt);
            //点用量数据保存到 usagePointDate中
            }else if(EnumPointTypeDefine.usage.toString().equals(pointVo.getPointType())){
-               usagePointDataHelper.insertAllPoint(pointVo.getPointId(),dateStr,hourStr,pointData,pointUsage,dateTime,dateTimeInt);
+              // usagePointDataHelper.insertAllPoint(pointVo.getPointId(),dateStr,hourStr,pointData,pointUsage,dateTime,dateTimeInt);
                usagePointDataDateHelper.makeUsagePointDate(pointVo.getPointId(),pointUsage,dateTime);
                usagePointDataWeekHelper.makeUsagePointWeek(pointVo.getPointId(),pointUsage,dateTime);
                usagePointDataMonHelper.makeUsagePointMon(pointVo.getPointId(),pointUsage,dateTime);

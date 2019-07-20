@@ -20,7 +20,7 @@ public interface TaPonitMapper {
 
     TaPoint findPointByPointId(@Param("point_id")int pointId);
 
-    List<TaPoint> getPointsByPage();
+    List<TaPoint> getPointsByPage(@Param("point_name")String pointName,@Param("remarks_name")String remarksName);
 
     List<TaPoint> getPointsByPointIds(@Param("pointIds") String pointIds);
 

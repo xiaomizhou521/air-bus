@@ -21,30 +21,15 @@
 
     <insert id="updateTaPointByPointID"  parameterType="com.main.data_show.pojo.TaPoint" >
         <![CDATA[update ta_point set
-                 <if test="pointName!=null and pointName!=''">
-                   point_name = #{pointName},
-                 </if>
-                 <if test="remarksName!=null and remarksName!=''">
-                   remarks_name = #{remarksName},
-                 </if>
-                 <if test="pointType!=null and pointType!=''">
-                   point_type = #{pointType},
-                 </if>
-                 <if test="pointUnit!=null and pointUnit!=''">
-                   point_unit = #{pointUnit},
-                 </if>
-                 <if test="blockNo!=null and blockNo!=''">
-                   block_no = #{blockNo},
-                 </if>
-                 <if test="fileRelativePath!=null and fileRelativePath!=''">
-                   file_relative_path = #{fileRelativePath},
-                 </if>
-                 <if test="filePrefixName!=null and filePrefixName!=''">
-                   file_prefix_name = #{filePrefixName},
-                 </if>
-                 mod_date=now(),
-                 mod_user = #{modUser}
-                 where point_id = #{pointId}]]>
+                remarks_name = #{remarksName},
+                point_type = #{pointType},
+                point_unit = #{pointUnit},
+                block_no = #{blockNo},
+                file_relative_path = #{fileRelativePath},
+                file_prefix_name = #{filePrefixName},
+                mod_date=now(),
+                mod_user = #{modUser}
+                where point_id = #{pointId}]]>
     </insert>
 
     <insert id="updateTaPointByPointName"  parameterType="com.main.data_show.pojo.TaPoint" >
@@ -81,7 +66,16 @@
     </select>
 
     <select id="getPointsByPage" resultMap="pointResult">
-        select * from ta_point
+        select *
+        from ta_point
+        where 1=1
+        <if test="point_name != null and point_name != ''">
+         and point_name like CONCAT('%',#{point_name},'%')
+        </if>
+        <if test="remarks_name != null and remarks_name != ''">
+            and remarks_name like CONCAT('%',#{remarks_name},'%')
+        </if>
+        order by point_id desc
     </select>
 
     <select id="getPointsByPointIds" resultMap="pointResult" >
@@ -90,8 +84,15 @@
 
     <select id="likePointByPointName" resultMap="pointResult">
         <![CDATA[select * from ta_point
+                 where
+                 point_name like CONCAT('%',#{point_name},'%')
+                 order by point_name asc]]>
+    </select>
+
+    <select id="likePointByRemarkName" resultMap="pointResult">
+        <![CDATA[select * from ta_point
                  where point_name
-                 like CONCAT('%',#{point_name},'%') order by point_name asc]]>
+                 like CONCAT('%',#{remarks_name},'%') order by point_name asc]]>
     </select>
 
     <select id="getAllPointRelativePath" resultMap="pointResult">
