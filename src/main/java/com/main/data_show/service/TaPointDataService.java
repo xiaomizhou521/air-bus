@@ -35,7 +35,7 @@ public class TaPointDataService {
     public List<TaPointData> queryPointDataSum(String startExpDate, String endExpDate,String takeTime, String pointIds) throws ParseException {
         Date startExp = toolHelper.makeStrToDate(startExpDate+" "+takeTime, SysConsts.DATE_FORMAT_1);
         //开始时间应该 时选择的时间前一天开始统计  选择日期的用量
-        Date subStartExp = toolHelper.addSubDate(startExp, -1, SysConsts.DATE_FORMAT_1);
+        Date subStartExp = toolHelper.addSubDate(startExp, -1);
         Date endExp = toolHelper.makeStrToDate(endExpDate+" "+takeTime, SysConsts.DATE_FORMAT_1);
         return taPonitDataMapper.queryPointDataSum(subStartExp,endExp,pointIds);
     }

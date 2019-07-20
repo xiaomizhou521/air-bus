@@ -1,7 +1,10 @@
 package com.main.data_show.helper;
 
+import com.main.data_show.consts.ApplicationConsts;
 import com.main.data_show.consts.SysConsts;
-import org.apache.catalina.startup.Catalina;
+import com.main.data_show.enums.EnumUsageTimeTypeDefine;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 
@@ -18,13 +21,16 @@ public class ToolHelper {
     //盐，用于混交md5
     private static final String slat = "&%5123***&&%%$$#@";
 
+    @Autowired
+    private Environment env;
+
     public boolean isEmpty(String words) {
         return words == null || words.trim().length() == 0;
     }
 
     /**
      * 生成md5
-     * @param seckillId
+     * @param str
      * @return
      */
     public String getMD5(String str) {
@@ -45,26 +51,31 @@ public class ToolHelper {
         return sb.toString();
     }
 
-    public static void main(String[] args) throws Exception {
-        //7/6/2019
-        System.out.println(dateStrFormatStr("7/6/2019"));
-    }
     //日期字符串和小时字符串拼成时间
     public Date makeDateByDateAndHour(String dateStr,String hourStr) throws ParseException {
         Date date = makeStrToDate(dateStr+" "+hourStr,SysConsts.DATE_FORMAT);
         return date;
     }
     //日期字符串转化为date
-    public Date makeStrToDate(String dateStr,String date_formate) throws ParseException {
+    public static Date makeStrToDate(String dateStr,String date_formate) throws ParseException {
         SimpleDateFormat df = new SimpleDateFormat(date_formate);
         Date date = df.parse(dateStr);
         return date;
     }
     //日期 加 减
-    public Date addSubDate(Date date, int index,String date_formate){
+    public static  Date addSubDate(Date date, int index){
         Calendar rightNow = Calendar.getInstance();
         rightNow.setTime(date);
         rightNow.add(Calendar.DAY_OF_MONTH, index);
+        Date dt1 = rightNow.getTime();
+        return dt1;
+    }
+
+    //小时 加 减
+    public static Date addSubHour(Date date, int index){
+        Calendar rightNow = Calendar.getInstance();
+        rightNow.setTime(date);
+        rightNow.add(Calendar.HOUR_OF_DAY, index);
         Date dt1 = rightNow.getTime();
         return dt1;
     }
@@ -115,8 +126,8 @@ public class ToolHelper {
         return date;
     }
     //日期转成数字 例如  20190706010000
-    public long dateToNumDate(Date date){
-        SimpleDateFormat sdf=new SimpleDateFormat("yyyyMMddHHmmss");
+    public static long dateToNumDate(Date date,String format){
+        SimpleDateFormat sdf=new SimpleDateFormat(format);
         String c=sdf.format(date);
         long numDate = Long.parseLong(c);
         return numDate;
@@ -129,5 +140,79 @@ public class ToolHelper {
      return b1.subtract(b2).doubleValue();
     }
 
+    //double加法
+    public  double doubleSum(double d1, double d2) {
+     BigDecimal bd1 = new BigDecimal(Double.toString(d1));
+     BigDecimal bd2 = new BigDecimal(Double.toString(d2));
+     return bd1.add(bd2).doubleValue();
+   }
+
+    //判断某个时间属于哪一天
+    // 根据配置的时间点来决定  数据库存的时间应该就是 年月日
+    //返回年月日的数字
+    // type ：  date,week,mon三种
+    public long  getUsageDateWeekMonNum(Date checkDate,String type) throws Exception {
+         //判断规则为 取得checkDate的小时数和配置的小时说比较
+         //如果 checkDate的小时数<=配置的小时   即为今天
+         //如果 checkDate的小时数>配置的小时   即为明天
+        //取得配置的小时数
+        int defHour = Integer.parseInt(env.getProperty(ApplicationConsts.SYS_POINT_USAGE_RECORD_DEF_HOUR));
+        //如果 配置的是 0 点 那么日期就算今天的日期 不需要处理
+        if(defHour == 0){
+            if(EnumUsageTimeTypeDefine.date.toString().equals(type)){
+                return dateToNumDate(checkDate,SysConsts.DATE_FORMAT_4);
+            }else if(EnumUsageTimeTypeDefine.week.toString().equals(type)){
+                return getWeekNumByDate(checkDate);
+            }else if(EnumUsageTimeTypeDefine.mon.toString().equals(type)){
+                return dateToNumDate(checkDate,SysConsts.DATE_FORMAT_5);
+            }
+        }else if(defHour>0){
+            SimpleDateFormat sdf=new SimpleDateFormat("HH");
+            int c=Integer.parseInt(sdf.format(checkDate));
+            if(EnumUsageTimeTypeDefine.date.toString().equals(type)){
+                if(c<=defHour){
+                    return dateToNumDate(checkDate,SysConsts.DATE_FORMAT_4);
+                }else {
+                    //加一天
+                    Date addDate = addSubDate(checkDate, 1);
+                    return dateToNumDate(addDate,SysConsts.DATE_FORMAT_4);
+                }
+            }else if(EnumUsageTimeTypeDefine.week.toString().equals(type)){
+                if(c<=defHour){
+                    return getWeekNumByDate(checkDate);
+                }else {
+                    //加一天
+                    Date addDate = addSubDate(checkDate, 1);
+                    return getWeekNumByDate(addDate);
+                }
+            }else if(EnumUsageTimeTypeDefine.mon.toString().equals(type)){
+                if(c<=defHour){
+                    return dateToNumDate(checkDate,SysConsts.DATE_FORMAT_5);
+                }else {
+                    //加一天
+                    Date addDate = addSubDate(checkDate, 1);
+                    return dateToNumDate(addDate,SysConsts.DATE_FORMAT_5);
+                }
+            }
+        }else{
+            throw new Exception("时间间隔不能是负数！！！");
+        }
+        return 0;
+    }
+    //取周数
+    public long getWeekNumByDate(Date date){
+        Calendar cal = Calendar.getInstance();
+        cal.setFirstDayOfWeek(Calendar.MONDAY);//设置周一为一周的第一天
+        cal.setTime(date);
+        int weekNum = cal.get(Calendar.WEEK_OF_YEAR);
+        int yearNum = cal.get(Calendar.YEAR);
+        return Long.parseLong(yearNum+""+weekNum);
+    }
+
+    public static void main(String[] args) throws ParseException {
+        Date date = makeStrToDate("2019-07-31 00:54:21", SysConsts.DATE_FORMAT_1);
+        Date addDate = addSubDate(date, 1);
+        System.out.println(dateToNumDate(addDate,SysConsts.DATE_FORMAT_5));
+    }
 
 }

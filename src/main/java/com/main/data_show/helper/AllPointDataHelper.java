@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
+import java.util.Date;
 
 @Service
 public class AllPointDataHelper {
@@ -22,12 +23,12 @@ public class AllPointDataHelper {
     public TaAllPonitDataMapper taAllPonitDataMapper;
 
     //pointName 重复不存在的时候新增
-    public int insertAllPoint(int pointId,String dateStr,String hourStr,String pointData,double pointUsage) throws ParseException {
+    public int insertAllPoint(int pointId, String dateStr, String hourStr, String pointData, double pointUsage, Date dateTime, long dateTimeInt) throws ParseException {
             //测试插入taPoint
             TaAllPointData allPointDataVo = new TaAllPointData();
             allPointDataVo.setPointId(pointId);
-            allPointDataVo.setCreateTime(toolHelper.makeDateByDateAndHour(dateStr,hourStr));
-            allPointDataVo.setCreateTimeInt(toolHelper.dateToNumDate(allPointDataVo.getCreateTime()));
+            allPointDataVo.setCreateTime(dateTime);
+            allPointDataVo.setCreateTimeInt(dateTimeInt);
             allPointDataVo.setDateShow(dateStr);
             allPointDataVo.setHourShow(hourStr);
             allPointDataVo.setPointData(pointData);

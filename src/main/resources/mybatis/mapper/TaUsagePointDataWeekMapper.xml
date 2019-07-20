@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.main.data_show.mapper.TaUsagePonitDataWeekMapper">
+    <insert id="insertTaInstantPointDataWeek"  parameterType="com.main.data_show.pojo.TaUsagePointDataWeek" >
+        INSERT INTO ta_usage_point_data_week (point_id,date_show,point_data)
+        VALUES (#{pointId},#{dateShow},#{pointData});
+    </insert>
+    <select id="getUsagePointDataWeekByPointIdAndTime" resultType="com.main.data_show.pojo.TaUsagePointDataWeek">
+        <![CDATA[select point_id as pointId,
+                 date_show as dateShow,
+                 point_data as pointData
+                 from ta_usage_point_data_week t
+                 where t.point_id = #{point_id}
+                 and t.date_show = #{date_show}]]>
+    </select>
+    <update id="updateTaPointDataWeekByPointIdAndTime"  parameterType="com.main.data_show.pojo.TaUsagePointDataWeek" >
+                 update ta_usage_point_data_week set
+                 point_data = #{pointData}
+                 where point_id = #{pointId}
+                 and date_show = #{dateShow}
+    </update>
+
+</mapper>

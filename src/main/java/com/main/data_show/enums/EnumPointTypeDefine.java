@@ -1,5 +1,5 @@
 package com.main.data_show.enums;
 
-public enum EnumPointTypeDefind {
+public enum EnumPointTypeDefine {
     instant,usage
 }
