@@ -14,7 +14,9 @@
     <script type="text/javascript" src="../static/css/bootstrap/jquery-1.11.1.js" ></script>
     <script type="text/javascript" src="../static/css/bootstrap/bootstrap.min.js"></script>
     <script>
-
+         function toAdd() {
+             window.location.href = "/work/toAddPoint";
+         }
     </script>
 </head>
 <body>
@@ -32,7 +34,7 @@
             <input type="submit" class="btn btn-primary btn-sm" style="width:100px;height:35px;margin-bottom: 10px;" value="查询" />
         </div>
         <div style="float:left;width:5%;margin-left: 50px;">
-            <input type="button" class="btn btn-primary btn-sm" style="width:100px;height:35px;margin-bottom: 10px;" value="增加" onclick="toSearch()" />
+            <input type="button" class="btn btn-primary btn-sm" style="width:100px;height:35px;margin-bottom: 10px;" value="增加" onclick="toAdd()" />
         </div>
     </form>
 </div>

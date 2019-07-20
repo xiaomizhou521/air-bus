@@ -88,6 +88,34 @@ public class WorkController {
         return JspPageConst.TO_EDIT_POINT_JSP_REDIRECT;
     }
 
+    @RequestMapping(value = "work/toAddPoint")
+    public String toAddPoint(HttpServletRequest request) {
+        return JspPageConst.TO_ADD_POINT_JSP_REDIRECT;
+    }
+
+    @RequestMapping(value = "work/checkPointNameRepeat")
+    public void checkPointNameRepeat(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        response.setCharacterEncoding(Beans.UTF_8);
+        JSONObject result = new JSONObject();
+        try {
+            String pointName = request.getParameter("pointName");
+            TaPoint point = taPointService.findPointByPointName(pointName);
+            if(point != null){
+                throw new Exception("点名字已经存在！");
+            }
+            result.put("code",1);
+            result.put("data","");
+        } catch (Exception e) {
+            e.printStackTrace();
+            result.put("code",-1);
+            result.put("data",e.getMessage());
+        } finally {
+            response.getWriter().print(result);
+            response.getWriter().flush();
+            response.getWriter().close();
+        }
+    }
+
     @RequestMapping(value = "work/editPointDo")
     public String editPointDo(HttpServletRequest request) throws Exception {
         String pointId = request.getParameter("pointId");
@@ -108,6 +136,35 @@ public class WorkController {
         pointVo.setFileRelativePath(fileRelativePath);
         pointVo.setFilePrefixName(filePrefixName);
         taPointService.update(pointVo);
+        return JspPageConst.REDIRECT_TO_POINT_LIST_JSP_REDIRECT;
+    }
+
+    @RequestMapping(value = "work/addPointDo")
+    public String addPointDo(HttpServletRequest request) throws Exception {
+        String pointName = request.getParameter("pointName");
+        String remarksName = request.getParameter("remarksName");
+        String pointType = request.getParameter("pointType");
+        String pointUnit = request.getParameter("pointUnit");
+        String blockNo = request.getParameter("blockNo");
+        String fileRelativePath = request.getParameter("fileRelativePath");
+        String filePrefixName = request.getParameter("filePrefixName");
+        if(toolHelper.isEmpty(pointName)||toolHelper.isEmpty(pointType)||toolHelper.isEmpty(fileRelativePath)||toolHelper.isEmpty(filePrefixName)){
+            throw new Exception("提交的点的必填信息存在空值");
+        }
+        TaPoint pointVo = taPonitMapper.findPointByPointName(pointName);
+        if(pointVo != null){
+            throw new Exception("点信息已经存在");
+        }
+        pointVo = new TaPoint();
+        pointVo.setPointName(pointName);
+        pointVo.setRemarksName(remarksName);
+        pointVo.setPointType(pointType);
+        pointVo.setPointUnit(pointUnit);
+        pointVo.setBlockNo(blockNo);
+        pointVo.setFileRelativePath(fileRelativePath);
+        pointVo.setFilePrefixName(filePrefixName);
+        pointVo.setState(1);
+        taPointService.insert(pointVo);
         return JspPageConst.REDIRECT_TO_POINT_LIST_JSP_REDIRECT;
     }
 

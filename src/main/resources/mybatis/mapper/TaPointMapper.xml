@@ -50,7 +50,8 @@
         file_relative_path as fileRelativePath,
         file_prefix_name as filePrefixName
         from ta_point
-        where point_name = #{point_name}
+        where state = 1
+        and point_name = #{point_name}
     </select>
 
     <select id="findPointByPointId" resultType="com.main.data_show.pojo.TaPoint">
@@ -62,13 +63,15 @@
                 block_no as blockNo,
                 file_relative_path as fileRelativePath,
                 file_prefix_name as filePrefixName
-                from ta_point where point_id = #{point_id}]]>
+                from ta_point
+                where state = 1
+                and point_id = #{point_id}]]>
     </select>
 
     <select id="getPointsByPage" resultMap="pointResult">
         select *
         from ta_point
-        where 1=1
+        where state = 1
         <if test="point_name != null and point_name != ''">
          and point_name like CONCAT('%',#{point_name},'%')
         </if>
@@ -79,25 +82,29 @@
     </select>
 
     <select id="getPointsByPointIds" resultMap="pointResult" >
-        select * from ta_point where  point_id in (${pointIds}) order by point_name asc
+        select * from ta_point
+        where state = 1
+        and point_id in (${pointIds})
+        order by point_name asc
     </select>
 
     <select id="likePointByPointName" resultMap="pointResult">
         <![CDATA[select * from ta_point
-                 where
-                 point_name like CONCAT('%',#{point_name},'%')
+                 where state = 1
+                 and point_name like CONCAT('%',#{point_name},'%')
                  order by point_name asc]]>
     </select>
 
     <select id="likePointByRemarkName" resultMap="pointResult">
         <![CDATA[select * from ta_point
-                 where point_name
-                 like CONCAT('%',#{remarks_name},'%') order by point_name asc]]>
+                 where state = 1
+                 and point_name like CONCAT('%',#{remarks_name},'%') order by point_name asc]]>
     </select>
 
     <select id="getAllPointRelativePath" resultMap="pointResult">
         <![CDATA[select t.file_relative_path ,t.file_prefix_name
                  from ta_point t
+                 where t.state = 1
                  order by t.file_relative_path,t.file_prefix_name]]>
     </select>
 </mapper>

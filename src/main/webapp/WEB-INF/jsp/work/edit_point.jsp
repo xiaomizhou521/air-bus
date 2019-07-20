@@ -20,6 +20,24 @@
             history.go(-1)
         }
 
+        function checkForm(){
+            var pointTypeId = $("#pointTypeId").val();
+            if(pointTypeId==null||pointTypeId==''){
+                alert("请选择点类型");
+                return false;
+            }
+            var fileRelativePathId = $("#fileRelativePathId").val();
+            if(fileRelativePathId==null||fileRelativePathId==''){
+                alert("请输入点文件相对路径");
+                return false;
+            }
+            var filePrefixNameId = $("#filePrefixNameId").val();
+            if(filePrefixNameId==null||filePrefixNameId==''){
+                alert("请输入CSV文件名前缀");
+                return false;
+            }
+        }
+
     </script>
 </head>
 <body>
@@ -58,16 +76,16 @@
            </tr>
            <tr>
                <td>点文件相对路径：</td>
-               <td><input type="text" class="form-control" value="${pointVo.fileRelativePath}" name="fileRelativePath"/></td>
+               <td><input type="text" id="fileRelativePathId" class="form-control" value="${pointVo.fileRelativePath}" name="fileRelativePath"/></td>
            </tr>
            <tr>
                <td>CSV文件名前缀：</td>
-               <td><input type="text" class="form-control" value="${pointVo.filePrefixName}" name="filePrefixName"/></td>
+               <td><input type="text"  id="filePrefixNameId" class="form-control" value="${pointVo.filePrefixName}" name="filePrefixName"/></td>
            </tr>
            <tr>
                <td colspan="2" style="text-align: center">
                    <input type="button" style="width:100px" class="btn form-control btn-default" onclick="goBack()" value="取消">
-                   <input type="submit" style="width:100px" class="btn form-control btn-default btn-primary" value="确定">
+                   <input type="submit" style="width:100px" onclick="return checkForm()" class="btn form-control btn-default btn-primary" value="确定">
                </td>
            </tr>
        </table>
