@@ -93,4 +93,10 @@
                  where point_name
                  like CONCAT('%',#{point_name},'%') order by point_name asc]]>
     </select>
+
+    <select id="getAllPointRelativePath" resultMap="pointResult">
+        <![CDATA[select t.file_relative_path ,t.file_prefix_name
+                 from ta_point t
+                 order by t.file_relative_path,t.file_prefix_name]]>
+    </select>
 </mapper>

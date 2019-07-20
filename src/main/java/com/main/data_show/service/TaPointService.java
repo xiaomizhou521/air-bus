@@ -8,7 +8,10 @@ import com.main.data_show.pojo.TaUser;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class TaPointService {
@@ -46,6 +49,24 @@ public class TaPointService {
 
     public List<TaPoint> likePointByPointName(String pointName){
         return taPonitMapper.likePointByPointName(pointName);
+    }
+
+    //取点的所有 路径
+    public List<TaPoint> getAllPointRelativePath(){
+        List<TaPoint> allPointRelativePath = taPonitMapper.getAllPointRelativePath();
+        List<TaPoint> result  = new ArrayList<>();
+        Set<String> checkSet = new HashSet<>();
+        //去重
+        for(TaPoint vo : allPointRelativePath){
+            StringBuffer sb = new StringBuffer();
+            sb.append(vo.getFileRelativePath()).append(vo.getFilePrefixName());
+            String checkPath = sb.toString();
+            if(!checkSet.contains(checkPath)){
+                checkSet.add(checkPath);
+                result.add(vo);
+            }
+        }
+        return result;
     }
 
     public TaPoint findPointByPointId(int pointId){

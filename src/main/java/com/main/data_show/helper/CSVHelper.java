@@ -3,6 +3,7 @@ package com.main.data_show.helper;
 import com.csvreader.CsvReader;
 import com.csvreader.CsvWriter;
 import com.main.data_show.consts.ApplicationConsts;
+import com.main.data_show.consts.ParamConsts;
 import com.main.data_show.consts.SysConsts;
 import com.main.data_show.enums.EnumPointTypeDefine;
 import com.main.data_show.pojo.TaPoint;
@@ -118,9 +119,9 @@ public class CSVHelper {
                     if("basePointDate".equals(readFileType)){
                         System.out.println("读取CSV文件:"+fileName+"开始");
                         //点文件相对路径
-                        String relativePath = getPointRelativePath(filePath,basePath);
+                        String relativePath = toolHelper.getPointRelativePath(filePath,basePath);
                         //点文件名的前缀
-                        String fileNamePrefix = getPointRFilenNamePrefix(fileName);
+                        String fileNamePrefix = toolHelper.getPointRFilenNamePrefix(fileName);
                         readCSV(chileFilePath,relativePath,fileNamePrefix);
                     }else if("basePointRemark".equals(readFileType)){
                         readPointRemarkCSV(chileFilePath);
@@ -142,21 +143,54 @@ public class CSVHelper {
         }
     }
 
-    //取文件的相对路径
-    public String getPointRelativePath(String allPath,String basePath){
-        allPath = allPath.replace(basePath,"");
-        return allPath;
+    public void startTimerImportCSVFile(){
+        long startTime = System.currentTimeMillis();
+        String readBasePath = env.getProperty(ApplicationConsts.SYS_DEMO_EXPORT_DATA_BASE_PATH);
+        if(!readBasePath.endsWith(ParamConsts.SEPERRE_STR)){
+            readBasePath = readBasePath+ParamConsts.SEPERRE_STR;
+        }
+        //遍历所有的点  取相对路径和 文件名前缀 要去重
+        List<TaPoint> allPointRelativePathList = taPointService.getAllPointRelativePath();
+        for(TaPoint pointVo : allPointRelativePathList){
+            try {
+                String relativePath = pointVo.getFileRelativePath();
+                if(!relativePath.endsWith(ParamConsts.SEPERRE_STR)){
+                    relativePath = relativePath + ParamConsts.SEPERRE_STR;
+                }
+                //计算文件名称
+                //String dateStr = toolHelper.dateToStrDate(new Date(), SysConsts.DATE_FORMAT_6);
+                String dateStr = "07-02-19";
+                String fileNamePrefix = pointVo.getFilePrefixName()+dateStr+".CSV";
+                String allPath = readBasePath + relativePath + fileNamePrefix;
+                logger.info("当前读取的文件名全路径为:"+allPath);
+                readCSV(allPath,relativePath,fileNamePrefix);
+            }catch (Exception e){
+                e.printStackTrace();
+                logger.error(e.getMessage());
+            }
+        }
+        long endTime = System.currentTimeMillis();
+        long userTime = endTime - startTime;
+        logger.info("---------------共耗时："+userTime+"毫秒");
+        logger.info("---------------共耗时："+userTime+"毫秒");
+        logger.info("---------------共耗时："+userTime+"毫秒");
+        logger.info("---------------共耗时："+userTime+"毫秒");
+        logger.info("---------------共耗时："+userTime+"毫秒");
+        logger.info("---------------共耗时："+userTime+"毫秒");
+        logger.info("---------------共耗时："+userTime+"毫秒");
+        logger.info("---------------共耗时："+userTime+"毫秒");
+        logger.info("---------------共耗时："+userTime+"毫秒");
     }
 
-    //取文件的前缀
-    public String getPointRFilenNamePrefix(String fileName){
-        String prefix = fileName.substring(0, fileName.length() - 12);
-        return prefix;
-    }
 
-//具体读取某个csv文件
+    //具体读取某个csv文件
     public void readCSV(String filePath,String relativePath,String fileNamePrefix) throws Exception {
         try {
+            File file = new File(filePath);
+            if(!file.exists()){
+              logger.error("文件："+filePath+" 不存在！！");
+              throw new Exception("文件："+filePath+" 不存在！！");
+            }
             //取当前点的类型 路径中包含 "REPORTS/POWER/KWH"的是 用量的点
             String pointType = EnumPointTypeDefine.instant.toString();
             if(filePath.indexOf(SysConsts.POINT_USAGE_DEF_FILE_PATH)>-1){

@@ -23,4 +23,6 @@ public interface TaPonitMapper {
     List<TaPoint> getPointsByPage();
 
     List<TaPoint> getPointsByPointIds(@Param("pointIds") String pointIds);
+
+    List<TaPoint> getAllPointRelativePath();
 }

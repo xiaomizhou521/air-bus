@@ -209,6 +209,25 @@ public class ToolHelper {
         return Long.parseLong(yearNum+""+weekNum);
     }
 
+    //取文件的相对路径
+    public String getPointRelativePath(String allPath,String basePath){
+        allPath = allPath.replace(basePath,"");
+        return allPath;
+    }
+
+    //取文件的前缀
+    public String getPointRFilenNamePrefix(String fileName){
+        String prefix = fileName.substring(0, fileName.length() - 12);
+        return prefix;
+    }
+
+    //日期转成字符串 例如  20190706010000
+    public String dateToStrDate(Date date,String format){
+        SimpleDateFormat sdf=new SimpleDateFormat(format);
+        String c=sdf.format(date);
+        return c;
+    }
+
     public static void main(String[] args) throws ParseException {
         Date date = makeStrToDate("2019-07-31 00:54:21", SysConsts.DATE_FORMAT_1);
         Date addDate = addSubDate(date, 1);
