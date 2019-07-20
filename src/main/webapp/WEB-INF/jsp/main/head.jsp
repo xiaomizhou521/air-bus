@@ -30,7 +30,7 @@
                     <li class="layui-nav-item layui-nav-itemed">
                         <a href="javascript:;">系统管理</a>
                         <dl class="layui-nav-child">
-                            <dd><a class="menuClass" href="javaScript:void(0);" url="/work/toPointList">点列表</a></dd>
+                            <dd class="layui-this"><a class="menuClass" href="javaScript:void(0);" url="/work/toPointList">点列表</a></dd>
                             <dd><a class="menuClass" href="javaScript:void(0);" url="/work/toExportDataRecode">导出数据记录</a></dd>
                             <dd><a class="menuClass" href="javaScript:void(0);" url="/work/toExportUsageRecode">导出用量报告</a></dd>
                             <dd><a class="menuClass" href="javaScript:void(0);" url="/work/toExportDeviceChart">导出设备图表-设备</a></dd>
