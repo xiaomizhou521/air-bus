@@ -6,6 +6,7 @@ import com.main.data_show.consts.ApplicationConsts;
 import com.main.data_show.consts.ParamConsts;
 import com.main.data_show.consts.SysConsts;
 import com.main.data_show.enums.EnumPointTypeDefine;
+import com.main.data_show.pojo.TaInstantPointData;
 import com.main.data_show.pojo.TaPoint;
 import com.main.data_show.pojo.TaPointData;
 import com.main.data_show.pojo.TaUsagePointData;
@@ -16,8 +17,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
-import java.io.IOException;
+import javax.servlet.http.HttpServletResponse;
+import java.io.*;
 import java.nio.charset.Charset;
 import java.text.ParseException;
 import java.util.*;
@@ -63,7 +64,7 @@ public class CSVHelper {
     //遍历文件夹读取所有文件
     public  void exportPointBaseData() throws Exception {
         long startTime = System.currentTimeMillis();
-        String readBasePath = env.getProperty(ApplicationConsts.SYS_DEMO_EXPORT_DATA_BASE_PATH);
+        String readBasePath = env.getProperty(ApplicationConsts.SYS_DEMO_IMPORT_DATA_BASE_PATH);
         File file=new File(readBasePath);
         if(!file.isDirectory()){
             //file不是文件夹
@@ -91,7 +92,7 @@ public class CSVHelper {
     //导入点的备注信息
     //遍历文件夹读取所有文件
     public  void exportPointBaseRemarkData() throws Exception {
-        String readBasePath = env.getProperty(ApplicationConsts.SYS_DEMO_EXPORT_DATA_REMARK_BASE_PATH);
+        String readBasePath = env.getProperty(ApplicationConsts.SYS_DEMO_IMPORT_DATA_REMARK_BASE_PATH);
         File file=new File(readBasePath);
         if(!file.isDirectory()){
             //file不是文件夹
@@ -145,7 +146,7 @@ public class CSVHelper {
 
     public void startTimerImportCSVFile(){
         long startTime = System.currentTimeMillis();
-        String readBasePath = env.getProperty(ApplicationConsts.SYS_DEMO_EXPORT_DATA_BASE_PATH);
+        String readBasePath = env.getProperty(ApplicationConsts.SYS_DEMO_IMPORT_DATA_BASE_PATH);
         if(!readBasePath.endsWith(ParamConsts.SEPERRE_STR)){
             readBasePath = readBasePath+ParamConsts.SEPERRE_STR;
         }
@@ -328,34 +329,39 @@ public class CSVHelper {
     }
 
 
-    public void writeCSV1(List<TaPoint> taPointList,List<TaPointData> taPointDataList){
+    public String writeCSV1(List<TaPoint> taPointList, Map<Long,Map<Integer, TaInstantPointData>> resultDateMap, String startTime, String endTime, HttpServletResponse response) throws Exception {
         try {
-            File file = new File("C:\\01work\\priv_work190415\\CSV_test\\test.csv");
+            String readBasePath = env.getProperty(ApplicationConsts.SYS_DEMO_EXPORT_DATA_BASE_PATH);
+            if(toolHelper.isEmpty(readBasePath)){
+                throw new Exception(ApplicationConsts.SYS_DEMO_EXPORT_DATA_BASE_PATH+",基础路径为空!");
+            }
+            if(!readBasePath.endsWith(ParamConsts.SEPERRE_STR)){
+                readBasePath = readBasePath+ParamConsts.SEPERRE_STR;
+            }
+            //生成文件名
+            String fileName = "Instant("+startTime+"_"+endTime+").CSV";
+            String exportFilePath = readBasePath+fileName;
+            File file = new File(exportFilePath);
             if(!file.exists()){
                 file.createNewFile();
             }
             CsvWriter csvWriter = new CsvWriter(file.getCanonicalPath(), ',', Charset.forName("GBK"));
             //通用部分
             writeCommon(csvWriter,taPointList);
-        /*  数据格式 如下
-                               Row: 4, 2019-03-11 00:00:00.0, 2019/3/11, 0:00:00, 1049479.13
-                    <==        Row: 5, 2019-03-11 00:00:00.0, 2019/3/11, 0:00:00, 5421.92
-                    <==        Row: 6, 2019-03-11 00:00:00.0, 2019/3/11, 0:00:00, 405849.88
-                    <==        Row: 14, 2019-03-11 00:00:00.0, 2019/3/11, 0:00:00, 330458.09
-                    <==        Row: 4, 2019-03-11 01:00:00.0, 2019/3/11, 1:00:00, 1049556
-                    <==        Row: 5, 2019-03-11 01:00:00.0, 2019/3/11, 1:00:00, 5422.08
-                    <==        Row: 6, 2019-03-11 01:00:00.0, 2019/3/11, 1:00:00, 405867.94
-                    <==        Row: 14, 2019-03-11 01:00:00.0, 2019/3/11, 1:00:00, 330458.25*/
             Map<Date,ArrayList> pointDateMap = new LinkedHashMap<>();
-            for(TaPointData dataVo : taPointDataList){
-                if(!pointDateMap.containsKey(dataVo.getCreateTime())){
-                    ArrayList<String> pointDataList = new ArrayList<>();
-                    pointDataList.add(dataVo.getDateShow());
-                    pointDataList.add(dataVo.getHourShow());
-                    pointDataList.add(dataVo.getPointData());
-                    pointDateMap.put(dataVo.getCreateTime(),pointDataList);
-                }else{
-                    pointDateMap.get(dataVo.getCreateTime()).add(dataVo.getPointData());
+            for(Map.Entry<Long,Map<Integer, TaInstantPointData>> dataVoMap : resultDateMap.entrySet()){
+                Map<Integer, TaInstantPointData> value = dataVoMap.getValue();
+                for(TaPoint pointVo : taPointList){
+                    TaInstantPointData dataVo = value.get(pointVo.getPointId());
+                    if(!pointDateMap.containsKey(dataVo.getCreateTime())){
+                        ArrayList<String> pointDataList = new ArrayList<>();
+                        pointDataList.add(dataVo.getDateShow());
+                        pointDataList.add(dataVo.getHourShow());
+                        pointDataList.add(dataVo.getPointData());
+                        pointDateMap.put(dataVo.getCreateTime(),pointDataList);
+                    }else{
+                        pointDateMap.get(dataVo.getCreateTime()).add(dataVo.getPointData());
+                    }
                 }
             }
             for(Map.Entry<Date,ArrayList> map : pointDateMap.entrySet()){
@@ -363,8 +369,8 @@ public class CSVHelper {
                 csvWriter.writeRecord(value.toArray(new String[value.size()]));
             }
             csvWriter.close();
-
-            /*response.setContentType("application/csv; charset=utf-8");
+            return exportFilePath;
+           /* response.setContentType("application/csv; charset=utf-8");
             response.setHeader("Content-Disposition", "attachment; filename=" + fileName);
             InputStream in = new FileInputStream(file);
             OutputStream out = response.getOutputStream();
@@ -373,8 +379,9 @@ public class CSVHelper {
             while ((len = in.read(buffer)) > 0) {
                 out.write(buffer, 0, len);
             }*/
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
+            throw e;
         }
     }
 

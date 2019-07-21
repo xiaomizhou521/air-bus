@@ -14,32 +14,72 @@
             $("#pointId_Select").load("/work/toLoadPointSelect",{
                 selectId:'data-recode'
             },function(){
-                $("#proc_dep_id1_id").delegate("li","click",function(){
-                    alert();
-                });
             })
+
+            $("#showDownBtn").show();
+            $("#useDownBtn").hide();
 
         })
 
         function makeReport(){
             var pointIds = $("#data-recode-pointIds").val();
-            var pointTest = $(".filter-option").html();
-            alert(pointIds);
-            alert(pointTest);
-
-            /*var startExpDate = $("#startDate").val();
+            if(pointIds==null||pointIds==''){
+                alert("请选择点！");
+                return;
+            }
+            var startExpDate = $("#startDate").val();
+            if(startExpDate==null||startExpDate==''){
+                alert("请选择开始时间！");
+                return;
+            }
             var endExpDate = $('#endDate').val();
+            if(endExpDate==null||endExpDate==''){
+                alert("请选择结束时间！");
+                return;
+            }
+            $("#makeReportId").attr("disabled",true);
+            $("#showFilePath").html("生成报告中。。。。请不要关闭页面！");
+            var words = (pointIds+'').split(',');
+            var pointIdsValue = "";
+            for(var i=0 ;i < words.length; i++){
+                if(pointIdsValue == ""){
+                    pointIdsValue = words[i];
+                }else{
+                    pointIdsValue = pointIdsValue +";"+ words[i];
+                }
+            }
             $.ajax({
                 type:"POST",
                 url:'/work/exportDataRecodeDo',
                 dataType:'json',
                 async:false,
                 traditional: true,
-                data:{'startExpDate':startExpDate,'endExpDate':endExpDate,'pointIds':pointIds},
+                data:{'startExpDate':startExpDate,'endExpDate':endExpDate,'pointIds':pointIdsValue},
                 success: function(data) {
-
+                    $("#makeReportId").attr("disabled",false);
+                    var code = data.code;
+                    var result = data.data;
+                    if(code ==1){
+                        $("#csvFilePath").val(result)
+                        $("#showFilePath").html("生成报告位置："+result);
+                        $("#showDownBtn").hide();
+                        $("#useDownBtn").show();
+                        alert("报告生成成功！可点击下载");
+                    }else if(code ==-1){
+                        $("#showFilePath").html("");
+                         alert("报告生成失败:"+result);
+                    }
                 }
-            });*/
+            });
+        }
+
+        function downLoadFile() {
+            var csvFilePath = $("#csvFilePath").val();
+            if(csvFilePath ==null ||csvFilePath==''){
+                alert("请先生成报告！");
+                return;
+            }
+            window.location.href = "/work/downloadCsv?filePath=" + csvFilePath;
         }
     </script>
     <style>
@@ -70,7 +110,17 @@
                     </td>
                 </tr>
             </table>
-            <div><input type="button" class="btn btn-default btn-success" onclick="makeReport()" value="生成报告"></div>
+            <div style="    height: 80px;">
+                <div style="float:left;"><input type="button" id="makeReportId" class="btn btn-default btn-success" onclick="makeReport()" value="生成报告"></div>
+                <div style="float:left;margin-left:20px;">
+                    <%--<input id="showDownBtn" type="button" class="btn btn-default" value="下载文件">--%>
+                    <input id="useDownBtn" type="button" class="btn btn-default btn-success" onclick="downLoadFile()" value="下载文件">
+                </div>
+            </div>
+            <div id="">
+                       <span id="showFilePath"></span>
+                       <input type="hidden" id="csvFilePath" />
+            </div>
         </div>
     </div>
 

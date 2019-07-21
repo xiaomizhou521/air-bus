@@ -8,6 +8,9 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -80,6 +83,22 @@ public class ToolHelper {
         return dt1;
     }
 
+    /**
+     * 字符串转换成日期
+     * @param str
+     * @return date
+     */
+    public Date StrToDate(String str,String formatStr) {
+        SimpleDateFormat format = new SimpleDateFormat(formatStr);
+        Date date = null;
+        try {
+            date = format.parse(str);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return date;
+    }
+
     /***
       * 判断字符串是否为数字（包含小数点）
       * @param str
@@ -126,7 +145,7 @@ public class ToolHelper {
         return date;
     }
     //日期转成数字 例如  20190706010000
-    public static long dateToNumDate(Date date,String format){
+    public long dateToNumDate(Date date,String format){
         SimpleDateFormat sdf=new SimpleDateFormat(format);
         String c=sdf.format(date);
         long numDate = Long.parseLong(c);
@@ -228,10 +247,42 @@ public class ToolHelper {
         return c;
     }
 
+    /**
+     * 中文文件名支持
+     *
+     * @param request
+     * @param response
+     * @param fileName
+     * @throws UnsupportedEncodingException
+     */
+    public void setFileDownloadHeader(HttpServletRequest request, HttpServletResponse response, String fileName) throws UnsupportedEncodingException {
+        String encodedfileName = null;
+        String agent = request.getHeader("USER-AGENT");
+        if (null != agent && -1 != agent.indexOf("MSIE")) {
+            encodedfileName = java.net.URLEncoder.encode(fileName, "UTF-8");
+        } else if (null != agent && -1 != agent.indexOf("Mozilla")) {
+            encodedfileName = new String(fileName.getBytes("UTF-8"), "iso-8859-1");
+        } else {
+            encodedfileName = java.net.URLEncoder.encode(fileName, "UTF-8");
+        }
+        response.setHeader("Content-Disposition", "attachment; filename=\"" + encodedfileName + "\"");
+    }
+
+    //比较两个字符串时间的大小 true 正确 false 错误
+    public boolean compareStrDate(String startDateStr,String endDateStr,String format){
+        Date startDate = StrToDate(startDateStr, format);
+        Date endDate = StrToDate(endDateStr, format);
+        if(startDate.before(endDate)){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
     public static void main(String[] args) throws ParseException {
         Date date = makeStrToDate("2019-07-31 00:54:21", SysConsts.DATE_FORMAT_1);
         Date addDate = addSubDate(date, 1);
-        System.out.println(dateToNumDate(addDate,SysConsts.DATE_FORMAT_5));
+       // System.out.println(dateToNumDate(addDate,SysConsts.DATE_FORMAT_5));
     }
 
 }

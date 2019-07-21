@@ -7,4 +7,18 @@
         INSERT INTO ta_instant_point_data (point_id,create_time_int, create_time, date_show, hour_show, point_data,point_usage)
         VALUES (#{pointId},#{createTimeInt},#{createTime}, #{dateShow}, #{hourShow}, #{pointData},#{pointUsage});
     </insert>
+    <select id="findInstantPointByPointIdAndTime" resultType="com.main.data_show.pojo.TaInstantPointData">
+        <![CDATA[select point_id as pointId,
+                create_time_int as createTimeInt,
+                create_time as createTime,
+                date_show as dateShow,
+                hour_show as hourShow,
+                point_data as pointData,
+                point_usage as pointUsage
+                from ta_instant_point_data
+                where point_id = #{point_id}
+                and create_time_int >= ${startExpDate}
+                and create_time_int < ${endExpDate}
+                order by create_time_int asc]]>
+    </select>
 </mapper>

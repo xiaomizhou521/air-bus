@@ -3,11 +3,15 @@ package com.main.data_show.controller;
 import cn.com.enorth.utility.Beans;
 import com.github.pagehelper.PageInfo;
 import com.main.data_show.consts.JspPageConst;
+import com.main.data_show.consts.ParamConsts;
+import com.main.data_show.consts.SysConsts;
 import com.main.data_show.helper.CSVHelper;
+import com.main.data_show.helper.InstantPointDataHelper;
 import com.main.data_show.helper.JFreeChartHelper;
 import com.main.data_show.helper.ToolHelper;
 import com.main.data_show.mapper.TaPonitDataMapper;
 import com.main.data_show.mapper.TaPonitMapper;
+import com.main.data_show.pojo.TaInstantPointData;
 import com.main.data_show.pojo.TaPoint;
 import com.main.data_show.pojo.TaPointData;
 import com.main.data_show.service.TaPointDataService;
@@ -23,7 +27,9 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.jsp.JspPage;
-import java.io.IOException;
+import java.io.*;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -52,6 +58,9 @@ public class WorkController {
 
     @Autowired
     private JFreeChartHelper jFreeChartHelper;
+
+    @Autowired
+    private InstantPointDataHelper instantPointDataHelper;
 
 
     @RequestMapping(value = "work/toPointList")
@@ -177,32 +186,67 @@ public class WorkController {
     }
     //导出数据记录
     @RequestMapping(value = "work/exportDataRecodeDo")
-    public void exportDataRecodeDo(HttpServletRequest request) throws Exception {
-        String pointIds = request.getParameter("pointIds");
-        String startExpDate = request.getParameter("startExpDate");
-        String endExpDate = request.getParameter("endExpDate");
-        String pointsInStr = "";
-        if(toolHelper.isEmpty(pointIds)){
-            throw new Exception("请选择点信息");
-        }
-        if(toolHelper.isEmpty(startExpDate)){
-            throw new Exception("请选择导出开始时间");
-        }
-        if(toolHelper.isEmpty(endExpDate)){
-            throw new Exception("请选择导出结束时间");
-        }
-        for(String str : pointIds.split(";")){
-            if(toolHelper.isEmpty(pointsInStr)){
-                pointsInStr = str;
-            }else{
-                pointsInStr = pointsInStr+","+str;
+    public void exportDataRecodeDo(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        response.setCharacterEncoding(Beans.UTF_8);
+        JSONObject result = new JSONObject();
+        try {
+            String pointIds = request.getParameter("pointIds");
+            String startExpDate = request.getParameter("startExpDate");
+            String endExpDate = request.getParameter("endExpDate");
+            String pointsInStr = "";
+            if(toolHelper.isEmpty(pointIds)){
+                throw new Exception("请选择点信息");
             }
+            if(toolHelper.isEmpty(startExpDate)){
+                throw new Exception("请选择导出开始时间");
+            }
+            if(toolHelper.isEmpty(endExpDate)){
+                throw new Exception("请选择导出结束时间");
+            }
+            if(!toolHelper.compareStrDate(startExpDate,endExpDate,SysConsts.DATE_FORMAT_7)){
+                throw new Exception("结束时间要大于开始时间");
+            }
+            for(String str : pointIds.split(";")){
+                if(toolHelper.isEmpty(pointsInStr)){
+                    pointsInStr = str;
+                }else{
+                    pointsInStr = pointsInStr+","+str;
+                }
+            }
+            //取点信息
+            List<TaPoint> taPointList = taPointService.getPointsByPointIds(pointsInStr);
+            Map<Long,Map<Integer,TaInstantPointData>> exportResult = new LinkedHashMap<>();
+            for(TaPoint point : taPointList){
+                //单个取每个点的数据
+                long startExportTimeNum = toolHelper.dateToNumDate(toolHelper.StrToDate(startExpDate, SysConsts.DATE_FORMAT_7), SysConsts.DATE_FORMAT_3);
+                long endExportTimeNum = toolHelper.dateToNumDate(toolHelper.StrToDate(endExpDate, SysConsts.DATE_FORMAT_7), SysConsts.DATE_FORMAT_3);
+                List<TaInstantPointData> instntPointVoList = instantPointDataHelper.findInstantPointByPointIdAndTime(startExportTimeNum, endExportTimeNum, point.getPointId());
+                //循环建出能写进文件的数据格式
+                for(TaInstantPointData vo : instntPointVoList){
+                    if(exportResult.containsKey(vo.getCreateTimeInt())){
+                        exportResult.get(vo.getCreateTimeInt()).put(vo.getPointId(),vo);
+                    }else{
+                        Map<Integer,TaInstantPointData> exportPointResult = new LinkedHashMap<>();
+                        exportPointResult.put(vo.getPointId(),vo);
+                        exportResult.put(vo.getCreateTimeInt(),exportPointResult);
+                    }
+                }
+            }
+            System.out.println(exportResult.size());
+            //取点数据
+            List<TaPointData> taPointDataList = taPonitDataMapper.queryPointData(startExpDate, endExpDate, pointsInStr);
+            String path = csvHelper.writeCSV1(taPointList, exportResult, startExpDate, endExpDate, response);
+            result.put("code",1);
+            result.put("data",path);
+        }catch (Exception e) {
+            e.printStackTrace();
+            result.put("code",-1);
+            result.put("data",e.getMessage());
+        } finally {
+            response.getWriter().print(result);
+            response.getWriter().flush();
+            response.getWriter().close();
         }
-        //取点信息
-        List<TaPoint> taPointList = taPointService.getPointsByPointIds(pointsInStr);
-        //取点数据
-        List<TaPointData> taPointDataList = taPonitDataMapper.queryPointData(startExpDate, endExpDate, pointsInStr);
-        csvHelper.writeCSV1(taPointList,taPointDataList);
     }
 
     @RequestMapping(value = "work/toExportUsageRecode")
@@ -332,6 +376,70 @@ public class WorkController {
             response.getWriter().print(result);
             response.getWriter().flush();
             response.getWriter().close();
+        }
+    }
+
+    /**
+     * 下载文件
+     *
+     * @param request
+     * @param response
+     * @throws Exception
+     */
+    @RequestMapping(value = "work/downloadCsv")
+    public void downloadCsv(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        FileInputStream fileInputStream = null;
+        BufferedInputStream bufferedInputStream = null;
+        OutputStream outputStream = null;
+        BufferedOutputStream bufferedOutputStream = null;
+        try {
+            String downloadZipPath = request.getParameter("filePath");
+            File file = new File(downloadZipPath);
+            if(!file.exists()){
+                throw new Exception("文件："+downloadZipPath+" 不存在！");
+            }
+            String packageName = file.getName();
+           // String packageName = downloadZipPath.substring(downloadZipPath.lastIndexOf(ParamConsts.SEPERRE_STR),downloadZipPath.length()-1);
+            fileInputStream = new FileInputStream(new File(downloadZipPath));
+            bufferedInputStream = new BufferedInputStream(fileInputStream);
+            outputStream = response.getOutputStream();
+            bufferedOutputStream = new BufferedOutputStream(outputStream);
+
+            toolHelper.setFileDownloadHeader(request, response, packageName);
+            int byteRead = 0;
+            byte[] buffer = new byte[8192];
+            while ((byteRead = bufferedInputStream.read(buffer, 0, 8192)) != -1) {
+                bufferedOutputStream.write(buffer, 0, byteRead);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (bufferedOutputStream!=null) {
+                try {
+                    bufferedOutputStream.flush();
+                    bufferedOutputStream.close();
+                } catch (IOException e) {
+                    System.out.println("bos.close has occur a problem.");
+                    e.printStackTrace();
+                }
+            }
+            if (outputStream!=null) {
+                try {
+                    outputStream.flush();
+                    outputStream.close();
+                } catch (IOException e) {
+                    System.out.println("fos.close has occur a problem.");
+                    e.printStackTrace();
+                }
+            }
+            if (bufferedInputStream!=null) {
+                try {
+                    bufferedInputStream.close();
+                } catch (IOException e) {
+                    System.out.println("bis.close has occur a problem.");
+                    e.printStackTrace();
+                }
+            }
         }
     }
 
