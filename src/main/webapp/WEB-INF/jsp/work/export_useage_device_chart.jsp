@@ -18,6 +18,15 @@
     <link rel="stylesheet" type="text/css" href="../static/css/dist/css/bootstrap-select.css">
     <script>
         $(function(){
+            $("#pointId_Select").load("/work/toLoadPointSelect",{
+                selectId:'data-recode',
+                pointType:'usage'
+            },function(){
+            })
+
+            $("#showDownBtn").show();
+            $("#useDownBtn").hide();
+
              $("#date_mod").show();
              $("#week_mod").hide();
              $("#mon_mod").hide();
@@ -40,31 +49,74 @@
         })
 
         function makeReport(){
-            var pointIds ='';
-            $(".pointIdClass").each(function(){
-                if($(this).is(":checked")){
-                    if(pointIds == ''){
-                        pointIds = $(this).val();
-                    }else{
-                        pointIds = pointIds+";"+$(this).val();
-                    }
-
-                }
-            })
-            var startExpDate = $("#startDate").val();
-            var endExpDate = $('#endDate').val();
+            var pointIds = $("#data-recode-pointIds").val();
+            if(pointIds==null||pointIds==''){
+                alert("请选择点！");
+                return;
+            }
+            var startExpDate;
+            var endExpDate;
+            var intervalTypeId = $("#intervalTypeId").val();
+            if(intervalTypeId == 'week'){
+                startExpDate = $("#d122").val();
+                endExpDate = $('#d123').val();
+            }else if(intervalTypeId == 'date'){
+                startExpDate = $("#startDate").val();
+                endExpDate = $('#endDate').val();
+            }else if(intervalTypeId == 'mon'){
+                startExpDate = $("#startMon").val();
+                endExpDate = $('#endMon').val();
+            }
+            if(startExpDate==null||startExpDate==''){
+                alert("请选择开始时间！");
+                return;
+            }
+            if(endExpDate==null||endExpDate==''){
+                alert("请选择结束时间！");
+                return;
+            }
             var takeTime = $("#takeTimeId").val();
+            var words = (pointIds+'').split(',');
+            var pointIdsValue = "";
+            for(var i=0 ;i < words.length; i++){
+                if(pointIdsValue == ""){
+                    pointIdsValue = words[i];
+                }else{
+                    pointIdsValue = pointIdsValue +";"+ words[i];
+                }
+            }
             $.ajax({
                 type:"POST",
-                url:'/work/exportUsageRecodeDo',
+                url:'/work/exportUsageChartDo',
                 dataType:'json',
                 async:false,
                 traditional: true,
-                data:{'startExpDate':startExpDate,'endExpDate':endExpDate,'pointIds':pointIds,'takeTime':takeTime},
+                data:{'startExpDate':startExpDate,'endExpDate':endExpDate,'pointIds':pointIdsValue,'type':intervalTypeId},
                 success: function(data) {
-
+                    $("#makeReportId").attr("disabled",false);
+                    var code = data.code;
+                    var result = data.data;
+                    if(code ==1){
+                        $("#csvFilePath").val(result)
+                        $("#showFilePath").html("生成报告位置："+result);
+                        $("#showDownBtn").hide();
+                        $("#useDownBtn").show();
+                        alert("报告生成成功！可点击下载");
+                    }else if(code ==-1){
+                        $("#showFilePath").html("");
+                        alert("报告生成失败:"+result);
+                    }
                 }
             });
+        }
+
+        function downLoadFile() {
+            var csvFilePath = $("#csvFilePath").val();
+            if(csvFilePath ==null ||csvFilePath==''){
+                alert("请先生成报告！");
+                return;
+            }
+            window.location.href = "/work/downloadCsv?filePath=" + csvFilePath;
         }
 
         function funccc122(){
@@ -81,17 +133,13 @@
     <div style="width: 100%">
         <div style="width:1100px;margin:auto;margin-top:20px;">
             <table>
-            <tr>
-                <td style="width: 200px">请选择要生成图表的点:</td>
-                <td>
-                    <ul class="pagination" style="width: 100%;margin:0px">
-                        <c:forEach items="${pointList}" var="res" varStatus="index">
-                            <li class=""><input type="checkbox" class="pointIdClass" name="pointIds" id="pointIndex${index.index}"  value="${res.pointId}"><label for="pointIndex${index.index}">${res.pointName}</label></li>
-                        </c:forEach>
-                    </ul>
-                </td>
-            </tr>
-            <tr>
+                <tr style="height: 80px;">
+                    <td style="width: 200px">请选择点:</td>
+                    <td>
+                        <div id="pointId_Select"></div>
+                    </td>
+                </tr>
+            <tr style="height: 80px;">
                 <td style="width: 200px">请选择统计周期:</td>
                 <td>
                    <select class="form-control" style="width:200px" id="intervalTypeId" name="intervalType" />
@@ -101,7 +149,7 @@
                     </select>
                 </td>
             </tr>
-            <tr id="date_mod">
+            <tr id="date_mod" style="height: 80px;">
                 <td style="width: 200px">请选择日期间隔:</td>
                 <td>
                     <div class="input-group" style="float:left;margin-bottom: 10px;line-height: 35px;width:10%;margin-left:5px;">
@@ -113,7 +161,7 @@
                     </div>
                 </td>
             </tr>
-            <tr id="week_mod">
+            <tr id="week_mod" style="height: 80px;">
                 <td style="width: 200px">请选择周间隔:</td>
                 <td >
                     <div class="input-group" style="float:left;margin-bottom: 10px;line-height: 35px;width:10%;margin-left:5px;">
@@ -125,7 +173,7 @@
                     </div>
                 </td>
             </tr>
-            <tr id="mon_mod">
+            <tr id="mon_mod" style="height: 80px;">
                 <td style="width: 200px">请选择月间隔:</td>
                 <td>
                     <div class="input-group" style="float:left;margin-bottom: 10px;line-height: 35px;width:10%;margin-left:5px;">
@@ -138,7 +186,7 @@
                 </td>
             </tr>
 
-            <tr>
+            <%--<tr>
                 <td style="width: 200px">请选择采样时间:</td>
                 <td>
                     <select id="takeTimeId" class="form-control" style="width:150px;">
@@ -168,9 +216,19 @@
                         <option value="23:00:00">23:00</option>
                     </select>
                 </td>
-            </tr>
+            </tr>--%>
             </table>
-            <div style="margin-top:30px;"><input type="button" class="btn btn-default btn-success" onclick="makeReport()" value="生成报告"></div>
+            <div style="    height: 80px;">
+                <div style="float:left;"><input type="button" id="makeReportId" class="btn btn-default btn-success" onclick="makeReport()" value="生成报告"></div>
+                <div style="float:left;margin-left:20px;">
+                    <%--<input id="showDownBtn" type="button" class="btn btn-default" value="下载文件">--%>
+                    <input id="useDownBtn" type="button" class="btn btn-default btn-success" onclick="downLoadFile()" value="下载文件">
+                </div>
+            </div>
+            <div id="">
+                <span id="showFilePath"></span>
+                <input type="hidden" id="csvFilePath" />
+            </div>
         </div>
     </div>
 </form>

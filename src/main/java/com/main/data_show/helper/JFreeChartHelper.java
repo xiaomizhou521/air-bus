@@ -6,6 +6,7 @@ import com.main.data_show.consts.SysConsts;
 import com.main.data_show.pojo.TaInstantPointData;
 import com.main.data_show.pojo.TaPoint;
 import com.main.data_show.pojo.TaPointData;
+import com.main.data_show.pojo.TaUsagePointDataDate;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartFrame;
 import org.jfree.chart.ChartUtilities;
@@ -57,9 +58,17 @@ public class JFreeChartHelper {
         JFreeChart freeChart = createChart(dataset);
         // 步骤3：将JFreeChart对象输出到文件，Servlet输出流等
         //生成文件名
-        String readBasePath = env.getProperty(ApplicationConsts.SYS_DEMO_USAGE_EXPORT_DATA_BASE_PATH);
+        String readBasePath = env.getProperty(ApplicationConsts.SYS_DEMO_INSTANT_EXPORT_IMG_BASE_PATH);
         if(toolHelper.isEmpty(readBasePath)){
-            throw new Exception(ApplicationConsts.SYS_DEMO_USAGE_EXPORT_DATA_BASE_PATH+",基础路径为空!");
+            throw new Exception(ApplicationConsts.SYS_DEMO_INSTANT_EXPORT_IMG_BASE_PATH+",基础路径为空!");
+        }
+        String imgWidth = env.getProperty(ApplicationConsts.SYS_DEMO_EXPORT_IMG_WIDTH);
+        if(toolHelper.isEmpty(imgWidth)){
+            throw new Exception(ApplicationConsts.SYS_DEMO_EXPORT_IMG_WIDTH+",导出图片宽设置为空!");
+        }
+        String imgHeight = env.getProperty(ApplicationConsts.SYS_DEMO_EXPORT_IMG_HEIGHT);
+        if(toolHelper.isEmpty(imgHeight)){
+            throw new Exception(ApplicationConsts.SYS_DEMO_EXPORT_IMG_HEIGHT+",导出图片高设置为空!");
         }
         if(!readBasePath.endsWith(ParamConsts.SEPERRE_STR)){
             readBasePath = readBasePath+ParamConsts.SEPERRE_STR;
@@ -72,18 +81,41 @@ public class JFreeChartHelper {
         String endStr = endTime.substring(0,endTime.length()-6);
         String fileName = "Instant("+startStr+"_"+endStr+").png";
         String exportFilePath = readBasePath+fileName;
-        saveAsFile(freeChart, exportFilePath, 1000, 500);
+        saveAsFile(freeChart, exportFilePath, Integer.parseInt(imgWidth), Integer.parseInt(imgHeight));
         return exportFilePath;
     }
 
     //生成设备图表开始 柱形图
-    public void createUsageDeviceChartStart(java.util.List<TaPoint> taPointList, List<TaPointData> taPointDataList) throws IOException {
+    public String createUsageDeviceChartStart(java.util.List<TaPoint> taPointList, List<TaUsagePointDataDate> taPointDataList,String startStr,String endStr) throws Exception {
+        //生成文件名
+        String readBasePath = env.getProperty(ApplicationConsts.SYS_DEMO_USAGE_EXPORT_IMG_BASE_PATH);
+        if(toolHelper.isEmpty(readBasePath)){
+            throw new Exception(ApplicationConsts.SYS_DEMO_USAGE_EXPORT_IMG_BASE_PATH+",基础路径为空!");
+        }
+        String imgWidth = env.getProperty(ApplicationConsts.SYS_DEMO_EXPORT_IMG_WIDTH);
+        if(toolHelper.isEmpty(imgWidth)){
+            throw new Exception(ApplicationConsts.SYS_DEMO_EXPORT_IMG_WIDTH+",导出图片宽设置为空!");
+        }
+        String imgHeight = env.getProperty(ApplicationConsts.SYS_DEMO_EXPORT_IMG_HEIGHT);
+        if(toolHelper.isEmpty(imgHeight)){
+            throw new Exception(ApplicationConsts.SYS_DEMO_EXPORT_IMG_HEIGHT+",导出图片高设置为空!");
+        }
         // 步骤1：创建CategoryDataset对象（准备数据）
         DefaultCategoryDataset usageDeviceChartData = createUsageDeviceChartData(taPointList, taPointDataList);
         // 步骤2：根据Dataset 生成JFreeChart对象，以及做相应的设置
         JFreeChart freeChart = createUageChart(usageDeviceChartData);
         // 步骤3：将JFreeChart对象输出到文件，Servlet输出流等
-        saveAsFile(freeChart, "C:\\01work\\priv_work190415\\CSV_test\\zhuxing.png", 1000, 500);
+        if(!readBasePath.endsWith(ParamConsts.SEPERRE_STR)){
+            readBasePath = readBasePath+ParamConsts.SEPERRE_STR;
+        }
+        File file1 = new File(readBasePath);
+        if(!file1.exists()){
+            file1.mkdir();
+        }
+        String fileName = "Usage("+startStr+"_"+endStr+").png";
+        String exportFilePath = readBasePath+fileName;
+        saveAsFile(freeChart, exportFilePath, Integer.parseInt(imgWidth), Integer.parseInt(imgHeight));
+        return exportFilePath;
     }
 
     public TimeSeriesCollection createDeviceChartDate(java.util.List<TaPoint> taPointList, List<TaInstantPointData> taPointDataList){
@@ -120,20 +152,15 @@ public class JFreeChartHelper {
         return lineDataset;
     }
 
-    public DefaultCategoryDataset createUsageDeviceChartData(java.util.List<TaPoint> taPointList, List<TaPointData> taPointDataList){
+    public DefaultCategoryDataset createUsageDeviceChartData(java.util.List<TaPoint> taPointList, List<TaUsagePointDataDate> taPointDataList){
         Map<Integer,String> ponitMap = new HashMap<>();
         for(TaPoint pointVo : taPointList){
             ponitMap.put(pointVo.getPointId(),"点名："+pointVo.getPointName()+"("+pointVo.getRemarksName()+")"+",类型："+pointVo.getPointType()+",单位："+pointVo.getPointUnit());
         }
         DefaultCategoryDataset dateSet = new DefaultCategoryDataset();
-        dateSet.setValue(100,"好","苹果");
         //创造图标数据
-        for(TaPointData pointDateVo : taPointDataList){
-            if(toolHelper.isNumeric(pointDateVo.getPointData())){
-                dateSet.setValue(Double.valueOf(pointDateVo.getPointData()),ponitMap.get(pointDateVo.getPointId()),pointDateVo.getDateShow()+pointDateVo.getHourShow());
-            }else{
-                dateSet.setValue(0,ponitMap.get(pointDateVo.getPointId()),pointDateVo.getDateShow()+pointDateVo.getHourShow());
-            }
+        for(TaUsagePointDataDate pointDateVo : taPointDataList){
+            dateSet.setValue(pointDateVo.getPointData(),ponitMap.get(pointDateVo.getPointId()),String.valueOf(pointDateVo.getDateShow()));
         }
         return dateSet;
     }
@@ -228,9 +255,9 @@ public class JFreeChartHelper {
     }
 
     public JFreeChart createUageChart(DefaultCategoryDataset dateSet) throws IOException {
-        JFreeChart chart = ChartFactory.createBarChart("柱状图",//标题
-                "水果",//目录轴的显示标签
-                "单位:百万",//数值的显示标签
+        /*JFreeChart chart = ChartFactory.createBarChart("柱状图",//标题
+                "用量",//目录轴的显示标签
+                "kmh/",//数值的显示标签
                 dateSet,//数据
                 PlotOrientation.VERTICAL,//图标方向  水平/垂直
                 true,//是否显示图例
@@ -264,7 +291,29 @@ public class JFreeChartHelper {
        // renderer.setDefaultItemLabelFont(new Font("黑体",Font.BOLD,20));
         renderer.setDrawBarOutline(false);
         renderer.setMaximumBarWidth(0.4); //设置柱子宽度
-        renderer.setMinimumBarLength(0.00); //设置柱子高度
+        renderer.setMinimumBarLength(0.00); //设置柱子高度*/
+        //创建图形实体对象
+        JFreeChart chart=ChartFactory.createBarChart3D(//工厂模式
+                "用量", //图形的标题
+                "点用量图", //目录轴的显示标签(X轴)
+                "",  //数据轴的显示标签(Y轴)
+                dateSet, //数据集
+                PlotOrientation.VERTICAL, //垂直显示图形
+                true,  //是否生成图样
+                false, //是否生成提示工具
+                false);//是否生成URL链接
+        CategoryPlot plot=chart.getCategoryPlot();//获取图形区域对象
+        //------------------------------------------获取X轴
+        CategoryAxis domainAxis=plot.getDomainAxis();
+        domainAxis.setLabelFont(new Font("黑体",Font.BOLD,14));//设置X轴的标题的字体
+        domainAxis.setTickLabelFont(new Font("宋体",Font.BOLD,12));//设置X轴坐标上的字体
+        //-----------------------------------------获取Y轴
+        ValueAxis rangeAxis=plot.getRangeAxis();
+        rangeAxis.setLabelFont(new Font("黑体",Font.BOLD,15));//设置Y轴坐标上的标题字体
+        //设置图样的文字样式
+        chart.getLegend().setItemFont(new Font("黑体",Font.BOLD ,15));
+        //设置图形的标题
+        chart.getTitle().setFont(new Font("宋体",Font.BOLD ,20));
         return chart;
     }
 

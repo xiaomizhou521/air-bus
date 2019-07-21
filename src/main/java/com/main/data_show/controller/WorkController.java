@@ -8,10 +8,8 @@ import com.main.data_show.consts.SysConsts;
 import com.main.data_show.helper.*;
 import com.main.data_show.mapper.TaPonitDataMapper;
 import com.main.data_show.mapper.TaPonitMapper;
-import com.main.data_show.pojo.TaInstantPointData;
-import com.main.data_show.pojo.TaPoint;
-import com.main.data_show.pojo.TaPointData;
-import com.main.data_show.pojo.TaUsagePointData;
+import com.main.data_show.mapper.TaUsagePonitDataDateMapper;
+import com.main.data_show.pojo.*;
 import com.main.data_show.service.TaPointDataService;
 import com.main.data_show.service.TaPointService;
 import net.sf.json.JSONArray;
@@ -59,6 +57,12 @@ public class WorkController {
 
     @Autowired
     private UsagePointDataHelper usagePointDataHelper;
+
+    @Autowired
+    private TaUsagePonitDataDateMapper taUsagePonitDataDateMapper;
+
+    @Autowired
+    private UsagePointDataDateHelper usagePointDataDateHelper;
 
 
     @RequestMapping(value = "work/toPointList")
@@ -275,6 +279,9 @@ public class WorkController {
             if(toolHelper.isEmpty(endExpDate)){
                 throw new Exception("请选择导出结束时间");
             }
+            if(!toolHelper.compareStrDate(startExpDate,endExpDate,SysConsts.DATE_FORMAT_7)){
+                throw new Exception("结束时间要大于开始时间");
+            }
             for(String str : pointIds.split(";")){
                 if(toolHelper.isEmpty(pointsInStr)){
                     pointsInStr = str;
@@ -359,7 +366,7 @@ public class WorkController {
         return JspPageConst.EXPORT_DEVICE_CHAER_JSP_REDIRECT;
     }
 
-    //导出设备图表-设备
+    //导出设备图表-设备 折线图
     @RequestMapping(value = "work/exportDeviceChartDo")
     public void exportDeviceChartDo(HttpServletRequest request, HttpServletResponse response) throws Exception {
         response.setCharacterEncoding(Beans.UTF_8);
@@ -377,6 +384,9 @@ public class WorkController {
             }
             if(toolHelper.isEmpty(endExpDate)){
                 throw new Exception("请选择导出结束时间");
+            }
+            if(!toolHelper.compareStrDate(startExpDate,endExpDate,SysConsts.DATE_FORMAT_1)){
+                throw new Exception("结束时间要大于开始时间");
             }
             for(String str : pointIds.split(";")){
                 if(toolHelper.isEmpty(pointsInStr)){
@@ -418,6 +428,56 @@ public class WorkController {
         List<TaPoint> pointList = taPonitMapper.getPointsByPage("","","");
         request.setAttribute("pointList",pointList);
         return JspPageConst.EXPORT_USAGE_DEVICE_CHAER_JSP_REDIRECT;
+    }
+
+
+    //导出用量图表-设备 柱形图
+    @RequestMapping(value = "work/exportUsageChartDo")
+    public void exportUsageChartDo(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        response.setCharacterEncoding(Beans.UTF_8);
+        JSONObject result = new JSONObject();
+        try {
+            String pointIds = request.getParameter("pointIds");
+            String type = request.getParameter("type");
+            String startExpDate = request.getParameter("startExpDate");
+            String endExpDate = request.getParameter("endExpDate");
+            String pointsInStr = "";
+            if(toolHelper.isEmpty(pointIds)){
+                throw new Exception("请选择点信息");
+            }
+            if(toolHelper.isEmpty(startExpDate)){
+                throw new Exception("请选择导出开始时间");
+            }
+            if(toolHelper.isEmpty(endExpDate)){
+                throw new Exception("请选择导出结束时间");
+            }
+            if(!toolHelper.compareStrDate(startExpDate,endExpDate,SysConsts.DATE_FORMAT_7)){
+                throw new Exception("结束时间要大于开始时间");
+            }
+            for(String str : pointIds.split(";")){
+                if(toolHelper.isEmpty(pointsInStr)){
+                    pointsInStr = str;
+                }else{
+                    pointsInStr = pointsInStr+","+str;
+                }
+            }
+            //取点信息
+            List<TaPoint> taPointList = taPointService.getPointsByPointIds(pointsInStr);
+            //取点数据
+            List<TaUsagePointDataDate> taUsagePointDataDates = usagePointDataDateHelper.queryUsagePointDataSum(startExpDate, endExpDate, pointsInStr);
+            String path = jFreeChartHelper.createUsageDeviceChartStart(taPointList, taUsagePointDataDates, startExpDate, endExpDate);
+            //  jFreeChartHelper.createUsageDeviceChartStart(taPointList,taPointDataList);
+            result.put("code",1);
+            result.put("data",path);
+        }catch (Exception e) {
+            e.printStackTrace();
+            result.put("code",-1);
+            result.put("data",e.getMessage());
+        } finally {
+            response.getWriter().print(result);
+            response.getWriter().flush();
+            response.getWriter().close();
+        }
     }
 
     @RequestMapping(value = "work/toLoadPointSelect")

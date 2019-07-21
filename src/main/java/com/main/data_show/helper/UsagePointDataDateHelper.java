@@ -1,5 +1,6 @@
 package com.main.data_show.helper;
 
+import com.main.data_show.consts.SysConsts;
 import com.main.data_show.enums.EnumUsageTimeTypeDefine;
 import com.main.data_show.mapper.TaUsagePonitDataDateMapper;
 import com.main.data_show.mapper.TaUsagePonitDataMapper;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
 import java.util.Date;
+import java.util.List;
 
 @Service
 public class UsagePointDataDateHelper {
@@ -40,6 +42,16 @@ public class UsagePointDataDateHelper {
               vo.setPointData(newResult);
               taUsagePonitDataDateMapper.updateTaPointDataDateByPointIdAndTime(vo);
           }
+    }
+
+    //用量 日 导出图
+    public List<TaUsagePointDataDate> queryUsagePointDataSum(String startExpDate, String endExpDate,String pointIds) throws ParseException {
+        Date startExp = toolHelper.makeStrToDate(startExpDate, SysConsts.DATE_FORMAT_7);
+        Date endExp = toolHelper.makeStrToDate(endExpDate, SysConsts.DATE_FORMAT_7);
+        //单个取每个点的数据
+        long startExportTimeNum = toolHelper.dateToNumDate(startExp, SysConsts.DATE_FORMAT_4);
+        long endExportTimeNum = toolHelper.dateToNumDate(endExp, SysConsts.DATE_FORMAT_4);
+        return taUsagePonitDataDateMapper.findUsagePointDataDateByPointIdAndTime(startExportTimeNum,endExportTimeNum,pointIds);
     }
 
 
