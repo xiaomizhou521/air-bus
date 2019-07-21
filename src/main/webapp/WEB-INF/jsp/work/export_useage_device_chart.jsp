@@ -10,10 +10,12 @@
 <html>
 <head>
     <title>Title</title>
-    <link rel="stylesheet" type="text/css" href="../static/js/bootstrap/css/bootstrap.css">
-    <script type="text/javascript" src="../static/js/bootstrap/js/bootstrap.min.js"></script>
-    <script type="text/javascript" src="../static/js/jquery/jquery-1.11.1.js" ></script>
+    <link rel="stylesheet" type="text/css" href="../static/css/bootstrap/bootstrap.css">
+    <script type="text/javascript" src="../static/css/bootstrap/jquery-1.11.1.js" ></script>
+    <script type="text/javascript" src="../static/css/bootstrap/bootstrap.min.js"></script>
     <script type="text/javascript" src="../static/js/datepicker/WdatePicker.js" ></script>
+    <script type="text/javascript" src="../static/css/dist/js/bootstrap-select.js"></script>
+    <link rel="stylesheet" type="text/css" href="../static/css/dist/css/bootstrap-select.css">
     <script>
         $(function(){
              $("#date_mod").show();

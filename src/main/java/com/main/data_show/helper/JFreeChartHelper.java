@@ -1,6 +1,9 @@
 package com.main.data_show.helper;
 
+import com.main.data_show.consts.ApplicationConsts;
+import com.main.data_show.consts.ParamConsts;
 import com.main.data_show.consts.SysConsts;
+import com.main.data_show.pojo.TaInstantPointData;
 import com.main.data_show.pojo.TaPoint;
 import com.main.data_show.pojo.TaPointData;
 import org.jfree.chart.ChartFactory;
@@ -23,6 +26,8 @@ import org.jfree.data.time.TimeSeries;
 import org.jfree.data.time.TimeSeriesCollection;
 import org.jfree.ui.RectangleInsets;
 import org.jfree.ui.TextAnchor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -39,17 +44,36 @@ import java.util.Map;
 
 @Service
 public class JFreeChartHelper {
-    @Resource
+    @Autowired
     private ToolHelper toolHelper;
+    @Autowired
+    private Environment env;
 
     //生成设备图表开始 折线图
-    public void createDeviceChartStart(java.util.List<TaPoint> taPointList, List<TaPointData> taPointDataList){
+    public String createDeviceChartStart(java.util.List<TaPoint> taPointList, List<TaInstantPointData> taPointDataList,String startTime,String endTime) throws Exception {
          // 步骤1：创建CategoryDataset对象（准备数据）
         TimeSeriesCollection dataset = createDeviceChartDate(taPointList,taPointDataList);
         // 步骤2：根据Dataset 生成JFreeChart对象，以及做相应的设置
         JFreeChart freeChart = createChart(dataset);
         // 步骤3：将JFreeChart对象输出到文件，Servlet输出流等
-        saveAsFile(freeChart, "C:\\01work\\priv_work190415\\CSV_test\\zhexin.png", 1000, 500);
+        //生成文件名
+        String readBasePath = env.getProperty(ApplicationConsts.SYS_DEMO_USAGE_EXPORT_DATA_BASE_PATH);
+        if(toolHelper.isEmpty(readBasePath)){
+            throw new Exception(ApplicationConsts.SYS_DEMO_USAGE_EXPORT_DATA_BASE_PATH+",基础路径为空!");
+        }
+        if(!readBasePath.endsWith(ParamConsts.SEPERRE_STR)){
+            readBasePath = readBasePath+ParamConsts.SEPERRE_STR;
+        }
+        File file1 = new File(readBasePath);
+        if(!file1.exists()){
+            file1.mkdir();
+        }
+        String startStr = startTime.substring(0,startTime.length()-6);
+        String endStr = endTime.substring(0,endTime.length()-6);
+        String fileName = "Instant("+startStr+"_"+endStr+").png";
+        String exportFilePath = readBasePath+fileName;
+        saveAsFile(freeChart, exportFilePath, 1000, 500);
+        return exportFilePath;
     }
 
     //生成设备图表开始 柱形图
@@ -62,14 +86,14 @@ public class JFreeChartHelper {
         saveAsFile(freeChart, "C:\\01work\\priv_work190415\\CSV_test\\zhuxing.png", 1000, 500);
     }
 
-    public TimeSeriesCollection createDeviceChartDate(java.util.List<TaPoint> taPointList, List<TaPointData> taPointDataList){
+    public TimeSeriesCollection createDeviceChartDate(java.util.List<TaPoint> taPointList, List<TaInstantPointData> taPointDataList){
         Map<Integer,String> ponitMap = new HashMap<>();
         for(TaPoint pointVo : taPointList){
             ponitMap.put(pointVo.getPointId(),"点名："+pointVo.getPointName()+"("+pointVo.getRemarksName()+")"+",类型："+pointVo.getPointType()+",单位："+pointVo.getPointUnit());
         }
         Map<Integer,TimeSeries> pointDateMap = new HashMap<>();
         //创造图标数据
-        for(TaPointData pointDateVo : taPointDataList){
+        for(TaInstantPointData pointDateVo : taPointDataList){
             TimeSeries timeSeries = null;
             if(pointDateMap.containsKey(pointDateVo.getPointId())){
                  timeSeries = pointDateMap.get(pointDateVo.getPointId());
@@ -173,7 +197,7 @@ public class JFreeChartHelper {
 
     // 保存为文件
     public static void saveAsFile(JFreeChart chart, String outputPath,
-                                  int weight, int height) {
+                                  int weight, int height) throws IOException {
         FileOutputStream out = null;
         try {
             File outFile = new File(outputPath);
@@ -188,8 +212,10 @@ public class JFreeChartHelper {
             out.flush();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
+            throw e;
         } catch (IOException e) {
             e.printStackTrace();
+            throw e;
         } finally {
             if (out != null) {
                 try {

@@ -361,35 +361,55 @@ public class WorkController {
 
     //导出设备图表-设备
     @RequestMapping(value = "work/exportDeviceChartDo")
-    public void exportDeviceChartDo(HttpServletRequest request) throws Exception {
-        String pointIds = request.getParameter("pointIds");
-        String startExpDate = request.getParameter("startExpDate");
-        String endExpDate = request.getParameter("endExpDate");
-        String pointsInStr = "";
-        if(toolHelper.isEmpty(pointIds)){
-            throw new Exception("请选择点信息");
-        }
-        if(toolHelper.isEmpty(startExpDate)){
-            throw new Exception("请选择导出开始时间");
-        }
-        if(toolHelper.isEmpty(endExpDate)){
-            throw new Exception("请选择导出结束时间");
-        }
-        for(String str : pointIds.split(";")){
-            if(toolHelper.isEmpty(pointsInStr)){
-                pointsInStr = str;
-            }else{
-                pointsInStr = pointsInStr+","+str;
+    public void exportDeviceChartDo(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        response.setCharacterEncoding(Beans.UTF_8);
+        JSONObject result = new JSONObject();
+        try {
+            String pointIds = request.getParameter("pointIds");
+            String startExpDate = request.getParameter("startExpDate");
+            String endExpDate = request.getParameter("endExpDate");
+            String pointsInStr = "";
+            if(toolHelper.isEmpty(pointIds)){
+                throw new Exception("请选择点信息");
             }
+            if(toolHelper.isEmpty(startExpDate)){
+                throw new Exception("请选择导出开始时间");
+            }
+            if(toolHelper.isEmpty(endExpDate)){
+                throw new Exception("请选择导出结束时间");
+            }
+            for(String str : pointIds.split(";")){
+                if(toolHelper.isEmpty(pointsInStr)){
+                    pointsInStr = str;
+                }else{
+                    pointsInStr = pointsInStr+","+str;
+                }
+            }
+            //取点信息
+            List<TaPoint> taPointList = taPointService.getPointsByPointIds(pointsInStr);
+            //取点数据
+           //t List<TaPointData> taPointDataLis = taPointDataService.queryPointDeviceChart(startExpDate, endExpDate,pointsInStr);
+            List<TaInstantPointData> taPointDataLis = new ArrayList<>();
+            for(TaPoint point : taPointList){
+                //单个取每个点的数据
+                long startExportTimeNum = toolHelper.dateToNumDate(toolHelper.StrToDate(startExpDate, SysConsts.DATE_FORMAT_7), SysConsts.DATE_FORMAT_3);
+                long endExportTimeNum = toolHelper.dateToNumDate(toolHelper.StrToDate(endExpDate, SysConsts.DATE_FORMAT_7), SysConsts.DATE_FORMAT_3);
+                List<TaInstantPointData> instntPointVoList = instantPointDataHelper.findInstantPointByPointIdAndTime(startExportTimeNum, endExportTimeNum, point.getPointId());
+                taPointDataLis.addAll(instntPointVoList);
+            }
+            String path = jFreeChartHelper.createDeviceChartStart(taPointList, taPointDataLis, startExpDate, endExpDate);
+            //  jFreeChartHelper.createUsageDeviceChartStart(taPointList,taPointDataList);
+            result.put("code",1);
+            result.put("data",path);
+        }catch (Exception e) {
+            e.printStackTrace();
+            result.put("code",-1);
+            result.put("data",e.getMessage());
+        } finally {
+            response.getWriter().print(result);
+            response.getWriter().flush();
+            response.getWriter().close();
         }
-        //取点信息
-        List<TaPoint> taPointList = taPointService.getPointsByPointIds(pointsInStr);
-        //取点数据
-        List<TaPointData> taPointDataList = taPointDataService.queryPointDeviceChart(startExpDate, endExpDate,pointsInStr);
-
-        jFreeChartHelper.createDeviceChartStart(taPointList,taPointDataList);
-
-        jFreeChartHelper.createUsageDeviceChartStart(taPointList,taPointDataList);
     }
 
     @RequestMapping(value = "work/toExportUsageDeviceChart")
