@@ -59,6 +59,7 @@ public class ToolHelper {
         Date date = makeStrToDate(dateStr+" "+hourStr,SysConsts.DATE_FORMAT);
         return date;
     }
+
     //日期字符串转化为date
     public static Date makeStrToDate(String dateStr,String date_formate) throws ParseException {
         SimpleDateFormat df = new SimpleDateFormat(date_formate);
@@ -272,7 +273,12 @@ public class ToolHelper {
     public boolean compareStrDate(String startDateStr,String endDateStr,String format){
         Date startDate = StrToDate(startDateStr, format);
         Date endDate = StrToDate(endDateStr, format);
-        if(startDate.before(endDate)){
+        return compareDate(startDate,endDate);
+    }
+
+    //比较两个日期的大小 true 正确 false 错误   相等返回正确
+    public boolean compareDate(Date startDate,Date endDate){
+        if(startDate.before(endDate)||startDate.getTime()==endDate.getTime()){
             return true;
         }else{
             return false;

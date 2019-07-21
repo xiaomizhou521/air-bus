@@ -10,37 +10,81 @@
 <html>
 <head>
     <title>Title</title>
-    <link rel="stylesheet" type="text/css" href="../static/js/bootstrap/css/bootstrap.css">
-    <script type="text/javascript" src="../static/js/bootstrap/js/bootstrap.min.js"></script>
-    <script type="text/javascript" src="../static/js/jquery/jquery-1.11.1.js" ></script>
+    <link rel="stylesheet" type="text/css" href="../static/css/bootstrap/bootstrap.css">
+    <script type="text/javascript" src="../static/css/bootstrap/jquery-1.11.1.js" ></script>
+    <script type="text/javascript" src="../static/css/bootstrap/bootstrap.min.js"></script>
     <script type="text/javascript" src="../static/js/datepicker/WdatePicker.js" ></script>
+    <script type="text/javascript" src="../static/css/dist/js/bootstrap-select.js"></script>
+    <link rel="stylesheet" type="text/css" href="../static/css/dist/css/bootstrap-select.css">
     <script>
-        function makeReport(){
-            var pointIds ='';
-            $(".pointIdClass").each(function(){
-                if($(this).is(":checked")){
-                    if(pointIds == ''){
-                        pointIds = $(this).val();
-                    }else{
-                        pointIds = pointIds+";"+$(this).val();
-                    }
-
-                }
+        $(function () {
+            $("#pointId_Select").load("/work/toLoadPointSelect",{
+                selectId:'data-recode',
+                pointType:'usage'
+            },function(){
             })
+
+            $("#showDownBtn").show();
+            $("#useDownBtn").hide();
+
+        })
+        function makeReport(){
+            var pointIds = $("#data-recode-pointIds").val();
+            if(pointIds==null||pointIds==''){
+                alert("请选择点！");
+                return;
+            }
             var startExpDate = $("#startDate").val();
+            if(startExpDate==null||startExpDate==''){
+                alert("请选择开始时间！");
+                return;
+            }
             var endExpDate = $('#endDate').val();
+            if(endExpDate==null||endExpDate==''){
+                alert("请选择结束时间！");
+                return;
+            }
             var takeTime = $("#takeTimeId").val();
+            var words = (pointIds+'').split(',');
+            var pointIdsValue = "";
+            for(var i=0 ;i < words.length; i++){
+                if(pointIdsValue == ""){
+                    pointIdsValue = words[i];
+                }else{
+                    pointIdsValue = pointIdsValue +";"+ words[i];
+                }
+            }
             $.ajax({
                 type:"POST",
                 url:'/work/exportUsageRecodeDo',
                 dataType:'json',
                 async:false,
                 traditional: true,
-                data:{'startExpDate':startExpDate,'endExpDate':endExpDate,'pointIds':pointIds,'takeTime':takeTime},
+                data:{'startExpDate':startExpDate,'endExpDate':endExpDate,'pointIds':pointIdsValue,'takeTime':takeTime},
                 success: function(data) {
-
+                    $("#makeReportId").attr("disabled",false);
+                    var code = data.code;
+                    var result = data.data;
+                    if(code ==1){
+                        $("#csvFilePath").val(result)
+                        $("#showFilePath").html("生成报告位置："+result);
+                        $("#showDownBtn").hide();
+                        $("#useDownBtn").show();
+                        alert("报告生成成功！可点击下载");
+                    }else if(code ==-1){
+                        $("#showFilePath").html("");
+                        alert("报告生成失败:"+result);
+                    }
                 }
             });
+        }
+        function downLoadFile() {
+            var csvFilePath = $("#csvFilePath").val();
+            if(csvFilePath ==null ||csvFilePath==''){
+                alert("请先生成报告！");
+                return;
+            }
+            window.location.href = "/work/downloadCsv?filePath=" + csvFilePath;
         }
 
     </script>
@@ -50,16 +94,12 @@
     <div style="width: 100%">
         <div style="width:1100px;margin:auto;margin-top:20px;">
             <table>
-                <tr>
-                <td style="width: 200px">请选择要导出数据的点:</td>
-                <td>
-                    <ul class="pagination" style="width: 100%;margin:0px">
-                        <c:forEach items="${pointList}" var="res" varStatus="index">
-                            <li class=""><input type="checkbox" class="pointIdClass" name="pointIds" id="pointIndex${index.index}"  value="${res.pointId}"><label for="pointIndex${index.index}">${res.pointName}</label></li>
-                        </c:forEach>
-                    </ul>
-                </td>
-            </tr>
+                <tr style="height: 80px;">
+                    <td style="width: 200px">请选择点:</td>
+                    <td>
+                        <div id="pointId_Select"></div>
+                    </td>
+                </tr>
             <tr>
                 <td style="width: 200px">请选择日期间隔:</td>
                 <td>
@@ -104,7 +144,17 @@
                 </td>
             </tr>
             </table>
-            <div style="margin-top:30px;"><input type="button" class="btn btn-default btn-success" onclick="makeReport()" value="生成报告"></div>
+            <div style="    height: 80px;">
+                <div style="float:left;"><input type="button" id="makeReportId" class="btn btn-default btn-success" onclick="makeReport()" value="生成报告"></div>
+                <div style="float:left;margin-left:20px;">
+                    <%--<input id="showDownBtn" type="button" class="btn btn-default" value="下载文件">--%>
+                    <input id="useDownBtn" type="button" class="btn btn-default btn-success" onclick="downLoadFile()" value="下载文件">
+                </div>
+            </div>
+            <div id="">
+                <span id="showFilePath"></span>
+                <input type="hidden" id="csvFilePath" />
+            </div>
         </div>
     </div>
 </form>

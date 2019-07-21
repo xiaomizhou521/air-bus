@@ -12,7 +12,8 @@
     <script>
         $(function () {
             $("#pointId_Select").load("/work/toLoadPointSelect",{
-                selectId:'data-recode'
+                selectId:'data-recode',
+                pointType:'instant'
             },function(){
             })
 

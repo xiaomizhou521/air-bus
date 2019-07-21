@@ -20,4 +20,19 @@
                  where t.point_id = #{point_id}
                  and t.create_time_int = #{create_time_int}]]>
     </select>
+
+    <select id="findUsagePointByPointIdAndTime" resultType="com.main.data_show.pojo.TaUsagePointData">
+        <![CDATA[select point_id as pointId,
+                create_time_int as createTimeInt,
+                create_time as createTime,
+                date_show as dateShow,
+                hour_show as hourShow,
+                point_data as pointData,
+                point_usage as pointUsage
+                from ta_usage_point_data
+                where point_id = #{point_id}
+                and create_time_int >= ${startExpDate}
+                and create_time_int < ${endExpDate}
+                order by create_time_int asc]]>
+    </select>
 </mapper>

@@ -38,7 +38,7 @@ public class TaPointService {
 
     public List<TaPoint> getPointsByPage(Integer pageNo, Integer limit,String searchPointName,String searchRemarkName){
         PageHelper.startPage(pageNo,limit);
-        List<TaPoint> pointsByPage = taPonitMapper.getPointsByPage(searchPointName,searchRemarkName);
+        List<TaPoint> pointsByPage = taPonitMapper.getPointsByPage(searchPointName,searchRemarkName,"");
 
         return pointsByPage;
     }

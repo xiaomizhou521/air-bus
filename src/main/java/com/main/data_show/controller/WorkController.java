@@ -5,15 +5,13 @@ import com.github.pagehelper.PageInfo;
 import com.main.data_show.consts.JspPageConst;
 import com.main.data_show.consts.ParamConsts;
 import com.main.data_show.consts.SysConsts;
-import com.main.data_show.helper.CSVHelper;
-import com.main.data_show.helper.InstantPointDataHelper;
-import com.main.data_show.helper.JFreeChartHelper;
-import com.main.data_show.helper.ToolHelper;
+import com.main.data_show.helper.*;
 import com.main.data_show.mapper.TaPonitDataMapper;
 import com.main.data_show.mapper.TaPonitMapper;
 import com.main.data_show.pojo.TaInstantPointData;
 import com.main.data_show.pojo.TaPoint;
 import com.main.data_show.pojo.TaPointData;
+import com.main.data_show.pojo.TaUsagePointData;
 import com.main.data_show.service.TaPointDataService;
 import com.main.data_show.service.TaPointService;
 import net.sf.json.JSONArray;
@@ -28,10 +26,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.jsp.JspPage;
 import java.io.*;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.apache.logging.log4j.message.MapMessage.MapFormat.JSON;
 
@@ -61,6 +56,9 @@ public class WorkController {
 
     @Autowired
     private InstantPointDataHelper instantPointDataHelper;
+
+    @Autowired
+    private UsagePointDataHelper usagePointDataHelper;
 
 
     @RequestMapping(value = "work/toPointList")
@@ -180,7 +178,7 @@ public class WorkController {
     @RequestMapping(value = "work/toExportDataRecode")
     public String toExportDataRecode(HttpServletRequest request) {
         //取得所有点
-        List<TaPoint> pointList = taPonitMapper.getPointsByPage("","");
+        List<TaPoint> pointList = taPonitMapper.getPointsByPage("","","");
         request.setAttribute("pointList",pointList);
         return JspPageConst.EXPORT_DATA_RECODE_JSP_REDIRECT;
     }
@@ -252,46 +250,111 @@ public class WorkController {
     @RequestMapping(value = "work/toExportUsageRecode")
     public String toExportUsageRecode(HttpServletRequest request) {
         //取得电表或者水表的点
-        List<TaPoint> pointList = taPonitMapper.getPointsByPage("","");
+        List<TaPoint> pointList = taPonitMapper.getPointsByPage("","","");
         request.setAttribute("pointList",pointList);
         return JspPageConst.EXPORT_USEAGE_RECODE_JSP_REDIRECT;
     }
 
     //导出用量报告
     @RequestMapping(value = "work/exportUsageRecodeDo")
-    public void exportUsageRecodeDo(HttpServletRequest request) throws Exception {
-        String pointIds = request.getParameter("pointIds");
-        String startExpDate = request.getParameter("startExpDate");
-        String endExpDate = request.getParameter("endExpDate");
-        String takeTime = request.getParameter("takeTime");
-        String pointsInStr = "";
-        if(toolHelper.isEmpty(pointIds)){
-            throw new Exception("请选择点信息");
-        }
-        if(toolHelper.isEmpty(startExpDate)){
-            throw new Exception("请选择导出开始时间");
-        }
-        if(toolHelper.isEmpty(endExpDate)){
-            throw new Exception("请选择导出结束时间");
-        }
-        for(String str : pointIds.split(";")){
-            if(toolHelper.isEmpty(pointsInStr)){
-                pointsInStr = str;
-            }else{
-                pointsInStr = pointsInStr+","+str;
+    public void exportUsageRecodeDo(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        response.setCharacterEncoding(Beans.UTF_8);
+        JSONObject result = new JSONObject();
+        try {
+            String pointIds = request.getParameter("pointIds");
+            String startExpDate = request.getParameter("startExpDate");
+            String endExpDate = request.getParameter("endExpDate");
+            String takeTime = request.getParameter("takeTime");
+            String pointsInStr = "";
+            if(toolHelper.isEmpty(pointIds)){
+                throw new Exception("请选择点信息");
             }
+            if(toolHelper.isEmpty(startExpDate)){
+                throw new Exception("请选择导出开始时间");
+            }
+            if(toolHelper.isEmpty(endExpDate)){
+                throw new Exception("请选择导出结束时间");
+            }
+            for(String str : pointIds.split(";")){
+                if(toolHelper.isEmpty(pointsInStr)){
+                    pointsInStr = str;
+                }else{
+                    pointsInStr = pointsInStr+","+str;
+                }
+            }
+            //取点信息
+            List<TaPoint> taPointList = taPointService.getPointsByPointIds(pointsInStr);
+        /*    List<TaUsagePointData> resultList = new ArrayList<>();*/
+            Map<Date,Map<Integer,Double>> exportResult = new LinkedHashMap<>();
+            for(TaPoint vo : taPointList){
+                List<TaUsagePointData> taInstantPointData = usagePointDataHelper.queryUsagePointDataSum(startExpDate, endExpDate, takeTime, vo.getPointId());
+                //循环建出能写进文件的数据格式
+                //第一个时间分界点  当数据时间大于这个时  要重算分界点 分界点决定数据属于哪个key
+                Date firstIntervalTime = toolHelper.makeDateByDateAndHour(taInstantPointData.get(0).getDateShow(), takeTime);
+                for(TaUsagePointData usageVo : taInstantPointData){
+                    //如果第一条数据小于第一分界点，则数据放入map  key 就是第一份节点
+                    if(toolHelper.compareDate(usageVo.getCreateTime(),firstIntervalTime)){
+                        if(exportResult.containsKey(firstIntervalTime)){
+                            //如果存在这个可以  则取出老数据加上新数据 在放回去
+                            //要判断一下点是否已经存在了 不存在要创建的
+                            Map<Integer, Double> integerDoubleMap = exportResult.get(firstIntervalTime);
+                            if(integerDoubleMap.containsKey(vo.getPointId())){
+                                double oldDouble = integerDoubleMap.get(vo.getPointId());
+                                double newDouble = toolHelper.doubleSum(oldDouble, usageVo.getPointUsage());
+                                integerDoubleMap.put(vo.getPointId(),newDouble);
+                            }else{
+                                integerDoubleMap.put(vo.getPointId(),usageVo.getPointUsage());
+                            }
+                        }else{
+                            Map<Integer,Double> exportPointResult = new LinkedHashMap<>();
+                            exportPointResult.put(vo.getPointId(),usageVo.getPointUsage());
+                            //小时应该事 页面查询的时间分界点
+                            //先生成当前的key
+                            exportResult.put(firstIntervalTime,exportPointResult);
+                        }
+                    }else{
+                        //如果第一条数据大于第一分界点，则日期加一 然后计算新的分界点
+                        firstIntervalTime = toolHelper.addSubDate(firstIntervalTime,1);
+                        if(exportResult.containsKey(firstIntervalTime)){
+                            Map<Integer, Double> integerDoubleMap = exportResult.get(firstIntervalTime);
+                            if(integerDoubleMap.containsKey(vo.getPointId())){
+                                double oldDouble = integerDoubleMap.get(vo.getPointId());
+                                double newDouble = toolHelper.doubleSum(oldDouble, usageVo.getPointUsage());
+                                integerDoubleMap.put(vo.getPointId(),newDouble);
+                            }else{
+                                integerDoubleMap.put(vo.getPointId(),usageVo.getPointUsage());
+                            }
+                        }else{
+                            Map<Integer,Double> exportPointResult = new LinkedHashMap<>();
+                            exportPointResult.put(vo.getPointId(),usageVo.getPointUsage());
+                            //小时应该事 页面查询的时间分界点
+                            //先生成当前的key
+                            exportResult.put(firstIntervalTime,exportPointResult);
+                        }
+                    }
+                }
+              /*  resultList.addAll(taInstantPointData);*/
+            }
+            //取点数据
+            //List<TaPointData> taPointDataList = taPointDataService.queryPointDataSum(startExpDate, endExpDate, takeTime,pointsInStr);
+            String path = csvHelper.writeCSV2(taPointList,exportResult,takeTime,startExpDate,endExpDate);
+            result.put("code",1);
+            result.put("data",path);
+        }catch (Exception e) {
+            e.printStackTrace();
+            result.put("code",-1);
+            result.put("data",e.getMessage());
+        } finally {
+            response.getWriter().print(result);
+            response.getWriter().flush();
+            response.getWriter().close();
         }
-        //取点信息
-        List<TaPoint> taPointList = taPointService.getPointsByPointIds(pointsInStr);
-        //取点数据
-        List<TaPointData> taPointDataList = taPointDataService.queryPointDataSum(startExpDate, endExpDate, takeTime,pointsInStr);
-        csvHelper.writeCSV2(taPointList,taPointDataList,takeTime);
     }
 
     @RequestMapping(value = "work/toExportDeviceChart")
     public String toExportDeviceChart(HttpServletRequest request) throws Exception {
         //取得非 电表水表的点
-        List<TaPoint> pointList = taPonitMapper.getPointsByPage("","");
+        List<TaPoint> pointList = taPonitMapper.getPointsByPage("","","");
         request.setAttribute("pointList",pointList);
         return JspPageConst.EXPORT_DEVICE_CHAER_JSP_REDIRECT;
     }
@@ -332,7 +395,7 @@ public class WorkController {
     @RequestMapping(value = "work/toExportUsageDeviceChart")
     public String toExportUsageDeviceChart(HttpServletRequest request) throws Exception {
         //取得非 电表水表的点
-        List<TaPoint> pointList = taPonitMapper.getPointsByPage("","");
+        List<TaPoint> pointList = taPonitMapper.getPointsByPage("","","");
         request.setAttribute("pointList",pointList);
         return JspPageConst.EXPORT_USAGE_DEVICE_CHAER_JSP_REDIRECT;
     }
@@ -340,9 +403,10 @@ public class WorkController {
     @RequestMapping(value = "work/toLoadPointSelect")
     public String toLoadPointSelect(HttpServletRequest request) throws Exception {
         String data_recode = request.getParameter("selectId");
+        String pointType = request.getParameter("pointType");
         request.setAttribute("selectId",data_recode);
         //取得所有点
-        List<TaPoint> pointList = taPonitMapper.getPointsByPage("","");
+        List<TaPoint> pointList = taPonitMapper.getPointsByPage("","",pointType);
         request.setAttribute("pointList",pointList);
         return JspPageConst.LOAD__POINT_SELECT_JSP_REDIRECT;
     }
