@@ -1,5 +1,6 @@
 package com.main.data_show.helper;
 
+import com.main.data_show.consts.SysConsts;
 import com.main.data_show.enums.EnumUsageTimeTypeDefine;
 import com.main.data_show.mapper.TaUsagePonitDataMonMapper;
 import com.main.data_show.mapper.TaUsagePonitDataWeekMapper;
@@ -8,7 +9,9 @@ import com.main.data_show.pojo.TaUsagePointDataWeek;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.text.ParseException;
 import java.util.Date;
+import java.util.List;
 
 @Service
 public class UsagePointDataWeekHelper {
@@ -39,6 +42,13 @@ public class UsagePointDataWeekHelper {
               vo.setPointData(newResult);
               taUsagePonitDataWeekMapper.updateTaPointDataWeekByPointIdAndTime(vo);
           }
+    }
+
+    //用量 周 导出图
+    public List<TaUsagePointDataWeek> queryUsagePointDataWeekSum(String startExpDate, String endExpDate, String pointIds) throws ParseException {
+        int startExportTimeNum = Integer.parseInt(startExpDate);
+        int endExportTimeNum = Integer.parseInt(endExpDate);
+        return taUsagePonitDataWeekMapper.findUsagePointDataWeekByPointIdAndTime(startExportTimeNum,endExportTimeNum,pointIds);
     }
 
 

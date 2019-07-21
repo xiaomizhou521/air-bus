@@ -4,6 +4,8 @@ import com.main.data_show.pojo.TaUsagePointDataDate;
 import com.main.data_show.pojo.TaUsagePointDataWeek;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
+
 public interface TaUsagePonitDataWeekMapper {
 
     public int insertTaInstantPointDataWeek(TaUsagePointDataWeek taUsagePointDataWeek);
@@ -11,6 +13,8 @@ public interface TaUsagePonitDataWeekMapper {
     public TaUsagePointDataWeek getUsagePointDataWeekByPointIdAndTime(@Param("point_id")int point_id, @Param("date_show")long date_show);
 
     public void updateTaPointDataWeekByPointIdAndTime(TaUsagePointDataWeek taUsagePointDataDate);
+
+    public List<TaUsagePointDataWeek> findUsagePointDataWeekByPointIdAndTime(long startExpDate, long endExpDate, @Param("pointIds")String pointIds);
 
 
 

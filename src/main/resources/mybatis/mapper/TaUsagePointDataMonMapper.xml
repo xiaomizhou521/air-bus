@@ -21,4 +21,15 @@
                  where point_id = #{pointId}
                  and date_show = #{dateShow}
     </update>
+
+    <select id="findUsagePointDataMonByPointIdAndTime" resultType="com.main.data_show.pojo.TaUsagePointDataMon">
+        <![CDATA[select point_id as pointId,
+                date_show as dateShow,
+                point_data as pointData
+                from ta_usage_point_data_mon
+                where point_id in (${pointIds})
+                and date_show >= ${startExpDate}
+                and date_show <= ${endExpDate}
+                order by point_id asc,date_show asc]]>
+    </select>
 </mapper>

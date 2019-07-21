@@ -20,6 +20,8 @@ public class SysConsts {
 
     public static String DATE_FORMAT_7 = "yyyy-MM-dd";
 
+    public static String DATE_FORMAT_8 = "yyyy-MM";
+
 //路径中包含这个的是 用量的点
     public static String POINT_USAGE_DEF_FILE_PATH = "REPORTS/POWER/KWH";
 }
