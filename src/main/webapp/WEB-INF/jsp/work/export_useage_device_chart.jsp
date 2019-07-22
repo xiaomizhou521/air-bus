@@ -26,6 +26,7 @@
 
             $("#showDownBtn").show();
             $("#useDownBtn").hide();
+            $("#showImg").hide();
 
              $("#date_mod").show();
              $("#week_mod").hide();
@@ -101,7 +102,9 @@
                         $("#showFilePath").html("生成报告位置："+result);
                         $("#showDownBtn").hide();
                         $("#useDownBtn").show();
-                        alert("报告生成成功！可点击下载");
+                        $("#showImg").show();
+                        var src = "/work/readImgIo?filePath="+result;
+                        $("#showImg").attr("src",src);
                     }else if(code ==-1){
                         $("#showFilePath").html("");
                         alert("报告生成失败:"+result);
@@ -149,7 +152,7 @@
                     </select>
                 </td>
             </tr>
-            <tr id="date_mod" style="height: 80px;">
+            <tr id="date_mod" style="height: 100px;">
                 <td style="width: 200px">请选择日期间隔:</td>
                 <td>
                     <div class="input-group" style="float:left;margin-bottom: 10px;line-height: 35px;width:10%;">
@@ -161,7 +164,7 @@
                     </div>
                 </td>
             </tr>
-            <tr id="week_mod" style="height: 80px;">
+            <tr id="week_mod" style="height: 100px;">
                 <td style="width: 200px">请选择周间隔:</td>
                 <td >
                     <div class="input-group" style="float:left;margin-bottom: 10px;line-height: 35px;width:10%;">
@@ -173,7 +176,7 @@
                     </div>
                 </td>
             </tr>
-            <tr id="mon_mod" style="height: 80px;">
+            <tr id="mon_mod" style="height: 100px;">
                 <td style="width: 200px">请选择月间隔:</td>
                 <td>
                     <div class="input-group" style="float:left;margin-bottom: 10px;line-height: 35px;width:10%;">
@@ -219,8 +222,8 @@
             </tr>--%>
             </table>
             <div style="    height: 80px;">
-                <div style="float:left;"><input type="button" id="makeReportId" class="btn btn-default btn-success" onclick="makeReport('bar')" value="生成柱形报告"></div>
-                <div style="float:left;margin-left:20px;"><input type="button" id="makeReportId2" class="btn btn-default btn-success" onclick="makeReport('series')" value="生成折线报告"></div>
+                <div style="float:left;"><input type="button" id="makeReportId" class="btn btn-default btn-success" onclick="makeReport('bar')" value="生成柱形图报告"></div>
+                <div style="float:left;margin-left:20px;"><input type="button" id="makeReportId2" class="btn btn-default btn-success" onclick="makeReport('series')" value="生成折线图报告"></div>
                 <div style="float:left;margin-left:20px;">
                     <%--<input id="showDownBtn" type="button" class="btn btn-default" value="下载文件">--%>
                     <input id="useDownBtn" type="button" class="btn btn-default btn-success" onclick="downLoadFile()" value="下载文件">
@@ -229,6 +232,11 @@
             <div id="">
                 <span id="showFilePath"></span>
                 <input type="hidden" id="csvFilePath" />
+            </div>
+            <div style="width: 100%">
+                <div style="width: 800px;margin:auto">
+                    <img id="showImg" src="" width="800px" height="400px" />
+                </div>
             </div>
         </div>
     </div>

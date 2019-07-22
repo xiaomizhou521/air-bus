@@ -35,15 +35,15 @@ $(function(){
 
 </script>
 <body>
+<div style="height: auto">
+    <ul id="selectText"></ul>
+</div>
 <div class="input-group" style="float:left;width:800px" id="proc_dep_id1_id">
     <select class="selectpicker" multiple  data-live-search="true" data-hide-disabled="true" data-size="5" style="width:500px;"  id="data-recode-pointIds">
         <c:forEach items="${pointList}" var="level1Code">
             <option value="${level1Code.pointId}">${level1Code.pointName}(${level1Code.remarksName})</option>
         </c:forEach>
     </select>
-</div>
-<div style="min-height:50px;height: auto">
-    <ul id="selectText"></ul>
 </div>
 </body>
 </html>

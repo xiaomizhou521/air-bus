@@ -98,10 +98,10 @@
                         <div id="pointId_Select"></div>
                     </td>
                 </tr>
-                <tr>
+                <tr style="height: 100px;">
                     <td style="width: 200px">请选择日期间隔:</td>
                     <td>
-                        <div class="input-group" style="float:left;margin-bottom: 10px;line-height: 35px;width:10%;margin-left:5px;">
+                        <div class="input-group" style="float:left;margin-bottom: 10px;line-height: 35px;width:10%;">
                             <input class="input-warning form-control" autocomplete="off" style="width:180px;height: 41px;" id="startDate" name="startExpDate" value="${startModDate}" size="20"  onclick="WdatePicker({dateFmt:'yyyy-MM-dd',startDate:'', minDate:'',maxDate:''})" type="text">
                         </div>
                         <div style="float:left;line-height: 35px;width:1%;text-align:center;">~</div>
@@ -112,7 +112,7 @@
                 </tr>
             </table>
             <div style="    height: 80px;">
-                <div style="float:left;"><input type="button" id="makeReportId" class="btn btn-default btn-success" onclick="makeReport()" value="生成报告"></div>
+                <div style="float:left;"><input type="button" id="makeReportId" class="btn btn-default btn-success" onclick="makeReport()" value="生成CSV报告"></div>
                 <div style="float:left;margin-left:20px;">
                     <%--<input id="showDownBtn" type="button" class="btn btn-default" value="下载文件">--%>
                     <input id="useDownBtn" type="button" class="btn btn-default btn-success" onclick="downLoadFile()" value="下载文件">

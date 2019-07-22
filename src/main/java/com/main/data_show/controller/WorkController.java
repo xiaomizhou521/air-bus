@@ -18,13 +18,21 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import net.sf.json.JsonConfig;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import sun.misc.BASE64Encoder;
 
 import javax.annotation.Resource;
+import javax.imageio.ImageIO;
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.jsp.JspPage;
+import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.*;
 
@@ -634,6 +642,41 @@ public class WorkController {
                 }
             }
         }
+    }
+
+    /**
+     * 读取文件流
+     *
+     * @param request
+     * @param response
+     * @throws Exception
+     */
+    @RequestMapping(value = "/work/readImgIo", produces = MediaType.IMAGE_PNG_VALUE)
+    public ResponseEntity<byte[]> readImgIo(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        BufferedImage bi;
+        ByteArrayOutputStream baos =null;
+        try {
+            BASE64Encoder encoder = new sun.misc.BASE64Encoder();
+            String downloadZipPath = request.getParameter("filePath");
+            File file = new File(downloadZipPath);
+            if(!file.exists()){
+                throw new Exception("文件："+downloadZipPath+" 不存在！");
+            }
+            bi = ImageIO.read(file);
+            baos = new ByteArrayOutputStream();
+            ImageIO.write(bi, "png", baos);
+            byte[] bytes = baos.toByteArray();
+            final HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.IMAGE_PNG);
+            return new ResponseEntity<>(bytes, headers, HttpStatus.OK);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if(baos!=null){
+                baos.close();
+            }
+        }
+        return null;
     }
 
 }
