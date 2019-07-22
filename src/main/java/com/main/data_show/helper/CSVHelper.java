@@ -9,6 +9,7 @@ import com.main.data_show.enums.EnumPointTypeDefine;
 import com.main.data_show.pojo.TaInstantPointData;
 import com.main.data_show.pojo.TaPoint;
 import com.main.data_show.pojo.TaUsagePointData;
+import com.main.data_show.pojo.TaUsagePointDataDate;
 import com.main.data_show.service.TaPointService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -447,6 +448,50 @@ public class CSVHelper {
                 ArrayList<String> value = map.getValue();
                 csvWriter.writeRecord(value.toArray(new String[value.size()]));
             }
+            csvWriter.close();
+            return exportFilePath;
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
+        }
+    }
+
+    //用量图表报告   表格
+    public String writeCSV3(List<TaPoint> taPointList, List<TaUsagePointDataDate> exportResult, String startTime, String endTime) throws Exception {
+        try {
+            String readBasePath = env.getProperty(ApplicationConsts.SYS_DEMO_USAGE_EXPORT_DATA_BASE_PATH);
+            if(toolHelper.isEmpty(readBasePath)){
+                throw new Exception(ApplicationConsts.SYS_DEMO_USAGE_EXPORT_DATA_BASE_PATH+",基础路径为空!");
+            }
+            if(!readBasePath.endsWith(ParamConsts.SEPERRE_STR)){
+                readBasePath = readBasePath+ParamConsts.SEPERRE_STR;
+            }
+            File file1 = new File(readBasePath);
+            if(!file1.exists()){
+                file1.mkdir();
+            }
+            //生成文件名
+            String fileName = "Usage("+startTime+"_"+endTime+").CSV";
+            String exportFilePath = readBasePath+fileName;
+            File file = new File(exportFilePath);
+            if(!file.exists()){
+                file.createNewFile();
+            }
+            CsvWriter csvWriter = new CsvWriter(file.getCanonicalPath(), ',', Charset.forName("GBK"));
+            List<List<String>> result = new ArrayList<>();
+            List<String> dateShow = new ArrayList<>();
+            dateShow.add("");
+            for(int i=0;i<exportResult.size();i++){
+                dateShow.add(String.valueOf(exportResult.get(i).getDateShow()));
+            }
+            result.add(dateShow);
+            for(int i=0;i<exportResult.size();i++){
+                dateShow.add(String.valueOf(exportResult.get(i).getDateShow()));
+            }
+           /* for(Map.Entry<Date,ArrayList> map : pointDateMap.entrySet()){
+                ArrayList<String> value = map.getValue();
+                csvWriter.writeRecord(value.toArray(new String[value.size()]));
+            }*/
             csvWriter.close();
             return exportFilePath;
         } catch (Exception e) {

@@ -152,36 +152,36 @@
             <tr id="date_mod" style="height: 80px;">
                 <td style="width: 200px">请选择日期间隔:</td>
                 <td>
-                    <div class="input-group" style="float:left;margin-bottom: 10px;line-height: 35px;width:10%;margin-left:5px;">
-                        <input class="input-warning form-control" style="width:180px;height: 41px;" id="startDate" name="startExpDate" value="${startModDate}" size="20"  onclick="WdatePicker({dateFmt:'yyyy-MM-dd',startDate:'', minDate:'',maxDate:''})" type="text">
+                    <div class="input-group" style="float:left;margin-bottom: 10px;line-height: 35px;width:10%;">
+                        <input class="input-warning form-control" autocomplete="off" style="width:180px;height: 41px;" id="startDate" name="startExpDate" value="${startModDate}" size="20"  onclick="WdatePicker({dateFmt:'yyyy-MM-dd',startDate:'', minDate:'',maxDate:''})" type="text">
                     </div>
                     <div style="float:left;line-height: 35px;width:1%;text-align:center;">~</div>
                     <div class="input-group" style="float:left;margin-bottom: 10px;line-height: 35px;width:10%">
-                        <input class="input-warning form-control" style="width:180px;height: 41px;" id="endDate" name="endExpDate" value="${endModDate}" size="20"  onclick="WdatePicker({dateFmt:'yyyy-MM-dd',startDate:'', minDate:'',maxDate:''})" type="text">
+                        <input class="input-warning form-control" autocomplete="off" style="width:180px;height: 41px;" id="endDate" name="endExpDate" value="${endModDate}" size="20"  onclick="WdatePicker({dateFmt:'yyyy-MM-dd',startDate:'', minDate:'',maxDate:''})" type="text">
                     </div>
                 </td>
             </tr>
             <tr id="week_mod" style="height: 80px;">
                 <td style="width: 200px">请选择周间隔:</td>
                 <td >
-                    <div class="input-group" style="float:left;margin-bottom: 10px;line-height: 35px;width:10%;margin-left:5px;">
-                        <input  id="d122"  name="startWeek" type="text" style="width:180px;height: 41px;"  class="input-warning form-control" onclick="WdatePicker({maxDate:'#F{$dp.$D(\'d122\')}',isShowWeek:true,onpicked:funccc122,errDealMode:3})"/>
+                    <div class="input-group" style="float:left;margin-bottom: 10px;line-height: 35px;width:10%;">
+                        <input  id="d122"  name="startWeek" autocomplete="off" type="text" style="width:180px;height: 41px;"  class="input-warning form-control" onclick="WdatePicker({maxDate:'#F{$dp.$D(\'d122\')}',isShowWeek:true,onpicked:funccc122,errDealMode:3})"/>
                     </div>
                     <div style="float:left;line-height: 35px;width:1%;text-align:center;">~</div>
                     <div class="input-group" style="float:left;margin-bottom: 10px;line-height: 35px;width:10%">
-                        <input  id="d123" name="endWeek" type="text" style="width:180px;height: 41px;"  class="input-warning form-control" onclick="WdatePicker({maxDate:'#F{$dp.$D(\'d123\')}',isShowWeek:true,onpicked:funccc123,errDealMode:3})"/>
+                        <input  id="d123" name="endWeek" autocomplete="off" type="text" style="width:180px;height: 41px;"  class="input-warning form-control" onclick="WdatePicker({maxDate:'#F{$dp.$D(\'d123\')}',isShowWeek:true,onpicked:funccc123,errDealMode:3})"/>
                     </div>
                 </td>
             </tr>
             <tr id="mon_mod" style="height: 80px;">
                 <td style="width: 200px">请选择月间隔:</td>
                 <td>
-                    <div class="input-group" style="float:left;margin-bottom: 10px;line-height: 35px;width:10%;margin-left:5px;">
-                        <input class="input-warning form-control" style="width:180px;height: 41px;" id="startMon" name="startMon" value="${startModDate}" size="20"  onclick="WdatePicker({dateFmt:'yyyy-MM',startDate:'', minDate:'',maxDate:''})" type="text">
+                    <div class="input-group" style="float:left;margin-bottom: 10px;line-height: 35px;width:10%;">
+                        <input class="input-warning form-control" autocomplete="off" style="width:180px;height: 41px;" id="startMon" name="startMon" value="${startModDate}" size="20"  onclick="WdatePicker({dateFmt:'yyyy-MM',startDate:'', minDate:'',maxDate:''})" type="text">
                     </div>
                     <div style="float:left;line-height: 35px;width:1%;text-align:center;">~</div>
                     <div class="input-group" style="float:left;margin-bottom: 10px;line-height: 35px;width:10%">
-                        <input class="input-warning form-control" style="width:180px;height: 41px;" id="endMon" name="endMon" value="${endModDate}" size="20"  onclick="WdatePicker({dateFmt:'yyyy-MM',startDate:'', minDate:'',maxDate:''})" type="text">
+                        <input class="input-warning form-control" autocomplete="off" style="width:180px;height: 41px;" id="endMon" name="endMon" value="${endModDate}" size="20"  onclick="WdatePicker({dateFmt:'yyyy-MM',startDate:'', minDate:'',maxDate:''})" type="text">
                     </div>
                 </td>
             </tr>

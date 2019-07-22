@@ -108,11 +108,11 @@
                 <td style="width: 200px">请选择日期间隔:</td>
                 <td>
                     <div class="input-group" style="float:left;margin-bottom: 10px;line-height: 35px;width:10%;margin-left:5px;">
-                        <input class="input-warning form-control" style="width:180px;height: 41px;" id="startDate" name="startExpDate" value="${startModDate}" size="20"  onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:00:00',startDate:'', minDate:'',maxDate:''})" type="text">
+                        <input class="input-warning form-control" autocomplete="off" style="width:180px;height: 41px;" id="startDate" name="startExpDate" value="${startModDate}" size="20"  onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:00:00',startDate:'', minDate:'',maxDate:''})" type="text">
                     </div>
                     <div style="float:left;line-height: 35px;width:1%;text-align:center;">~</div>
                     <div class="input-group" style="float:left;margin-bottom: 10px;line-height: 35px;width:10%">
-                        <input class="input-warning form-control" style="width:180px;height: 41px;" id="endDate" name="endExpDate" value="${endModDate}" size="20"  onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:00:00',startDate:'', minDate:'',maxDate:''})" type="text">
+                        <input class="input-warning form-control" autocomplete="off" style="width:180px;height: 41px;" id="endDate" name="endExpDate" value="${endModDate}" size="20"  onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:00:00',startDate:'', minDate:'',maxDate:''})" type="text">
                     </div>
                 </td>
             </tr>
