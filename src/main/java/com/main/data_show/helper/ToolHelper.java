@@ -276,7 +276,7 @@ public class ToolHelper {
         return compareDate(startDate,endDate);
     }
 
-    //比较两个日期的大小 true 正确 false 错误   相等返回正确
+    //比较两个日期的大小 true 正确 false 错误
     public boolean compareDate(Date startDate,Date endDate){
         if(startDate.before(endDate)||(startDate.getTime()==endDate.getTime())){
             return true;

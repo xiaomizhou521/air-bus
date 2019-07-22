@@ -48,7 +48,7 @@
             })
         })
 
-        function makeReport(){
+        function makeReport(reportType){
             var pointIds = $("#data-recode-pointIds").val();
             if(pointIds==null||pointIds==''){
                 alert("请选择点！");
@@ -91,7 +91,7 @@
                 dataType:'json',
                 async:false,
                 traditional: true,
-                data:{'startExpDate':startExpDate,'endExpDate':endExpDate,'pointIds':pointIdsValue,'type':intervalTypeId},
+                data:{'startExpDate':startExpDate,'endExpDate':endExpDate,'pointIds':pointIdsValue,'type':intervalTypeId,'reportType':reportType},
                 success: function(data) {
                     $("#makeReportId").attr("disabled",false);
                     var code = data.code;
@@ -219,7 +219,8 @@
             </tr>--%>
             </table>
             <div style="    height: 80px;">
-                <div style="float:left;"><input type="button" id="makeReportId" class="btn btn-default btn-success" onclick="makeReport()" value="生成报告"></div>
+                <div style="float:left;"><input type="button" id="makeReportId" class="btn btn-default btn-success" onclick="makeReport('bar')" value="生成柱形报告"></div>
+                <div style="float:left;margin-left:20px;"><input type="button" id="makeReportId2" class="btn btn-default btn-success" onclick="makeReport('series')" value="生成折线报告"></div>
                 <div style="float:left;margin-left:20px;">
                     <%--<input id="showDownBtn" type="button" class="btn btn-default" value="下载文件">--%>
                     <input id="useDownBtn" type="button" class="btn btn-default btn-success" onclick="downLoadFile()" value="下载文件">

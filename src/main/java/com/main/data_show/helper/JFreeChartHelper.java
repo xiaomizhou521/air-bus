@@ -3,10 +3,7 @@ package com.main.data_show.helper;
 import com.main.data_show.consts.ApplicationConsts;
 import com.main.data_show.consts.ParamConsts;
 import com.main.data_show.consts.SysConsts;
-import com.main.data_show.pojo.TaInstantPointData;
-import com.main.data_show.pojo.TaPoint;
-import com.main.data_show.pojo.TaPointData;
-import com.main.data_show.pojo.TaUsagePointDataDate;
+import com.main.data_show.pojo.*;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartFrame;
 import org.jfree.chart.ChartUtilities;
@@ -51,11 +48,11 @@ public class JFreeChartHelper {
     private Environment env;
 
     //生成设备图表开始 折线图
-    public String createDeviceChartStart(java.util.List<TaPoint> taPointList, List<TaInstantPointData> taPointDataList,String startTime,String endTime) throws Exception {
+    public String createDeviceChartStart(java.util.List<TaPoint> taPointList, List<TaInstantPointData> taPointDataList,String startTime,String endTime,String title,String xLabel,String yLabel) throws Exception {
          // 步骤1：创建CategoryDataset对象（准备数据）
         TimeSeriesCollection dataset = createDeviceChartDate(taPointList,taPointDataList);
         // 步骤2：根据Dataset 生成JFreeChart对象，以及做相应的设置
-        JFreeChart freeChart = createChart(dataset);
+        JFreeChart freeChart = createChart(dataset,title,xLabel,yLabel);
         // 步骤3：将JFreeChart对象输出到文件，Servlet输出流等
         //生成文件名
         String readBasePath = env.getProperty(ApplicationConsts.SYS_DEMO_INSTANT_EXPORT_IMG_BASE_PATH);
@@ -85,8 +82,41 @@ public class JFreeChartHelper {
         return exportFilePath;
     }
 
+    //生成用量折线图
+    public String createUsageDeviceSeriesChartStart(List<TaPoint> taPointList, List<TaUsagePointDataDate> taPointDataList,String startTime,String endTime,String title,String xLabel,String yLabel) throws Exception {
+        // 步骤1：创建CategoryDataset对象（准备数据）
+        DefaultCategoryDataset dataset = createDeviceUsageChartDate(taPointList,taPointDataList);
+        // 步骤2：根据Dataset 生成JFreeChart对象，以及做相应的设置
+        JFreeChart freeChart = createUsageChart(dataset,title,xLabel,yLabel);
+        // 步骤3：将JFreeChart对象输出到文件，Servlet输出流等
+        //生成文件名
+        String readBasePath = env.getProperty(ApplicationConsts.SYS_DEMO_INSTANT_EXPORT_IMG_BASE_PATH);
+        if(toolHelper.isEmpty(readBasePath)){
+            throw new Exception(ApplicationConsts.SYS_DEMO_INSTANT_EXPORT_IMG_BASE_PATH+",基础路径为空!");
+        }
+        String imgWidth = env.getProperty(ApplicationConsts.SYS_DEMO_EXPORT_IMG_WIDTH);
+        if(toolHelper.isEmpty(imgWidth)){
+            throw new Exception(ApplicationConsts.SYS_DEMO_EXPORT_IMG_WIDTH+",导出图片宽设置为空!");
+        }
+        String imgHeight = env.getProperty(ApplicationConsts.SYS_DEMO_EXPORT_IMG_HEIGHT);
+        if(toolHelper.isEmpty(imgHeight)){
+            throw new Exception(ApplicationConsts.SYS_DEMO_EXPORT_IMG_HEIGHT+",导出图片高设置为空!");
+        }
+        if(!readBasePath.endsWith(ParamConsts.SEPERRE_STR)){
+            readBasePath = readBasePath+ParamConsts.SEPERRE_STR;
+        }
+        File file1 = new File(readBasePath);
+        if(!file1.exists()){
+            file1.mkdir();
+        }
+        String fileName = "Instant("+startTime+"_"+endTime+").png";
+        String exportFilePath = readBasePath+fileName;
+        saveAsFile(freeChart, exportFilePath, Integer.parseInt(imgWidth), Integer.parseInt(imgHeight));
+        return exportFilePath;
+    }
+
     //生成设备图表开始 柱形图
-    public String createUsageDeviceChartStart(java.util.List<TaPoint> taPointList, List<TaUsagePointDataDate> taPointDataList,String startStr,String endStr) throws Exception {
+    public String createUsageDeviceBarChartStart(List<TaPoint> taPointList, List<TaUsagePointDataDate> taPointDataList,String startStr,String endStr,String title,String xLabel,String yLabel) throws Exception {
         //生成文件名
         String readBasePath = env.getProperty(ApplicationConsts.SYS_DEMO_USAGE_EXPORT_IMG_BASE_PATH);
         if(toolHelper.isEmpty(readBasePath)){
@@ -103,7 +133,7 @@ public class JFreeChartHelper {
         // 步骤1：创建CategoryDataset对象（准备数据）
         DefaultCategoryDataset usageDeviceChartData = createUsageDeviceChartData(taPointList, taPointDataList);
         // 步骤2：根据Dataset 生成JFreeChart对象，以及做相应的设置
-        JFreeChart freeChart = createUageChart(usageDeviceChartData);
+        JFreeChart freeChart = createUageChart(usageDeviceChartData, title, xLabel, yLabel);
         // 步骤3：将JFreeChart对象输出到文件，Servlet输出流等
         if(!readBasePath.endsWith(ParamConsts.SEPERRE_STR)){
             readBasePath = readBasePath+ParamConsts.SEPERRE_STR;
@@ -152,6 +182,19 @@ public class JFreeChartHelper {
         return lineDataset;
     }
 
+    public DefaultCategoryDataset createDeviceUsageChartDate(java.util.List<TaPoint> taPointList, List<TaUsagePointDataDate> taPointDataList){
+        Map<Integer,String> ponitMap = new HashMap<>();
+        for(TaPoint pointVo : taPointList){
+            ponitMap.put(pointVo.getPointId(),"点名："+pointVo.getPointName()+"("+pointVo.getRemarksName()+")"+",类型："+pointVo.getPointType()+",单位："+pointVo.getPointUnit());
+        }
+        DefaultCategoryDataset mDataset = new DefaultCategoryDataset();
+        //创造图标数据
+        for(TaUsagePointDataDate pointDateVo : taPointDataList){
+            mDataset.addValue(pointDateVo.getPointData(), ponitMap.get(pointDateVo.getPointId()), String.valueOf(pointDateVo.getDateShow()));
+        }
+        return mDataset;
+    }
+
     public DefaultCategoryDataset createUsageDeviceChartData(java.util.List<TaPoint> taPointList, List<TaUsagePointDataDate> taPointDataList){
         Map<Integer,String> ponitMap = new HashMap<>();
         for(TaPoint pointVo : taPointList){
@@ -166,11 +209,11 @@ public class JFreeChartHelper {
     }
 
     // 根据CategoryDataset生成JFreeChart对象
-    public static JFreeChart createChart(TimeSeriesCollection lineDataset) {
+    public static JFreeChart createChart(TimeSeriesCollection lineDataset,String title,String xLabel,String yLabel) {
         JFreeChart jfreechart = ChartFactory.createTimeSeriesChart(
-                "设备图表", 		// 标题
-                "时间", 		// categoryAxisLabel （category轴，横轴，X轴的标签）
-                "值", 	// valueAxisLabel（value轴，纵轴，Y轴的标签）
+                title, 		// 标题
+                xLabel, 		// categoryAxisLabel （category轴，横轴，X轴的标签）
+                yLabel, 	// valueAxisLabel（value轴，纵轴，Y轴的标签）
                 lineDataset,// dataset
                 true, 		// legend
                 true, 		// tooltips
@@ -221,6 +264,26 @@ public class JFreeChartHelper {
         return jfreechart;
     }
 
+    // 根据CategoryDataset生成JFreeChart对象
+    public static JFreeChart createUsageChart(DefaultCategoryDataset lineDataset,String title,String xLabel,String yLabel) {
+        JFreeChart mChart = ChartFactory.createLineChart(
+                title,//图名字
+                xLabel,//横坐标
+                yLabel,//纵坐标
+                lineDataset,//数据集
+                PlotOrientation.VERTICAL,
+                true, // 显示图例
+                true, // 采用标准生成器
+                false);// 是否生成超链接
+
+        CategoryPlot mPlot = (CategoryPlot)mChart.getPlot();
+        mPlot.setBackgroundPaint(Color.LIGHT_GRAY);
+        mPlot.setRangeGridlinePaint(Color.BLUE);//背景底部横虚线
+        mPlot.setOutlinePaint(Color.RED);//边界线
+
+        return mChart;
+    }
+
 
     // 保存为文件
     public static void saveAsFile(JFreeChart chart, String outputPath,
@@ -254,7 +317,7 @@ public class JFreeChartHelper {
         }
     }
 
-    public JFreeChart createUageChart(DefaultCategoryDataset dateSet) throws IOException {
+    public JFreeChart createUageChart(DefaultCategoryDataset dateSet,String title,String xLabel,String yLabel) throws IOException {
         /*JFreeChart chart = ChartFactory.createBarChart("柱状图",//标题
                 "用量",//目录轴的显示标签
                 "kmh/",//数值的显示标签
@@ -294,9 +357,9 @@ public class JFreeChartHelper {
         renderer.setMinimumBarLength(0.00); //设置柱子高度*/
         //创建图形实体对象
         JFreeChart chart=ChartFactory.createBarChart3D(//工厂模式
-                "用量", //图形的标题
-                "点用量图", //目录轴的显示标签(X轴)
-                "",  //数据轴的显示标签(Y轴)
+                title, //图形的标题
+                xLabel, //目录轴的显示标签(X轴)
+                yLabel,  //数据轴的显示标签(Y轴)
                 dateSet, //数据集
                 PlotOrientation.VERTICAL, //垂直显示图形
                 true,  //是否生成图样
