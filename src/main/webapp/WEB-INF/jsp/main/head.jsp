@@ -5,7 +5,7 @@
 <header th:fragment="header">
     <div class="layui-layout layui-layout-admin">
         <div class="layui-header">
-            <a href="javascript:;" class="layui-hide-xs"><div class="layui-logo" style="font-size: 25px;">数据整理系统</div>
+            <a href="javascript:;" class="layui-hide-xs"><div class="layui-logo" style="font-size: 25px;">数据展示系统</div>
             </a>
             <a href="javascript:;" class="layui-hide-xs">
                 <div class="switchMenu" style="display: none;"><i class="fa fa-indent"></i></div>
@@ -20,6 +20,7 @@
                         <dd id="updUsePwdDd" class="layui-this"><a href="javascript:;" onclick="updateUsePwd();">修改密码</a></dd>
                     </dl>--%>
                 </li>
+                <li class="layui-nav-item">当前用户:&nbsp;&nbsp;${nickname}</li>
                 <li class="layui-nav-item"><a href="/toLogOut">退出</a></li>
             </ul>
         </div>

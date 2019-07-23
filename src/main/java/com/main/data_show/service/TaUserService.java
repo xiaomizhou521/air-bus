@@ -23,6 +23,10 @@ public class TaUserService {
         return userMapper.findUserByUserName(userName);
     }
 
+    public TaUser findUserByUserId(int userId){
+        return userMapper.findUserByUserId(userId);
+    }
+
     public int add(TaUser user){
         return userMapper.add(user);
 

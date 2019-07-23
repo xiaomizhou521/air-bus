@@ -33,23 +33,28 @@
     </script>
 </head>
 <body>
-   <div>
+   <div style="height: 100%;    background: url(../static/images/ariplan.png);">
+       <div style="width:400px;margin:auto;height: 200px;padding-top: 200px">
        <form action="/login/loginDo" method="post">
-           <table class=" table">
+           <table class="table" style="    height: 300px;background: url(../static/images/bg.png);">
                <tr>
-                   <td>用户名</td><td><input type="text" class ="form-control" placeholder="" id="userName" name="userName" value=""/></td>
+                   <td style="vertical-align: middle;text-align: center" colspan="2"><span style="font-size: 30px;font-weight:bold">数据展示系统</span></td>
                </tr>
                <tr>
-                   <td>密码</td><td><input type="text" class ="form-control" placeholder="" id="passWord" name="passWord" value=""/></td>
+                   <td style="vertical-align: middle;">用户名:</td><td style="vertical-align: middle;"><input type="text" class ="form-control" placeholder="" id="userName" name="userName" value=""/></td>
                </tr>
                <tr>
-                   <td colspan="2"><input type="submit" onclick="return checkSubumit();" class="btn form-control" value="登陆"></td>
+                   <td style="vertical-align: middle;">密码:</td><td style="vertical-align: middle;"><input type="text" class ="form-control" placeholder="" id="passWord" name="passWord" value=""/></td>
+               </tr>
+               <tr>
+                   <td colspan="2"><input type="submit" style="height: 50px;" onclick="return checkSubumit();" class="btn form-control btn-primary" value="登陆"></td>
                </tr>
                <tr>
                    <td colspan="2" style="color:red;" id="messageId">${message}</td>
                </tr>
            </table>
        </form>
+       </div>
    </div>
 </body>
 </html>

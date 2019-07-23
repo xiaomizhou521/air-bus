@@ -233,7 +233,7 @@ public class CSVHelper {
                         //总表 不做处理立马就插进来  为了保证数据的完成 不丢失 之后在做别的处理
                         Date dateTime = toolHelper.makeDateByDateAndHour(dateStr, hourStr);
                         long dateTimeInt = toolHelper.dateToNumDate(dateTime,SysConsts.DATE_FORMAT_3);
-                        //allPointDataHelper.insertAllPoint(pointId,dateStr,hourStr,ponitValue,0,dateTime,dateTimeInt);
+                        allPointDataHelper.insertAllPoint(pointId,dateStr,hourStr,ponitValue,0,dateTime,dateTimeInt);
                         //每个小时的用量
                         double pointUsage = 0;
                         //用量时 需要保存上一小时的结果 算当前小时的用量
@@ -283,7 +283,7 @@ public class CSVHelper {
                 instantPointDataHelper.insertAllPoint(pointVo.getPointId(),dateStr,hourStr,pointData,0,dateTime,dateTimeInt);
            //点用量数据保存到 usagePointDate中
            }else if(EnumPointTypeDefine.usage.toString().equals(pointVo.getPointType())){
-              // usagePointDataHelper.insertAllPoint(pointVo.getPointId(),dateStr,hourStr,pointData,pointUsage,dateTime,dateTimeInt);
+              usagePointDataHelper.insertAllPoint(pointVo.getPointId(),dateStr,hourStr,pointData,pointUsage,dateTime,dateTimeInt);
                usagePointDataDateHelper.makeUsagePointDate(pointVo.getPointId(),pointUsage,dateTime);
                usagePointDataWeekHelper.makeUsagePointWeek(pointVo.getPointId(),pointUsage,dateTime);
                usagePointDataMonHelper.makeUsagePointMon(pointVo.getPointId(),pointUsage,dateTime);

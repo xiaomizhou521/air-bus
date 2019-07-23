@@ -5,6 +5,7 @@ import com.main.data_show.DataShowApplication;
 import com.main.data_show.bean.LoginUserVo;
 import com.main.data_show.consts.LoginConst;
 import com.main.data_show.pojo.TaUser;
+import com.main.data_show.service.TaUserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,8 @@ import java.sql.SQLException;
 public class LoginHelper {
     private static Logger logger = LoggerFactory.getLogger(LoginHelper.class);
 
+    @Autowired
+    private TaUserService taUserService;
     /*
      * 取得当前登陆的userId
      *
@@ -76,7 +79,8 @@ public class LoginHelper {
         if(userId == -1) {
             return null;
         }
-        return new TaUser();
+        TaUser userByUserId = taUserService.findUserByUserId(userId);
+        return userByUserId;
     }
 
     /*

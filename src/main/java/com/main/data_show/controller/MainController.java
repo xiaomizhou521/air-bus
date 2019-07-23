@@ -95,7 +95,9 @@ public class MainController {
     }
 
     @RequestMapping(value = "work/redirect")
-    public String redirectMain(HttpServletRequest request) {
+    public String redirectMain(HttpServletRequest request) throws Exception {
+        TaUser curUser = loginHelper.getCurUser(request);
+        request.setAttribute("nickname",curUser.getNickName());
         return JspPageConst.MAIN_JSP_REDIRECT;
     }
 

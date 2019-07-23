@@ -24,4 +24,13 @@
         from ta_user where user_name = #{user_name}
     </select>
 
+    <select id="findUserByUserId" resultType="com.main.data_show.pojo.TaUser">
+        select user_id as userId,
+        user_name as userName,
+        nick_name as nickName,
+        pass_word as passWord,
+        salt
+        from ta_user where user_id = #{user_id}
+    </select>
+
 </mapper>

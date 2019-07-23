@@ -17,5 +17,7 @@ public interface  TaUserMapper {
 
     TaUser findUserByUserName(@Param("user_name")String user_name);
 
+    TaUser findUserByUserId(@Param("user_id")int user_id);
+
     public int add(TaUser user);
 }
