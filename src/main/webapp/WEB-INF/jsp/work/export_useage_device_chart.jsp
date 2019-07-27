@@ -25,7 +25,7 @@
             })
 
             $("#showDownBtn").show();
-            $("#useDownBtn").hide();
+           // $("#useDownBtn").hide();
             $("#showImg").hide();
 
              $("#date_mod").show();
@@ -96,14 +96,17 @@
                 success: function(data) {
                     $("#makeReportId").attr("disabled",false);
                     var code = data.code;
-                    var result = data.data;
+                    var imgPath = data.imgPath;
+                    var csvPath = data.csvPath;
                     if(code ==1){
-                        $("#csvFilePath").val(result)
-                        $("#showFilePath").html("生成报告位置："+result);
+                        $("#csvFilePath").val(csvPath)
+                        $("#imgFilePath").val(imgPath)
+                        $("#showImagePath").html("生成图形报告位置："+imgPath);
+                        $("#showCSVPath").html("生成CSV报告位置："+csvPath);
                         $("#showDownBtn").hide();
                         $("#useDownBtn").show();
                         $("#showImg").show();
-                        var src = "/work/readImgIo?filePath="+result;
+                        var src = "/work/readImgIo?filePath="+imgPath;
                         $("#showImg").attr("src",src);
                     }else if(code ==-1){
                         $("#showFilePath").html("");
@@ -114,6 +117,15 @@
         }
 
         function downLoadFile() {
+            var csvFilePath = $("#imgFilePath").val();
+            if(csvFilePath ==null ||csvFilePath==''){
+                alert("请先生成报告！");
+                return;
+            }
+            window.location.href = "/work/downloadCsv?filePath=" + csvFilePath;
+        }
+
+        function downLoadFCSVile() {
             var csvFilePath = $("#csvFilePath").val();
             if(csvFilePath ==null ||csvFilePath==''){
                 alert("请先生成报告！");
@@ -132,7 +144,7 @@
     </script>
 </head>
 <body>
-<form action="/work/exportUsageRecodeDo" method="post">
+<form action="" method="post">
     <div style="width: 100%">
         <div style="width:1100px;margin:auto;margin-top:20px;">
             <table>
@@ -189,49 +201,25 @@
                 </td>
             </tr>
 
-            <%--<tr>
-                <td style="width: 200px">请选择采样时间:</td>
-                <td>
-                    <select id="takeTimeId" class="form-control" style="width:150px;">
-                        <option value="00:00:00">00:00</option>
-                        <option value="01:00:00">01:00</option>
-                        <option value="02:00:00">02:00</option>
-                        <option value="03:00:00">03:00</option>
-                        <option value="04:00:00">04:00</option>
-                        <option value="05:00:00">05:00</option>
-                        <option value="06:00:00">06:00</option>
-                        <option value="07:00:00">07:00</option>
-                        <option value="08:00:00">08:00</option>
-                        <option value="09:00:00">09:00</option>
-                        <option value="10:00:00">10:00</option>
-                        <option value="11:00:00">11:00</option>
-                        <option value="12:00:00">12:00</option>
-                        <option value="13:00:00">13:00</option>
-                        <option value="14:00:00">14:00</option>
-                        <option value="15:00:00">15:00</option>
-                        <option value="16:00:00" selected>16:00</option>
-                        <option value="17:00:00">17:00</option>
-                        <option value="18:00:00">18:00</option>
-                        <option value="19:00:00">19:00</option>
-                        <option value="20:00:00">20:00</option>
-                        <option value="21:00:00">21:00</option>
-                        <option value="22:00:00">22:00</option>
-                        <option value="23:00:00">23:00</option>
-                    </select>
-                </td>
-            </tr>--%>
             </table>
             <div style="    height: 80px;">
                 <div style="float:left;"><input type="button" id="makeReportId" class="btn btn-default btn-success" onclick="makeReport('bar')" value="生成柱形图报告"></div>
                 <div style="float:left;margin-left:20px;"><input type="button" id="makeReportId2" class="btn btn-default btn-success" onclick="makeReport('series')" value="生成折线图报告"></div>
                 <div style="float:left;margin-left:20px;">
                     <%--<input id="showDownBtn" type="button" class="btn btn-default" value="下载文件">--%>
-                    <input id="useDownBtn" type="button" class="btn btn-default btn-success" onclick="downLoadFile()" value="下载文件">
+                    <input id="useDownBtn" type="button" class="btn btn-default btn-success" onclick="downLoadFile()" value="下载视图报告">
+                </div>
+                <div style="float:left;margin-left:20px;">
+                    <input id="useDownBtn1" type="button" class="btn btn-default btn-success" onclick="downLoadFCSVile()" value="下载CSV报告">
                 </div>
             </div>
             <div id="">
-                <span id="showFilePath"></span>
+                <span id="showCSVPath"></span>
                 <input type="hidden" id="csvFilePath" />
+            </div>
+            <div id="">
+                <span id="showImagePath"></span>
+                <input type="hidden" id="imgFilePath" />
             </div>
             <div style="width: 100%">
                 <div style="width: 100%;margin:auto">

@@ -483,8 +483,8 @@ public class CSVHelper {
     }
 
     //用量图表报告   表格
-    public void writeCSV3(List<TaPoint> taPointList, List<TaUsagePointDataDate> exportResult, String startTime, String endTime) throws Exception {
-      /*  try {
+    public String writeCSV3(List<TaPoint> taPointList, List<TaUsagePointDataDate> exportResult, List<String> dateIntervalAllList,String startTime,String endTime) throws Exception {
+        try {
             String readBasePath = env.getProperty(ApplicationConsts.SYS_DEMO_USAGE_EXPORT_DATA_BASE_PATH);
             if(toolHelper.isEmpty(readBasePath)){
                 throw new Exception(ApplicationConsts.SYS_DEMO_USAGE_EXPORT_DATA_BASE_PATH+",基础路径为空!");
@@ -497,25 +497,54 @@ public class CSVHelper {
                 file1.mkdir();
             }
             //生成文件名
-            String fileName = "Usage("+startTime+"_"+endTime+").CSV";
+            long curSysTime = System.currentTimeMillis();
+            String fileName = "Usage("+startTime+"_"+endTime+")"+curSysTime+".CSV";
             String exportFilePath = readBasePath+fileName;
             File file = new File(exportFilePath);
             if(!file.exists()){
                 file.createNewFile();
             }
             CsvWriter csvWriter = new CsvWriter(file.getCanonicalPath(), ',', Charset.forName("GBK"));
-            List<List<String>> result = new ArrayList<List<String>>();
-            List<String> dateShow = new ArrayList<String>();
-            dateShow.add("");
-            for(int i=0;i<exportResult.size();i++){
-                dateShow.add(String.valueOf(exportResult.get(i).getDateShow()));
+            List<String> title = new ArrayList<String>();
+            title.add(" ");
+            for(String str : dateIntervalAllList){
+                title.add(str);
             }
-            result.add(dateShow);
-            for(int i=0;i<exportResult.size();i++){
-                dateShow.add(String.valueOf(exportResult.get(i).getDateShow()));
-            }*/
-           /* for(Map.Entry<Date,ArrayList> map : pointDateMap.entrySet()){
-                ArrayList<String> value = map.getValue();
+            Map<Integer,List<String>> pointDateMap = new HashMap<Integer,List<String>>();
+            Map<Integer,String> map = new LinkedHashMap<Integer,String>();
+            for(TaPoint point : taPointList){
+                int pointId = point.getPointId();
+                for(String str : dateIntervalAllList){
+                    boolean flg = false;
+                    for(TaUsagePointDataDate usagePointData : exportResult){
+                        if(usagePointData.getPointId() == pointId&&str.equals(String.valueOf(usagePointData.getDateShow()))){
+                            flg = true;
+                            if(pointDateMap.containsKey(usagePointData.getPointId())){
+                                pointDateMap.get(usagePointData.getPointId()).add(String.valueOf(usagePointData.getPointData()));
+                            }else{
+                                List<String> list =new ArrayList<String>();
+                                list.add(point.getPointName()+"("+point.getRemarksName()+")");
+                                list.add(String.valueOf(usagePointData.getPointData()));
+                                pointDateMap.put(usagePointData.getPointId(),list);
+                            }
+                        }
+                    }
+                    //如果循环一轮发现没有数据 补位-
+                    if(!flg){
+                        if(pointDateMap.containsKey(pointId)){
+                            pointDateMap.get(pointId).add("-");
+                        }else{
+                            List<String> list =new ArrayList<String>();
+                            list.add(point.getPointName()+"("+point.getRemarksName()+")");
+                            list.add("-");
+                            pointDateMap.put(pointId,list);
+                        }
+                    }
+                }
+            }
+            csvWriter.writeRecord(title.toArray(new String[title.size()]));
+            for(Map.Entry<Integer,List<String>> writeMap : pointDateMap.entrySet()){
+                List<String> value = writeMap.getValue();
                 csvWriter.writeRecord(value.toArray(new String[value.size()]));
             }
             csvWriter.close();
@@ -523,7 +552,7 @@ public class CSVHelper {
         } catch (Exception e) {
             e.printStackTrace();
             throw e;
-        }*/
+        }
     }
 }
 

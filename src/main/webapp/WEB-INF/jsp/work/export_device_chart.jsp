@@ -26,7 +26,7 @@
             })
 
             $("#showDownBtn").show();
-            $("#useDownBtn").hide();
+           // $("#useDownBtn").hide();
             $("#showImg").hide();
 
         })

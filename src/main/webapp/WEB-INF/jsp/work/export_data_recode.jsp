@@ -18,7 +18,7 @@
             })
 
             $("#showDownBtn").show();
-            $("#useDownBtn").hide();
+           // $("#useDownBtn").hide();
 
         })
 

@@ -25,7 +25,7 @@
             })
 
             $("#showDownBtn").show();
-            $("#useDownBtn").hide();
+            //$("#useDownBtn").hide();
 
         })
         function makeReport(){
