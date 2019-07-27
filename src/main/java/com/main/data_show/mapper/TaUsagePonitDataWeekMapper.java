@@ -14,7 +14,7 @@ public interface TaUsagePonitDataWeekMapper {
 
     public void updateTaPointDataWeekByPointIdAndTime(TaUsagePointDataWeek taUsagePointDataDate);
 
-    public List<TaUsagePointDataWeek> findUsagePointDataWeekByPointIdAndTime(long startExpDate, long endExpDate, @Param("pointIds")String pointIds);
+    public List<TaUsagePointDataWeek> findUsagePointDataWeekByPointIdAndTime(@Param("startExpDate")long startExpDate, @Param("endExpDate")long endExpDate, @Param("pointIds")String pointIds);
 
 
 

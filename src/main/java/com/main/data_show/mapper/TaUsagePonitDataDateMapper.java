@@ -11,7 +11,7 @@ public interface TaUsagePonitDataDateMapper {
 
     public TaUsagePointDataDate getUsagePointDataDateByPointIdAndTime(@Param("point_id")int point_id,@Param("date_show")long date_show);
 
-    public List<TaUsagePointDataDate> findUsagePointDataDateByPointIdAndTime(long startExpDate, long endExpDate, @Param("pointIds")String pointIds);
+    public List<TaUsagePointDataDate> findUsagePointDataDateByPointIdAndTime(@Param("startExpDate")long startExpDate, @Param("endExpDate")long endExpDate, @Param("pointIds")String pointIds);
 
     public void updateTaPointDataDateByPointIdAndTime(TaUsagePointDataDate taUsagePointDataDate);
 

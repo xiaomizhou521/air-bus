@@ -27,6 +27,9 @@ public class ToolHelper {
     @Autowired
     private Environment env;
 
+    @Autowired
+    private StartupHelper startupHelper;
+
     public boolean isEmpty(String words) {
         return words == null || words.trim().length() == 0;
     }
@@ -198,13 +201,14 @@ public class ToolHelper {
                     return dateToNumDate(addDate,SysConsts.DATE_FORMAT_4);
                 }
             }else if(EnumUsageTimeTypeDefine.week.toString().equals(type)){
-                if(c<=defHour){
+               /* if(c<=defHour){*/
+                //周事按配置的某个星期几为间隔 当前时间减去今年的第一个周几来计算周数的 应该不用加一天
                     return getWeekNumByDate(checkDate);
-                }else {
+              /*  }else {
                     //加一天
                     Date addDate = addSubDate(checkDate, 1);
                     return getWeekNumByDate(addDate);
-                }
+                }*/
             }else if(EnumUsageTimeTypeDefine.mon.toString().equals(type)){
                 if(c<=defHour){
                     return dateToNumDate(checkDate,SysConsts.DATE_FORMAT_5);
@@ -220,13 +224,44 @@ public class ToolHelper {
         return 0;
     }
     //取周数
-    public long getWeekNumByDate(Date date){
+    public long getWeekNumByDate(Date date) throws Exception {
+        //先判断传进来的日期的年  与  参数日期的年是不是相同 不相同 要拿着新的年 重算
         Calendar cal = Calendar.getInstance();
-        cal.setFirstDayOfWeek(Calendar.MONDAY);//设置周一为一周的第一天
         cal.setTime(date);
-        int weekNum = cal.get(Calendar.WEEK_OF_YEAR);
-        int yearNum = cal.get(Calendar.YEAR);
-        return Long.parseLong(yearNum+""+weekNum);
+        int checkYear = cal.get(Calendar.YEAR);
+        //SysConsts.DEF_YEAE 默认是-1 没有初始化过 或者更当前验证日期的年不一致 要拿新的年重算一下
+        //因为周数 每年的开始那周的日期都要计算
+        if(SysConsts.DEF_YEAE < 0||SysConsts.DEF_YEAE!=checkYear){
+            startupHelper.initYearFirstWeekDate(checkYear);
+        }
+        //计算一次之后 肯定相等了 如果还不想等 那肯定就是有问题了  抛异常
+        if(SysConsts.DEF_YEAE!=checkYear){
+          throw new Exception("当前系统内存中的用来计算的年份异常");
+        }
+        //计算周数规则  小于SysConsts.YEAR_FIRT_WEEK_STRART_DATE 的为第一周
+        //(验证时间 - SysConsts.YEAR_FIRT_WEEK_STRART_DATE)/7  + 1 为真正的周数
+        long betweenDate = (date.getTime() - SysConsts.YEAR_FIRT_WEEK_STRART_DATE.getTime())/(60*60*24*1000);
+        long weekNum = (betweenDate/7)+1;
+        String weekStr = weekNum+"";
+        if(weekStr.length()<2){
+            weekStr = "0"+weekStr;
+        }
+        return Long.parseLong(checkYear+""+weekStr);
+    }
+
+    public static void main(String[] args) throws ParseException {
+        //yyyy/MM/dd HH:mm:ss
+        Date startDate = makeStrToDate("2019/01/03 16:00:00", SysConsts.DATE_FORMAT);
+        Date endDate = makeStrToDate("2019/01/04 16:00:00", SysConsts.DATE_FORMAT);
+   /*     if(startDate.before(endDate)||(startDate.getTime()==endDate.getTime())){
+            System.out.println(true);
+        }else{
+            System.out.println(false);
+        }*/
+        //得到相差的天数 betweenDate
+        long betweenDate = (endDate.getTime() - startDate.getTime())/(60*60*24*1000);
+        System.out.println(betweenDate);
+        System.out.println(betweenDate/7);
     }
 
     //取文件的相对路径
@@ -276,7 +311,7 @@ public class ToolHelper {
         return compareDate(startDate,endDate);
     }
 
-    //比较两个日期的大小 true 正确 false 错误
+    //比较两个日期的大小 startDate <= endDate  true  startDate > endDate false 错误
     public boolean compareDate(Date startDate,Date endDate){
         if(startDate.before(endDate)||(startDate.getTime()==endDate.getTime())){
             return true;
@@ -285,10 +320,5 @@ public class ToolHelper {
         }
     }
 
-    public static void main(String[] args) throws ParseException {
-        Date date = makeStrToDate("2019-07-31 00:54:21", SysConsts.DATE_FORMAT_1);
-        Date addDate = addSubDate(date, 1);
-       // System.out.println(dateToNumDate(addDate,SysConsts.DATE_FORMAT_5));
-    }
 
 }

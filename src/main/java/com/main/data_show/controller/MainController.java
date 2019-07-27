@@ -78,6 +78,12 @@ public class MainController {
             throw new Exception("用户名或密码不能为空！");
         }
         TaUser userByUserName = userService.findUserByUserName(userName);
+        if(userByUserName == null){
+            //去登陆页面
+            request.setAttribute("message", "用户名或密码错误！");
+            logger.info("userName:"+userName+",登陆失败，用户名或密码错误!");
+            return JspPageConst.LOGIN_JSP_REDIRECT;
+        }
         String realPw = userByUserName.getPassWord();
         String salt = userByUserName.getSalt();
         String loginMd5Pw = userHelper.getPassWorldMd5(passWord, salt);

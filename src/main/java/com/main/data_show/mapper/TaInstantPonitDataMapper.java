@@ -11,7 +11,7 @@ public interface TaInstantPonitDataMapper {
 
     public int insertTaInstantPointData(TaInstantPointData taInstantPointData);
 
-    public List<TaInstantPointData> findInstantPointByPointIdAndTime(long startExpDate, long endExpDate, @Param("point_id") int pointId);
+    public List<TaInstantPointData> findInstantPointByPointIdAndTime(@Param("startExpDate")long startExpDate, @Param("endExpDate")long endExpDate, @Param("point_id") int pointId);
 
 
 }

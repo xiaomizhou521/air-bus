@@ -252,7 +252,6 @@ public class WorkController {
             }
             System.out.println(exportResult.size());
             //取点数据
-            List<TaPointData> taPointDataList = taPonitDataMapper.queryPointData(startExpDate, endExpDate, pointsInStr);
             String path = csvHelper.writeCSV1(taPointList, exportResult, startExpDate, endExpDate, response);
             result.put("code",1);
             result.put("data",path);

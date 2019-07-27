@@ -32,8 +32,8 @@ public class PointHelper {
             point.setFileRelativePath(relativePath);
             point.setFilePrefixName(fileNamePrefix);
             int newPointid = taPointService.insert(point);
-            point.setPointId(newPointid);
-            return point;
+            TaPoint pointByUserNamenew = taPointService.findPointByPointName(pointName);
+            return pointByUserNamenew;
         }else{
             System.out.println("pointName:"+pointName+",已存在！");
             return pointByUserName;

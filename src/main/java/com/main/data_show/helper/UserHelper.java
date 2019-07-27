@@ -15,9 +15,4 @@ public class UserHelper {
         return toolHelper.getMD5(temp);
     }
 
-    public static void main(String[] args) {
-        ToolHelper toolHelper = new ToolHelper();
-        String temp = toolHelper.getMD5("1234qwer") + toolHelper.getMD5("asdfwiueirlkajksjdklfjaklsjdklf");
-        System.out.println(toolHelper.getMD5(temp));
-    }
 }

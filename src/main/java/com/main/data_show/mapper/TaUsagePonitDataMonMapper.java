@@ -14,7 +14,7 @@ public interface TaUsagePonitDataMonMapper {
 
     public void updateTaPointDataMonByPointIdAndTime(TaUsagePointDataMon taUsagePointDataDate);
 
-    public List<TaUsagePointDataMon> findUsagePointDataMonByPointIdAndTime(long startExpDate, long endExpDate, @Param("pointIds")String pointIds);
+    public List<TaUsagePointDataMon> findUsagePointDataMonByPointIdAndTime(@Param("startExpDate")long startExpDate, @Param("endExpDate")long endExpDate, @Param("pointIds")String pointIds);
 
 
 

@@ -71,7 +71,7 @@ public class CSVHelper {
             System.out.println(file.getName()+"不是一个文件夹");
         }else{
             traversalFile(readBasePath,readBasePath,"basePointDate");
-          //  exportPointBaseRemarkData();
+            exportPointBaseRemarkData();
         }
         long endTime = System.currentTimeMillis();
         long useTime = endTime-startTime;
@@ -159,8 +159,8 @@ public class CSVHelper {
                     relativePath = relativePath + ParamConsts.SEPERRE_STR;
                 }
                 //计算文件名称
-                //String dateStr = toolHelper.dateToStrDate(new Date(), SysConsts.DATE_FORMAT_6);
-                String dateStr = "07-03-19";
+                String dateStr = toolHelper.dateToStrDate(new Date(), SysConsts.DATE_FORMAT_6);
+                //String dateStr = "07-03-19";
                 String fileNamePrefix = pointVo.getFilePrefixName()+dateStr+".CSV";
                 String allPath = readBasePath + relativePath + fileNamePrefix;
                 logger.info("当前读取的文件名全路径为:"+allPath);
@@ -187,6 +187,7 @@ public class CSVHelper {
     //具体读取某个csv文件
     public void readCSV(String filePath,String relativePath,String fileNamePrefix) throws Exception {
         try {
+            logger.warn(filePath);
             File file = new File(filePath);
             if(!file.exists()){
               logger.error("文件："+filePath+" 不存在！！");
@@ -233,7 +234,8 @@ public class CSVHelper {
                         //总表 不做处理立马就插进来  为了保证数据的完成 不丢失 之后在做别的处理
                         Date dateTime = toolHelper.makeDateByDateAndHour(dateStr, hourStr);
                         long dateTimeInt = toolHelper.dateToNumDate(dateTime,SysConsts.DATE_FORMAT_3);
-                        allPointDataHelper.insertAllPoint(pointId,dateStr,hourStr,ponitValue,0,dateTime,dateTimeInt);
+                        logger.warn("-------------------pointName:"+ponitVo.getPointName()+",pointId:"+pointId+",dateTimeInt:"+dateTimeInt+" dateStr:"+dateStr+" hourStr:"+hourStr);
+                    //    allPointDataHelper.insertAllPoint(pointId,dateStr,hourStr,ponitValue,0,dateTime,dateTimeInt);
                         //每个小时的用量
                         double pointUsage = 0;
                         //用量时 需要保存上一小时的结果 算当前小时的用量
@@ -283,10 +285,10 @@ public class CSVHelper {
                 instantPointDataHelper.insertAllPoint(pointVo.getPointId(),dateStr,hourStr,pointData,0,dateTime,dateTimeInt);
            //点用量数据保存到 usagePointDate中
            }else if(EnumPointTypeDefine.usage.toString().equals(pointVo.getPointType())){
-              usagePointDataHelper.insertAllPoint(pointVo.getPointId(),dateStr,hourStr,pointData,pointUsage,dateTime,dateTimeInt);
-               usagePointDataDateHelper.makeUsagePointDate(pointVo.getPointId(),pointUsage,dateTime);
+             // usagePointDataHelper.insertAllPoint(pointVo.getPointId(),dateStr,hourStr,pointData,pointUsage,dateTime,dateTimeInt);
+           //    usagePointDataDateHelper.makeUsagePointDate(pointVo.getPointId(),pointUsage,dateTime);
                usagePointDataWeekHelper.makeUsagePointWeek(pointVo.getPointId(),pointUsage,dateTime);
-               usagePointDataMonHelper.makeUsagePointMon(pointVo.getPointId(),pointUsage,dateTime);
+           //    usagePointDataMonHelper.makeUsagePointMon(pointVo.getPointId(),pointUsage,dateTime);
            }else{
                System.out.println("错误的点类型啊！！！！！！！");
            }
@@ -352,13 +354,13 @@ public class CSVHelper {
             CsvWriter csvWriter = new CsvWriter(file.getCanonicalPath(), ',', Charset.forName("GBK"));
             //通用部分
             writeCommon(csvWriter,taPointList);
-            Map<Date,ArrayList> pointDateMap = new LinkedHashMap<>();
+            Map<Date,List> pointDateMap = new LinkedHashMap<Date,List>();
             for(Map.Entry<Long,Map<Integer, TaInstantPointData>> dataVoMap : resultDateMap.entrySet()){
                 Map<Integer, TaInstantPointData> value = dataVoMap.getValue();
                 for(TaPoint pointVo : taPointList){
                     TaInstantPointData dataVo = value.get(pointVo.getPointId());
                     if(!pointDateMap.containsKey(dataVo.getCreateTime())){
-                        ArrayList<String> pointDataList = new ArrayList<>();
+                        List<String> pointDataList = new ArrayList<String>();
                         pointDataList.add(dataVo.getDateShow());
                         pointDataList.add(dataVo.getHourShow());
                         pointDataList.add(dataVo.getPointData());
@@ -368,8 +370,8 @@ public class CSVHelper {
                     }
                 }
             }
-            for(Map.Entry<Date,ArrayList> map : pointDateMap.entrySet()){
-                ArrayList<String> value = map.getValue();
+            for(Map.Entry<Date,List> map : pointDateMap.entrySet()){
+                List<String> value = map.getValue();
                 csvWriter.writeRecord(value.toArray(new String[value.size()]));
             }
             csvWriter.close();
@@ -391,7 +393,7 @@ public class CSVHelper {
         }
         csvWriter.writeRecord(new String[]{"   "});
         csvWriter.writeRecord(new String[]{"Point log"});
-        ArrayList<String> pointLogTitle = new ArrayList<>();
+        List<String> pointLogTitle = new ArrayList<String>();
         pointLogTitle.add("<>Date");
         pointLogTitle.add("Time");
         for(TaPoint pointvo : taPointList){
@@ -424,13 +426,13 @@ public class CSVHelper {
             CsvWriter csvWriter = new CsvWriter(file.getCanonicalPath(), ',', Charset.forName("GBK"));
             //通用部分
             writeCommon(csvWriter,taPointList);
-            Map<Date,ArrayList> pointDateMap = new LinkedHashMap<>();
+            Map<Date,List> pointDateMap = new LinkedHashMap<Date,List>();
             for(Map.Entry<Date,Map<Integer,Double>> dataVoMap : exportResult.entrySet()){
                 Map<Integer,Double> value = dataVoMap.getValue();
                 Date dateKey = dataVoMap.getKey();
                 String dateKeyStr = toolHelper.dateToStrDate(dateKey, SysConsts.DATE_FORMAT);
                 String[] s = dateKeyStr.split(" ");
-                ArrayList<String> pointDataList = new ArrayList<>();
+                List<String> pointDataList = new ArrayList<String>();
                 pointDataList.add(s[0]);
                 pointDataList.add(s[1]);
                 for(TaPoint pointVo : taPointList){
@@ -444,8 +446,8 @@ public class CSVHelper {
                 }
                 pointDateMap.put(dateKey,pointDataList);
             }
-            for(Map.Entry<Date,ArrayList> map : pointDateMap.entrySet()){
-                ArrayList<String> value = map.getValue();
+            for(Map.Entry<Date,List> map : pointDateMap.entrySet()){
+                List<String> value = map.getValue();
                 csvWriter.writeRecord(value.toArray(new String[value.size()]));
             }
             csvWriter.close();
@@ -457,8 +459,8 @@ public class CSVHelper {
     }
 
     //用量图表报告   表格
-    public String writeCSV3(List<TaPoint> taPointList, List<TaUsagePointDataDate> exportResult, String startTime, String endTime) throws Exception {
-        try {
+    public void writeCSV3(List<TaPoint> taPointList, List<TaUsagePointDataDate> exportResult, String startTime, String endTime) throws Exception {
+      /*  try {
             String readBasePath = env.getProperty(ApplicationConsts.SYS_DEMO_USAGE_EXPORT_DATA_BASE_PATH);
             if(toolHelper.isEmpty(readBasePath)){
                 throw new Exception(ApplicationConsts.SYS_DEMO_USAGE_EXPORT_DATA_BASE_PATH+",基础路径为空!");
@@ -478,8 +480,8 @@ public class CSVHelper {
                 file.createNewFile();
             }
             CsvWriter csvWriter = new CsvWriter(file.getCanonicalPath(), ',', Charset.forName("GBK"));
-            List<List<String>> result = new ArrayList<>();
-            List<String> dateShow = new ArrayList<>();
+            List<List<String>> result = new ArrayList<List<String>>();
+            List<String> dateShow = new ArrayList<String>();
             dateShow.add("");
             for(int i=0;i<exportResult.size();i++){
                 dateShow.add(String.valueOf(exportResult.get(i).getDateShow()));
@@ -487,17 +489,17 @@ public class CSVHelper {
             result.add(dateShow);
             for(int i=0;i<exportResult.size();i++){
                 dateShow.add(String.valueOf(exportResult.get(i).getDateShow()));
-            }
+            }*/
            /* for(Map.Entry<Date,ArrayList> map : pointDateMap.entrySet()){
                 ArrayList<String> value = map.getValue();
                 csvWriter.writeRecord(value.toArray(new String[value.size()]));
-            }*/
+            }
             csvWriter.close();
             return exportFilePath;
         } catch (Exception e) {
             e.printStackTrace();
             throw e;
-        }
+        }*/
     }
 }
 

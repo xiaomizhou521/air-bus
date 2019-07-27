@@ -12,11 +12,14 @@ import org.jfree.chart.axis.*;
 import org.jfree.chart.labels.ItemLabelAnchor;
 import org.jfree.chart.labels.ItemLabelPosition;
 import org.jfree.chart.labels.StandardCategoryItemLabelGenerator;
+import org.jfree.chart.labels.StandardXYItemLabelGenerator;
 import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.category.BarRenderer;
+import org.jfree.chart.renderer.xy.XYItemRenderer;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
+import org.jfree.chart.title.TextTitle;
 import org.jfree.data.RangeType;
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.data.time.Hour;
@@ -209,7 +212,7 @@ public class JFreeChartHelper {
     }
 
     // 根据CategoryDataset生成JFreeChart对象
-    public static JFreeChart createChart(TimeSeriesCollection lineDataset,String title,String xLabel,String yLabel) {
+    public JFreeChart createChart(TimeSeriesCollection lineDataset,String title,String xLabel,String yLabel) {
         JFreeChart jfreechart = ChartFactory.createTimeSeriesChart(
                 title, 		// 标题
                 xLabel, 		// categoryAxisLabel （category轴，横轴，X轴的标签）
@@ -238,7 +241,6 @@ public class JFreeChartHelper {
         dateaxis.setTickUnit(new DateTickUnit(DateTickUnit.HOUR, 1, new SimpleDateFormat(SysConsts.DATE_FORMAT_2)));
         dateaxis.setVerticalTickLabels(true);
         xyplot.setDomainAxis(dateaxis);
-
         // 以下的设置可以由用户定制，也可以省略
         XYPlot plot = (XYPlot) jfreechart.getPlot();
         XYLineAndShapeRenderer xylineandshaperenderer = (XYLineAndShapeRenderer) plot.getRenderer();
@@ -251,21 +253,21 @@ public class JFreeChartHelper {
         // 设置曲线图与xy轴的距离
         plot.setAxisOffset(new RectangleInsets(0D, 0D, 0D, 10D));
         // 设置曲线是否显示数据点
-//		xylineandshaperenderer.setBaseShapesVisible(true);
+		xylineandshaperenderer.setBaseShapesVisible(true);
         // 设置曲线显示各数据点的值
-//		XYItemRenderer xyitem = plot.getRenderer();
-//		xyitem.setBaseItemLabelsVisible(true);
-//		xyitem.setBasePositiveItemLabelPosition(new ItemLabelPosition(
-//				ItemLabelAnchor.OUTSIDE12, TextAnchor.BASELINE_LEFT));
-//		xyitem.setBaseItemLabelGenerator(new StandardXYItemLabelGenerator());
-//		xyitem.setBaseItemLabelFont(new Font("Dialog", 1, 14));
-//		plot.setRenderer(xyitem);
+		XYItemRenderer xyitem = plot.getRenderer();
+		xyitem.setBaseItemLabelsVisible(true);
+		xyitem.setBasePositiveItemLabelPosition(new ItemLabelPosition(
+				ItemLabelAnchor.OUTSIDE12, TextAnchor.BASELINE_LEFT));
+		xyitem.setBaseItemLabelGenerator(new StandardXYItemLabelGenerator());
+		xyitem.setBaseItemLabelFont(new Font("Dialog", 1, 14));
+		plot.setRenderer(xyitem);
 
         return jfreechart;
     }
 
     // 根据CategoryDataset生成JFreeChart对象
-    public static JFreeChart createUsageChart(DefaultCategoryDataset lineDataset,String title,String xLabel,String yLabel) {
+    public JFreeChart createUsageChart(DefaultCategoryDataset lineDataset,String title,String xLabel,String yLabel) {
         JFreeChart mChart = ChartFactory.createLineChart(
                 title,//图名字
                 xLabel,//横坐标
@@ -280,7 +282,7 @@ public class JFreeChartHelper {
         mPlot.setBackgroundPaint(Color.LIGHT_GRAY);
         mPlot.setRangeGridlinePaint(Color.BLUE);//背景底部横虚线
         mPlot.setOutlinePaint(Color.RED);//边界线
-
+        setCategoryPlot(mChart);
         return mChart;
     }
 
@@ -365,6 +367,14 @@ public class JFreeChartHelper {
                 true,  //是否生成图样
                 false, //是否生成提示工具
                 false);//是否生成URL链接
+        setCategoryPlot(chart);
+        return chart;
+    }
+
+    //设置图表的通用属性
+    public void setCategoryPlot(JFreeChart chart){
+        TextTitle textTitle = chart.getTitle();
+        textTitle.setFont(new Font("宋体",Font.BOLD,20));
         CategoryPlot plot=chart.getCategoryPlot();//获取图形区域对象
         //------------------------------------------获取X轴
         CategoryAxis domainAxis=plot.getDomainAxis();
@@ -377,7 +387,6 @@ public class JFreeChartHelper {
         chart.getLegend().setItemFont(new Font("黑体",Font.BOLD ,15));
         //设置图形的标题
         chart.getTitle().setFont(new Font("宋体",Font.BOLD ,20));
-        return chart;
     }
 
 }
