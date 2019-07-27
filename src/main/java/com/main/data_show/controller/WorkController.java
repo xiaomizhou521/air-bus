@@ -431,7 +431,7 @@ public class WorkController {
                 List<TaInstantPointData> instntPointVoList = instantPointDataHelper.findInstantPointByPointIdAndTime(startExportTimeNum, endExportTimeNum, point.getPointId());
                 taPointDataLis.addAll(instntPointVoList);
             }
-            List<String> hourIntervalAllList = toolHelper.getHourIntervalAllList(startExpDate, endExpDate);
+            List<String> hourIntervalAllList = toolHelper.getHourIntervalAllList(startExpDate, endExpDate,SysConsts.DATE_FORMAT_1,SysConsts.DATE_FORMAT_3);
             String path = jFreeChartHelper.createDeviceChartStart(taPointList, taPointDataLis, startExpDate, endExpDate,"设备值统计","日期","值",hourIntervalAllList);
             result.put("code",1);
             result.put("data",path);

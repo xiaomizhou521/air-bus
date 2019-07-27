@@ -345,7 +345,8 @@ public class CSVHelper {
                 file1.mkdir();
             }
             //生成文件名
-            String fileName = "Instant("+startTime+"_"+endTime+").CSV";
+            long curSystem = System.currentTimeMillis();
+            String fileName = "Instant("+startTime+"_"+endTime+")"+curSystem+".CSV";
             String exportFilePath = readBasePath+fileName;
             File file = new File(exportFilePath);
             if(!file.exists()){
@@ -355,18 +356,40 @@ public class CSVHelper {
             //通用部分
             writeCommon(csvWriter,taPointList);
             Map<Date,List> pointDateMap = new LinkedHashMap<Date,List>();
-            for(Map.Entry<Long,Map<Integer, TaInstantPointData>> dataVoMap : resultDateMap.entrySet()){
-                Map<Integer, TaInstantPointData> value = dataVoMap.getValue();
-                for(TaPoint pointVo : taPointList){
-                    TaInstantPointData dataVo = value.get(pointVo.getPointId());
-                    if(!pointDateMap.containsKey(dataVo.getCreateTime())){
-                        List<String> pointDataList = new ArrayList<String>();
-                        pointDataList.add(dataVo.getDateShow());
-                        pointDataList.add(dataVo.getHourShow());
-                        pointDataList.add(dataVo.getPointData());
-                        pointDateMap.put(dataVo.getCreateTime(),pointDataList);
-                    }else{
-                        pointDateMap.get(dataVo.getCreateTime()).add(dataVo.getPointData());
+            List<String> hourIntervalAllList = toolHelper.getHourIntervalAllList(startTime, endTime, SysConsts.DATE_FORMAT_7, SysConsts.DATE_FORMAT_3);
+            for(String str : hourIntervalAllList){
+                long longTime = Long.parseLong(str);
+                if(resultDateMap.containsKey(longTime)) {
+                  /*  for (Map.Entry<Long, Map<Integer, TaInstantPointData>> dataVoMap : resultDateMap.entrySet()) {
+                        Map<Integer, TaInstantPointData> value = dataVoMap.getValue();*/
+                        Map<Integer, TaInstantPointData> value = resultDateMap.get(longTime);
+                        for (TaPoint pointVo : taPointList) {
+                        TaInstantPointData dataVo = value.get(pointVo.getPointId());
+                        if (!pointDateMap.containsKey(dataVo.getCreateTime())) {
+                            List<String> pointDataList = new ArrayList<String>();
+                            pointDataList.add(dataVo.getDateShow());
+                            pointDataList.add(dataVo.getHourShow());
+                            pointDataList.add(dataVo.getPointData());
+                            pointDateMap.put(dataVo.getCreateTime(), pointDataList);
+                        } else {
+                            pointDateMap.get(dataVo.getCreateTime()).add(dataVo.getPointData());
+                        }
+                    }
+                   // }
+                }else{
+                    for (TaPoint pointVo : taPointList) {
+                        Date curDate = toolHelper.StrToDate(str, SysConsts.DATE_FORMAT_3);
+                        if (!pointDateMap.containsKey(curDate)) {
+                            List<String> pointDataList = new ArrayList<String>();
+                            String showDate = toolHelper.dateToStrDate(curDate, SysConsts.DATE_FORMAT_9);
+                            pointDataList.add(showDate);
+                            String showHour = toolHelper.dateToStrDate(curDate, SysConsts.DATE_FORMAT_10);
+                            pointDataList.add(showHour);
+                            pointDataList.add("-");
+                            pointDateMap.put(curDate, pointDataList);
+                        } else {
+                            pointDateMap.get(curDate).add("-");
+                        }
                     }
                 }
             }
@@ -416,8 +439,9 @@ public class CSVHelper {
                 file1.mkdir();
             }
             //生成文件名
+            long curSysTime = System.currentTimeMillis();
             String hour = takeTime.substring(0,2);
-            String fileName = "Usage("+startTime+"_"+endTime+"_"+hour+").CSV";
+            String fileName = "Usage("+startTime+"_"+endTime+"_"+hour+")"+curSysTime+".CSV";
             String exportFilePath = readBasePath+fileName;
             File file = new File(exportFilePath);
             if(!file.exists()){

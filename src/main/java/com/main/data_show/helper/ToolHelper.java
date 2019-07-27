@@ -370,12 +370,12 @@ public class ToolHelper {
         return days;
     }
     //取某个日期间隔的所有月份 可以按天  按周  按月
-    public List<String> getHourIntervalAllList(String startTime,String endTime){
+    public List<String> getHourIntervalAllList(String startTime,String endTime,String jinFormat,String chuFormat){
         // 返回的日期集合
         List<String> days = new ArrayList<String>();
         try {
-            DateFormat dateFormat = new SimpleDateFormat(SysConsts.DATE_FORMAT_1);
-            DateFormat resultDateFormat = new SimpleDateFormat(SysConsts.DATE_FORMAT_3);
+            DateFormat dateFormat = new SimpleDateFormat(jinFormat);
+            DateFormat resultDateFormat = new SimpleDateFormat(chuFormat);
             Date start = dateFormat.parse(startTime);
             Date end = dateFormat.parse(endTime);
 
