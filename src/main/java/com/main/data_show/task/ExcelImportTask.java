@@ -20,8 +20,8 @@ public class ExcelImportTask {
     /* @Scheduled(cron = "0 30 2 * * ?")*/
    public void importExcelStart() throws Exception {
        System.out.println("开始导入excel");
-      // csvHelper.exportPointBaseData();
-       csvHelper.startTimerImportCSVFile();
+       //csvHelper.exportPointBaseData();
+        csvHelper.startTimerImportCSVFile();
     }
 
  /*    @Scheduled(fixedRate = 15000)

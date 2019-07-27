@@ -496,8 +496,11 @@ public class WorkController {
             List<TaPoint> taPointList = taPointService.getPointsByPointIds(pointsInStr);
             //取点数据
             List<TaUsagePointDataDate> taUsagePointDataDates = new ArrayList<>();
+            List<String> dateIntervalAllList = null;
             if(EnumUsageTimeTypeDefine.date.toString().equals(dateType)){
                 taUsagePointDataDates = usagePointDataDateHelper.queryUsagePointDataSum(startExpDate, endExpDate, pointsInStr);
+                //取得所有要显示的日期
+                dateIntervalAllList = toolHelper.getDateIntervalAllList(startExpDate, endExpDate);
             }else if(EnumUsageTimeTypeDefine.mon.toString().equals(dateType)){
                 List<TaUsagePointDataMon> taUsagePointDataWeek = usagePointDataMonHelper.queryUsagePointDataMonSum(startExpDate, endExpDate, pointsInStr);
                 for(TaUsagePointDataMon vo : taUsagePointDataWeek){
@@ -507,6 +510,7 @@ public class WorkController {
                     dateVo.setPointData(vo.getPointData());
                     taUsagePointDataDates.add(dateVo);
                 }
+                dateIntervalAllList = toolHelper.getMonIntervalAllList(startExpDate, endExpDate);
             }else if(EnumUsageTimeTypeDefine.week.toString().equals(dateType)){
                 List<TaUsagePointDataWeek> taUsagePointDataMon = usagePointDataWeekHelper.queryUsagePointDataWeekSum(startExpDate, endExpDate, pointsInStr);
                 for(TaUsagePointDataWeek vo : taUsagePointDataMon){
@@ -516,12 +520,13 @@ public class WorkController {
                     dateVo.setPointData(vo.getPointData());
                     taUsagePointDataDates.add(dateVo);
                 }
+                dateIntervalAllList = toolHelper.getWeekIntervalAllList(startExpDate, endExpDate);
             }
             String path ="";
             if(EnumImgReportTypeDefine.bar.toString().equals(reportType)){
-                path = jFreeChartHelper.createUsageDeviceBarChartStart(taPointList, taUsagePointDataDates, startExpDate, endExpDate,"水电用量","日期","用量");
+                path = jFreeChartHelper.createUsageDeviceBarChartStart(taPointList, taUsagePointDataDates, startExpDate, endExpDate,"水电用量","日期","用量",dateIntervalAllList);
             }else if(EnumImgReportTypeDefine.series.toString().equals(reportType)){
-                path = jFreeChartHelper.createUsageDeviceSeriesChartStart(taPointList, taUsagePointDataDates, startExpDate, endExpDate,"水电用量","日期","用量");
+                path = jFreeChartHelper.createUsageDeviceSeriesChartStart(taPointList, taUsagePointDataDates, startExpDate, endExpDate,"水电用量","日期","用量",dateIntervalAllList);
             }
             result.put("code",1);
             result.put("data",path);

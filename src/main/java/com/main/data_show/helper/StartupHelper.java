@@ -21,6 +21,8 @@ public class StartupHelper {
     public void initYearFirstWeekDate(int year){
         //取得配置的小时数
         int defHour = Integer.parseInt(env.getProperty(ApplicationConsts.SYS_POINT_USAGE_RECORD_DEF_HOUR));
+        //星期几
+        int defWeek = Integer.parseInt(env.getProperty(ApplicationConsts.SYS_POINT_USAGE_RECORD_DEF_WEEK_NUM));
         Calendar calendar = new GregorianCalendar();//定义一个日历，变量作为年初
         Calendar calendarEnd = new GregorianCalendar();//定义一个日历，变量作为年末
         calendar.set(Calendar.YEAR, year);
@@ -31,7 +33,7 @@ public class StartupHelper {
         calendarEnd.set(Calendar.DAY_OF_MONTH, 31);//设置年末的日期为12月31日
         SimpleDateFormat sf = new SimpleDateFormat(SysConsts.DATE_FORMAT_3);
         while(calendar.getTime().getTime()<=calendarEnd.getTime().getTime()){//用一整年的日期循环
-            if(calendar.get(Calendar.DAY_OF_WEEK)==5){//判断如果为星期四时，打印
+            if(calendar.get(Calendar.DAY_OF_WEEK)==defWeek){//判断如果为星期四时，打印
                 calendar.set(Calendar.HOUR_OF_DAY,defHour);
                 calendar.set(Calendar.MINUTE,0);
                 calendar.set(Calendar.SECOND,0);

@@ -17,6 +17,7 @@ import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.category.BarRenderer;
+import org.jfree.chart.renderer.category.BarRenderer3D;
 import org.jfree.chart.renderer.xy.XYItemRenderer;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.chart.title.TextTitle;
@@ -40,6 +41,7 @@ import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -79,16 +81,21 @@ public class JFreeChartHelper {
         }
         String startStr = startTime.substring(0,startTime.length()-6);
         String endStr = endTime.substring(0,endTime.length()-6);
-        String fileName = "Instant("+startStr+"_"+endStr+").png";
+        long time = System.currentTimeMillis();
+        String fileName = "Instant("+startStr+"_"+endStr+")"+time+".png";
         String exportFilePath = readBasePath+fileName;
-        saveAsFile(freeChart, exportFilePath, Integer.parseInt(imgWidth), Integer.parseInt(imgHeight));
+      /*  int showWidth = dateIntervalAllList.size()*Integer.parseInt(imgWidth);
+        if(showWidth<500){
+            showWidth = 500;
+        }*/
+        saveAsFile(freeChart, exportFilePath, 1000, Integer.parseInt(imgHeight));
         return exportFilePath;
     }
 
     //生成用量折线图
-    public String createUsageDeviceSeriesChartStart(List<TaPoint> taPointList, List<TaUsagePointDataDate> taPointDataList,String startTime,String endTime,String title,String xLabel,String yLabel) throws Exception {
+    public String createUsageDeviceSeriesChartStart(List<TaPoint> taPointList, List<TaUsagePointDataDate> taPointDataList,String startTime,String endTime,String title,String xLabel,String yLabel,List<String> dateIntervalAllList) throws Exception {
         // 步骤1：创建CategoryDataset对象（准备数据）
-        DefaultCategoryDataset dataset = createDeviceUsageChartDate(taPointList,taPointDataList);
+        DefaultCategoryDataset dataset = createDeviceUsageChartDate(taPointList,taPointDataList,dateIntervalAllList);
         // 步骤2：根据Dataset 生成JFreeChart对象，以及做相应的设置
         JFreeChart freeChart = createUsageChart(dataset,title,xLabel,yLabel);
         // 步骤3：将JFreeChart对象输出到文件，Servlet输出流等
@@ -112,14 +119,19 @@ public class JFreeChartHelper {
         if(!file1.exists()){
             file1.mkdir();
         }
-        String fileName = "Instant("+startTime+"_"+endTime+").png";
+        long time = System.currentTimeMillis();
+        String fileName = "Instant("+startTime+"_"+endTime+")"+time+".png";
         String exportFilePath = readBasePath+fileName;
-        saveAsFile(freeChart, exportFilePath, Integer.parseInt(imgWidth), Integer.parseInt(imgHeight));
+        int showWidth = dateIntervalAllList.size()*Integer.parseInt(imgWidth);
+        if(showWidth<1000){
+            showWidth = 1000;
+        }
+        saveAsFile(freeChart, exportFilePath, showWidth, Integer.parseInt(imgHeight));
         return exportFilePath;
     }
 
     //生成设备图表开始 柱形图
-    public String createUsageDeviceBarChartStart(List<TaPoint> taPointList, List<TaUsagePointDataDate> taPointDataList,String startStr,String endStr,String title,String xLabel,String yLabel) throws Exception {
+    public String createUsageDeviceBarChartStart(List<TaPoint> taPointList, List<TaUsagePointDataDate> taPointDataList,String startStr,String endStr,String title,String xLabel,String yLabel,List<String> dateIntervalAllList) throws Exception {
         //生成文件名
         String readBasePath = env.getProperty(ApplicationConsts.SYS_DEMO_USAGE_EXPORT_IMG_BASE_PATH);
         if(toolHelper.isEmpty(readBasePath)){
@@ -134,7 +146,7 @@ public class JFreeChartHelper {
             throw new Exception(ApplicationConsts.SYS_DEMO_EXPORT_IMG_HEIGHT+",导出图片高设置为空!");
         }
         // 步骤1：创建CategoryDataset对象（准备数据）
-        DefaultCategoryDataset usageDeviceChartData = createUsageDeviceChartData(taPointList, taPointDataList);
+        DefaultCategoryDataset usageDeviceChartData = createUsageDeviceChartData(taPointList, taPointDataList, dateIntervalAllList);
         // 步骤2：根据Dataset 生成JFreeChart对象，以及做相应的设置
         JFreeChart freeChart = createUageChart(usageDeviceChartData, title, xLabel, yLabel);
         // 步骤3：将JFreeChart对象输出到文件，Servlet输出流等
@@ -145,9 +157,14 @@ public class JFreeChartHelper {
         if(!file1.exists()){
             file1.mkdir();
         }
-        String fileName = "Usage("+startStr+"_"+endStr+").png";
+        long time = System.currentTimeMillis();
+        String fileName = "Usage("+startStr+"_"+endStr+")"+time+".png";
         String exportFilePath = readBasePath+fileName;
-        saveAsFile(freeChart, exportFilePath, Integer.parseInt(imgWidth), Integer.parseInt(imgHeight));
+        int showWidth = dateIntervalAllList.size()*Integer.parseInt(imgWidth);
+        if(showWidth<1000){
+            showWidth = 1000;
+        }
+        saveAsFile(freeChart, exportFilePath, showWidth, Integer.parseInt(imgHeight));
         return exportFilePath;
     }
 
@@ -185,12 +202,17 @@ public class JFreeChartHelper {
         return lineDataset;
     }
 
-    public DefaultCategoryDataset createDeviceUsageChartDate(java.util.List<TaPoint> taPointList, List<TaUsagePointDataDate> taPointDataList){
+    public DefaultCategoryDataset createDeviceUsageChartDate(List<TaPoint> taPointList, List<TaUsagePointDataDate> taPointDataList,List<String> dateIntervalAllList){
         Map<Integer,String> ponitMap = new HashMap<>();
         for(TaPoint pointVo : taPointList){
-            ponitMap.put(pointVo.getPointId(),"点名："+pointVo.getPointName()+"("+pointVo.getRemarksName()+")"+",类型："+pointVo.getPointType()+",单位："+pointVo.getPointUnit());
+            ponitMap.put(pointVo.getPointId(),"点名："+pointVo.getPointName()+"("+pointVo.getRemarksName()+")"+",单位："+pointVo.getPointUnit());
         }
         DefaultCategoryDataset mDataset = new DefaultCategoryDataset();
+        for(String str : dateIntervalAllList){
+            for(Map.Entry<Integer,String> map: ponitMap.entrySet()){
+                mDataset.setValue(0,map.getValue(),str);
+            }
+        }
         //创造图标数据
         for(TaUsagePointDataDate pointDateVo : taPointDataList){
             mDataset.addValue(pointDateVo.getPointData(), ponitMap.get(pointDateVo.getPointId()), String.valueOf(pointDateVo.getDateShow()));
@@ -198,12 +220,17 @@ public class JFreeChartHelper {
         return mDataset;
     }
 
-    public DefaultCategoryDataset createUsageDeviceChartData(java.util.List<TaPoint> taPointList, List<TaUsagePointDataDate> taPointDataList){
-        Map<Integer,String> ponitMap = new HashMap<>();
+    public DefaultCategoryDataset createUsageDeviceChartData(java.util.List<TaPoint> taPointList, List<TaUsagePointDataDate> taPointDataList,List<String> dateIntervalAllList){
+        Map<Integer,String> ponitMap = new LinkedHashMap<>();
         for(TaPoint pointVo : taPointList){
-            ponitMap.put(pointVo.getPointId(),"点名："+pointVo.getPointName()+"("+pointVo.getRemarksName()+")"+",类型："+pointVo.getPointType()+",单位："+pointVo.getPointUnit());
+            ponitMap.put(pointVo.getPointId(),"点名："+pointVo.getPointName()+"("+pointVo.getRemarksName()+")"+",单位："+pointVo.getPointUnit());
         }
         DefaultCategoryDataset dateSet = new DefaultCategoryDataset();
+        for(String str : dateIntervalAllList){
+            for(Map.Entry<Integer,String> map: ponitMap.entrySet()){
+                dateSet.setValue(0,map.getValue(),str);
+            }
+        }
         //创造图标数据
         for(TaUsagePointDataDate pointDateVo : taPointDataList){
             dateSet.setValue(pointDateVo.getPointData(),ponitMap.get(pointDateVo.getPointId()),String.valueOf(pointDateVo.getDateShow()));
@@ -368,21 +395,66 @@ public class JFreeChartHelper {
                 false, //是否生成提示工具
                 false);//是否生成URL链接
         setCategoryPlot(chart);
+        CategoryPlot plot=chart.getCategoryPlot();
+        BarRenderer3D renderer = new BarRenderer3D();//3D属性修改
+        renderer.setBaseItemLabelGenerator(new StandardCategoryItemLabelGenerator());
+        renderer.setBaseItemLabelsVisible(true);
+        renderer.setBasePositiveItemLabelPosition(new ItemLabelPosition(ItemLabelAnchor.OUTSIDE12, TextAnchor.CENTER_LEFT));
+        //下面可以进一步调整数值的位置，但是得根据ItemLabelAnchor选择情况，例
+        // 如我选的是OUTSIDE12，那么下面设置为正数时，数值就会向上调整，负数则向下
+        renderer.setItemLabelAnchorOffset(10);
+        //最后还得将renderer 放到plot 中
+        plot.setRenderer(renderer);//将修改后的属性值保存到图中
         return chart;
     }
 
     //设置图表的通用属性
     public void setCategoryPlot(JFreeChart chart){
+        /*----------设置消除字体的锯齿渲染（解决中文问题）--------------*/
+        chart.getRenderingHints().put(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
         TextTitle textTitle = chart.getTitle();
         textTitle.setFont(new Font("宋体",Font.BOLD,20));
         CategoryPlot plot=chart.getCategoryPlot();//获取图形区域对象
         //------------------------------------------获取X轴
         CategoryAxis domainAxis=plot.getDomainAxis();
-        domainAxis.setLabelFont(new Font("黑体",Font.BOLD,14));//设置X轴的标题的字体
-        domainAxis.setTickLabelFont(new Font("宋体",Font.BOLD,12));//设置X轴坐标上的字体
+        //设置X轴坐标上的文字
+        domainAxis.setTickLabelFont(new Font("sans-serif", Font.PLAIN, 11));
+//设置X轴的标题文字
+        domainAxis.setLabelFont(new Font("宋体", Font.PLAIN, 12));
+        domainAxis.setTickLabelsVisible(true);//X轴的标题文字是否显示
+        domainAxis.setAxisLinePaint(Color.red);//X轴横线颜色
+        domainAxis.setTickMarksVisible(true);//标记线是否显示
+        domainAxis.setTickMarkOutsideLength(3);//标记线向外长度
+        domainAxis.setTickMarkInsideLength(3);//标记线向内长度
+        domainAxis.setTickMarkPaint(Color.red);//标记线颜色
+    /*    domainAxis.setUpperMargin(0.2);//设置距离图片左端距离
+        domainAxis.setLowerMargin(0.2); //设置距离图片右端距离*/
+        //横轴上的 Lable 是否完整显示
+        domainAxis.setMaximumCategoryLabelWidthRatio(0.6f);
+         //横轴上的 Lable 45度倾斜
+        domainAxis.setCategoryLabelPositions(CategoryLabelPositions.DOWN_45);
         //-----------------------------------------获取Y轴
-        ValueAxis rangeAxis=plot.getRangeAxis();
-        rangeAxis.setLabelFont(new Font("黑体",Font.BOLD,15));//设置Y轴坐标上的标题字体
+        ValueAxis rAxis = plot.getRangeAxis();//对Y轴做操作
+        //设置Y轴坐标上的文字
+        rAxis.setTickLabelFont(new Font("sans-serif", Font.PLAIN, 16));
+//设置Y轴的标题文字
+        rAxis.setLabelFont(new Font("黑体", Font.PLAIN, 16));
+//Y轴取值范围（下面不能出现 rAxis.setAutoRange(true) 否则不起作用）
+// rAxis.setLowerBound(100); //Y轴以开始的最小值
+// rAxis.setUpperBound(600);//Y轴的最大值
+        rAxis.setLabelAngle(1.6);//标题内容显示角度（1.6时候水平）
+        rAxis.setTickMarkInsideLength(3);//外刻度线向内长度
+        rAxis.setTickLabelsVisible(true);//刻度数值是否显示
+// 所有Y标记线是否显示（如果前面设置rAxis.setMinorTickMarksVisible(true); 则其照样显示）
+        rAxis.setTickMarksVisible(true);
+        rAxis.setAxisLinePaint(Color.red);//Y轴竖线颜色
+        rAxis.setAxisLineVisible(true);//Y轴竖线是否显示
+/*//设置最高的一个 Item 与图片顶端的距离 (在设置rAxis.setRange(100, 600);情况下不起作用)
+        rAxis.setUpperMargin(0.15);
+//设置最低的一个 Item 与图片底端的距离
+        rAxis.setLowerMargin(0.15);*/
+        rAxis.setAutoRange(true);//是否自动适应范围
+        rAxis.setVisible(true);//Y轴内容是否显示
         //设置图样的文字样式
         chart.getLegend().setItemFont(new Font("黑体",Font.BOLD ,15));
         //设置图形的标题

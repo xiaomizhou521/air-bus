@@ -12,10 +12,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -229,6 +232,16 @@ public class ToolHelper {
         Calendar cal = Calendar.getInstance();
         cal.setTime(date);
         int checkYear = cal.get(Calendar.YEAR);
+        return Long.parseLong(dateToWeekLong(date,checkYear));
+    }
+
+    //通过日期取周数
+    public String dateToWeekLong(Date date,int checkYear) throws Exception {
+        if(checkYear < 0){
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(date);
+            checkYear = cal.get(Calendar.YEAR);
+        }
         //SysConsts.DEF_YEAE 默认是-1 没有初始化过 或者更当前验证日期的年不一致 要拿新的年重算一下
         //因为周数 每年的开始那周的日期都要计算
         if(SysConsts.DEF_YEAE < 0||SysConsts.DEF_YEAE!=checkYear){
@@ -236,7 +249,7 @@ public class ToolHelper {
         }
         //计算一次之后 肯定相等了 如果还不想等 那肯定就是有问题了  抛异常
         if(SysConsts.DEF_YEAE!=checkYear){
-          throw new Exception("当前系统内存中的用来计算的年份异常");
+            throw new Exception("当前系统内存中的用来计算的年份异常");
         }
         //计算周数规则  小于SysConsts.YEAR_FIRT_WEEK_STRART_DATE 的为第一周
         //(验证时间 - SysConsts.YEAR_FIRT_WEEK_STRART_DATE)/7  + 1 为真正的周数
@@ -246,22 +259,7 @@ public class ToolHelper {
         if(weekStr.length()<2){
             weekStr = "0"+weekStr;
         }
-        return Long.parseLong(checkYear+""+weekStr);
-    }
-
-    public static void main(String[] args) throws ParseException {
-        //yyyy/MM/dd HH:mm:ss
-        Date startDate = makeStrToDate("2019/01/03 16:00:00", SysConsts.DATE_FORMAT);
-        Date endDate = makeStrToDate("2019/01/04 16:00:00", SysConsts.DATE_FORMAT);
-   /*     if(startDate.before(endDate)||(startDate.getTime()==endDate.getTime())){
-            System.out.println(true);
-        }else{
-            System.out.println(false);
-        }*/
-        //得到相差的天数 betweenDate
-        long betweenDate = (endDate.getTime() - startDate.getTime())/(60*60*24*1000);
-        System.out.println(betweenDate);
-        System.out.println(betweenDate/7);
+        return checkYear+""+weekStr;
     }
 
     //取文件的相对路径
@@ -320,5 +318,91 @@ public class ToolHelper {
         }
     }
 
+    //取某个日期间隔的所有时间 可以按天  按周  按月
+    public List<String> getDateIntervalAllList(String startTime,String endTime){
+        // 返回的日期集合
+        List<String> days = new ArrayList<String>();
+        try {
+            DateFormat dateFormat = new SimpleDateFormat(SysConsts.DATE_FORMAT_7);
+            DateFormat resultDateFormat = new SimpleDateFormat(SysConsts.DATE_FORMAT_4);
+            Date start = dateFormat.parse(startTime);
+            Date end = dateFormat.parse(endTime);
 
+            Calendar tempStart = Calendar.getInstance();
+            tempStart.setTime(start);
+
+            Calendar tempEnd = Calendar.getInstance();
+            tempEnd.setTime(end);
+            tempEnd.add(Calendar.DATE, +1);// 日期加1(包含结束)
+            while (tempStart.before(tempEnd)) {
+                days.add(resultDateFormat.format(tempStart.getTime()));
+                tempStart.add(Calendar.DAY_OF_YEAR, 1);
+            }
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return days;
+    }
+
+    //取某个日期间隔的所有月份 可以按天  按周  按月
+    public List<String> getMonIntervalAllList(String startTime,String endTime){
+        // 返回的日期集合
+        List<String> days = new ArrayList<String>();
+        try {
+            DateFormat dateFormat = new SimpleDateFormat(SysConsts.DATE_FORMAT_8);
+            DateFormat resultDateFormat = new SimpleDateFormat(SysConsts.DATE_FORMAT_5);
+            Date start = dateFormat.parse(startTime);
+            Date end = dateFormat.parse(endTime);
+
+            Calendar tempStart = Calendar.getInstance();
+            tempStart.setTime(start);
+
+            Calendar tempEnd = Calendar.getInstance();
+            tempEnd.setTime(end);
+            tempEnd.add(Calendar.MONTH, +1);// 日期加1(包含结束)
+            while (tempStart.before(tempEnd)) {
+                days.add(resultDateFormat.format(tempStart.getTime()));
+                tempStart.add(Calendar.MONTH, 1);
+            }
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return days;
+    }
+    public Date weekStrToDate(String weekStr){
+        //星期几
+        int defWeek = Integer.parseInt(env.getProperty(ApplicationConsts.SYS_POINT_USAGE_RECORD_DEF_WEEK_NUM));
+        String year = weekStr.substring(0, 4);
+        String week = weekStr.substring(4);
+        Calendar cal = Calendar.getInstance();
+        cal.setFirstDayOfWeek(Calendar.MONDAY);
+        cal.set(Calendar.YEAR, Integer.valueOf(year));
+        cal.set(Calendar.WEEK_OF_YEAR, Integer.valueOf(week));
+        cal.set(Calendar.DAY_OF_WEEK, defWeek);
+        Date time = cal.getTime();
+        return time;
+    }
+
+    //取某个日期间隔的所有周数 可以按天  按周  按月
+    public List<String> getWeekIntervalAllList(String startTime,String endTime){
+        // 返回的日期集合
+        List<String> days = new ArrayList<String>();
+        try {
+            Date start = weekStrToDate(startTime);
+            Date end = weekStrToDate(endTime);
+            Calendar tempStart = Calendar.getInstance();
+            tempStart.setTime(start);
+          //  tempStart.add(Calendar.WEEK_OF_YEAR, 1);// 日期加1(包含结束)
+            Calendar tempEnd = Calendar.getInstance();
+            tempEnd.setTime(end);
+            tempEnd.add(Calendar.WEEK_OF_YEAR, 2);// 日期加1(包含结束)
+            while (tempStart.before(tempEnd)) {
+                days.add(dateToWeekLong(tempStart.getTime(),-1));
+                tempStart.add(Calendar.WEEK_OF_YEAR, 1);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return days;
+    }
 }

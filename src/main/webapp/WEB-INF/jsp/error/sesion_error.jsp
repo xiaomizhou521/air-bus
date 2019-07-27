@@ -1,4 +1,3 @@
-<%@page import="cn.com.enorth.utility.Beans"%>
 <%@page import="cn.com.enorth.utility.app.web.strutsx.config.ConfigStrutsX"%>
 <%@ page language="java" import="java.util.*" pageEncoding="utf-8"%>
 <%@ page import="java.util.ArrayList"%>
@@ -6,7 +5,7 @@
 <%@ page import="java.util.Enumeration"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 
-<%
+<%--<%
     Enumeration<String> parameterNames = request.getParameterNames();
     List<String> params = new ArrayList<String>();
     boolean hasContent = false;
@@ -21,13 +20,10 @@
         for (String value : parameterValues) {
             strValues += value + ",";
         }
-        if (Beans.strUtil.isNotEmpty(strValues)) {
-            strValues = strValues.substring(0, strValues.length()-1);
-        }
-        params.add("\\\"" + parameterName + "\\\":\\\"" + strValues + "\\\"");
+
     }
     String targetUrl = request.getRequestURL().toString();
-%>
+%>--%>
 
 <!DOCTYPE html >
 <html >

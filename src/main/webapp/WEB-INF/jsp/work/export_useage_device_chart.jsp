@@ -234,8 +234,8 @@
                 <input type="hidden" id="csvFilePath" />
             </div>
             <div style="width: 100%">
-                <div style="width: 800px;margin:auto">
-                    <img id="showImg" src="" width="800px" height="400px" />
+                <div style="width: 100%;margin:auto">
+                    <img id="showImg" src="" width="100%" />
                 </div>
             </div>
         </div>
