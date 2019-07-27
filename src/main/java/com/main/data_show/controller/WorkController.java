@@ -304,10 +304,19 @@ public class WorkController {
                     pointsInStr = pointsInStr+","+str;
                 }
             }
+            Map<Date,Map<Integer,Double>> exportResult = new LinkedHashMap<>();
+            List<Date> dateHourIntervalAllList = toolHelper.getDateHourIntervalAllList(startExpDate, endExpDate, takeTime);
             //取点信息
             List<TaPoint> taPointList = taPointService.getPointsByPointIds(pointsInStr);
+            //填充所有的日期
+            for(Date date : dateHourIntervalAllList){
+                for(TaPoint point : taPointList){
+                    Map<Integer,Double> exportPointResult = new LinkedHashMap<>();
+                    exportPointResult.put(point.getPointId(),0D);
+                    exportResult.put(date,exportPointResult);
+                }
+            }
         /*    List<TaUsagePointData> resultList = new ArrayList<>();*/
-            Map<Date,Map<Integer,Double>> exportResult = new LinkedHashMap<>();
             for(TaPoint vo : taPointList){
                 List<TaUsagePointData> taInstantPointData = usagePointDataHelper.queryUsagePointDataSum(startExpDate, endExpDate, takeTime, vo.getPointId());
                 //循环建出能写进文件的数据格式

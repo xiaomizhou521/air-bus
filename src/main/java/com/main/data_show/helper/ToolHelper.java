@@ -395,6 +395,34 @@ public class ToolHelper {
         return days;
     }
 
+    //取某个某个时间段里面的 每天的同一个时间点
+    public List<Date> getDateHourIntervalAllList(String startExpDate, String endExpDate, String takeTime){
+        // 返回的日期集合
+        List<Date> days = new ArrayList<Date>();
+        try {
+            Date startExp = makeStrToDate(startExpDate+" "+takeTime, SysConsts.DATE_FORMAT_1);
+            //开始时间应该 时选择的时间前一天开始统计  选择日期的用量
+            Date start = addSubDate(startExp, -1);
+            Date end = makeStrToDate(endExpDate+" "+takeTime, SysConsts.DATE_FORMAT_1);
+
+            DateFormat resultDateFormat = new SimpleDateFormat(SysConsts.DATE_FORMAT_3);
+
+            Calendar tempStart = Calendar.getInstance();
+            tempStart.setTime(start);
+
+            Calendar tempEnd = Calendar.getInstance();
+            tempEnd.setTime(end);
+            tempEnd.add(Calendar.DAY_OF_MONTH, +1);// 日期加1(包含结束)
+            while (tempStart.before(tempEnd)) {
+                days.add(tempStart.getTime());
+                tempStart.add(Calendar.DAY_OF_MONTH, 1);
+            }
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return days;
+    }
+
     public Date weekStrToDate(String weekStr){
         //星期几
         int defWeek = Integer.parseInt(env.getProperty(ApplicationConsts.SYS_POINT_USAGE_RECORD_DEF_WEEK_NUM));
