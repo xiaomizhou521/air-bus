@@ -369,6 +369,32 @@ public class ToolHelper {
         }
         return days;
     }
+    //取某个日期间隔的所有月份 可以按天  按周  按月
+    public List<String> getHourIntervalAllList(String startTime,String endTime){
+        // 返回的日期集合
+        List<String> days = new ArrayList<String>();
+        try {
+            DateFormat dateFormat = new SimpleDateFormat(SysConsts.DATE_FORMAT_1);
+            DateFormat resultDateFormat = new SimpleDateFormat(SysConsts.DATE_FORMAT_3);
+            Date start = dateFormat.parse(startTime);
+            Date end = dateFormat.parse(endTime);
+
+            Calendar tempStart = Calendar.getInstance();
+            tempStart.setTime(start);
+
+            Calendar tempEnd = Calendar.getInstance();
+            tempEnd.setTime(end);
+            tempEnd.add(Calendar.HOUR_OF_DAY, +1);// 日期加1(包含结束)
+            while (tempStart.before(tempEnd)) {
+                days.add(resultDateFormat.format(tempStart.getTime()));
+                tempStart.add(Calendar.HOUR_OF_DAY, 1);
+            }
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return days;
+    }
+
     public Date weekStrToDate(String weekStr){
         //星期几
         int defWeek = Integer.parseInt(env.getProperty(ApplicationConsts.SYS_POINT_USAGE_RECORD_DEF_WEEK_NUM));

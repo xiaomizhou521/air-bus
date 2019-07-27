@@ -417,13 +417,13 @@ public class WorkController {
             List<TaInstantPointData> taPointDataLis = new ArrayList<>();
             for(TaPoint point : taPointList){
                 //单个取每个点的数据
-                long startExportTimeNum = toolHelper.dateToNumDate(toolHelper.StrToDate(startExpDate, SysConsts.DATE_FORMAT_7), SysConsts.DATE_FORMAT_3);
-                long endExportTimeNum = toolHelper.dateToNumDate(toolHelper.StrToDate(endExpDate, SysConsts.DATE_FORMAT_7), SysConsts.DATE_FORMAT_3);
+                long startExportTimeNum = toolHelper.dateToNumDate(toolHelper.StrToDate(startExpDate, SysConsts.DATE_FORMAT_1), SysConsts.DATE_FORMAT_3);
+                long endExportTimeNum = toolHelper.dateToNumDate(toolHelper.StrToDate(endExpDate, SysConsts.DATE_FORMAT_1), SysConsts.DATE_FORMAT_3);
                 List<TaInstantPointData> instntPointVoList = instantPointDataHelper.findInstantPointByPointIdAndTime(startExportTimeNum, endExportTimeNum, point.getPointId());
                 taPointDataLis.addAll(instntPointVoList);
             }
-            String path = jFreeChartHelper.createDeviceChartStart(taPointList, taPointDataLis, startExpDate, endExpDate,"设备值统计","日期","值");
-            //  jFreeChartHelper.createUsageDeviceChartStart(taPointList,taPointDataList);
+            List<String> hourIntervalAllList = toolHelper.getHourIntervalAllList(startExpDate, endExpDate);
+            String path = jFreeChartHelper.createDeviceChartStart(taPointList, taPointDataLis, startExpDate, endExpDate,"设备值统计","日期","值",hourIntervalAllList);
             result.put("code",1);
             result.put("data",path);
         }catch (Exception e) {

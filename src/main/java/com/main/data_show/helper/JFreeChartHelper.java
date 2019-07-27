@@ -53,20 +53,24 @@ public class JFreeChartHelper {
     private Environment env;
 
     //生成设备图表开始 折线图
-    public String createDeviceChartStart(java.util.List<TaPoint> taPointList, List<TaInstantPointData> taPointDataList,String startTime,String endTime,String title,String xLabel,String yLabel) throws Exception {
+    public String createDeviceChartStart(java.util.List<TaPoint> taPointList, List<TaInstantPointData> taPointDataList,String startTime,String endTime,String title,String xLabel,String yLabel,List<String> dateIntervalAllList) throws Exception {
          // 步骤1：创建CategoryDataset对象（准备数据）
-        TimeSeriesCollection dataset = createDeviceChartDate(taPointList,taPointDataList);
+    /*    TimeSeriesCollection dataset = createDeviceChartDate(taPointList,taPointDataList);
         // 步骤2：根据Dataset 生成JFreeChart对象，以及做相应的设置
-        JFreeChart freeChart = createChart(dataset,title,xLabel,yLabel);
+        JFreeChart freeChart = createChart(dataset,title,xLabel,yLabel);*/
+        // 步骤1：创建CategoryDataset对象（准备数据）
+        DefaultCategoryDataset dataset = createDeviceInstantChartDate(taPointList,taPointDataList,dateIntervalAllList);
+        // 步骤2：根据Dataset 生成JFreeChart对象，以及做相应的设置
+        JFreeChart freeChart = createUsageChart(dataset,title,xLabel,yLabel);
         // 步骤3：将JFreeChart对象输出到文件，Servlet输出流等
         //生成文件名
         String readBasePath = env.getProperty(ApplicationConsts.SYS_DEMO_INSTANT_EXPORT_IMG_BASE_PATH);
         if(toolHelper.isEmpty(readBasePath)){
             throw new Exception(ApplicationConsts.SYS_DEMO_INSTANT_EXPORT_IMG_BASE_PATH+",基础路径为空!");
         }
-        String imgWidth = env.getProperty(ApplicationConsts.SYS_DEMO_EXPORT_IMG_WIDTH);
+        String imgWidth = env.getProperty(ApplicationConsts.SYS_INSTANT_DEMO_EXPORT_IMG_WIDTH);
         if(toolHelper.isEmpty(imgWidth)){
-            throw new Exception(ApplicationConsts.SYS_DEMO_EXPORT_IMG_WIDTH+",导出图片宽设置为空!");
+            throw new Exception(ApplicationConsts.SYS_INSTANT_DEMO_EXPORT_IMG_WIDTH+",导出图片宽设置为空!");
         }
         String imgHeight = env.getProperty(ApplicationConsts.SYS_DEMO_EXPORT_IMG_HEIGHT);
         if(toolHelper.isEmpty(imgHeight)){
@@ -84,11 +88,11 @@ public class JFreeChartHelper {
         long time = System.currentTimeMillis();
         String fileName = "Instant("+startStr+"_"+endStr+")"+time+".png";
         String exportFilePath = readBasePath+fileName;
-      /*  int showWidth = dateIntervalAllList.size()*Integer.parseInt(imgWidth);
-        if(showWidth<500){
-            showWidth = 500;
-        }*/
-        saveAsFile(freeChart, exportFilePath, 1000, Integer.parseInt(imgHeight));
+        int showWidth = dateIntervalAllList.size()*Integer.parseInt(imgWidth);
+        if(showWidth<1000){
+            showWidth = 1000;
+        }
+        saveAsFile(freeChart, exportFilePath, showWidth, Integer.parseInt(imgHeight));
         return exportFilePath;
     }
 
@@ -201,7 +205,7 @@ public class JFreeChartHelper {
         }
         return lineDataset;
     }
-
+//用量折线图
     public DefaultCategoryDataset createDeviceUsageChartDate(List<TaPoint> taPointList, List<TaUsagePointDataDate> taPointDataList,List<String> dateIntervalAllList){
         Map<Integer,String> ponitMap = new HashMap<>();
         for(TaPoint pointVo : taPointList){
@@ -216,6 +220,28 @@ public class JFreeChartHelper {
         //创造图标数据
         for(TaUsagePointDataDate pointDateVo : taPointDataList){
             mDataset.addValue(pointDateVo.getPointData(), ponitMap.get(pointDateVo.getPointId()), String.valueOf(pointDateVo.getDateShow()));
+        }
+        return mDataset;
+    }
+    //设备折线图
+    public DefaultCategoryDataset createDeviceInstantChartDate(List<TaPoint> taPointList,List<TaInstantPointData> taPointDataList,List<String> dateIntervalAllList){
+        Map<Integer,String> ponitMap = new HashMap<>();
+        for(TaPoint pointVo : taPointList){
+            ponitMap.put(pointVo.getPointId(),"点名："+pointVo.getPointName()+"("+pointVo.getRemarksName()+")"+",单位："+pointVo.getPointUnit());
+        }
+        DefaultCategoryDataset mDataset = new DefaultCategoryDataset();
+        for(String str : dateIntervalAllList){
+            for(Map.Entry<Integer,String> map: ponitMap.entrySet()){
+                mDataset.setValue(0,map.getValue(),str);
+            }
+        }
+        //创造图标数据
+        for(TaInstantPointData pointDateVo : taPointDataList){
+            if(toolHelper.isNumeric(pointDateVo.getPointData())){
+                mDataset.addValue(Double.valueOf(pointDateVo.getPointData()), ponitMap.get(pointDateVo.getPointId()), String.valueOf(pointDateVo.getCreateTimeInt()));
+            }else{
+                mDataset.addValue(0, ponitMap.get(pointDateVo.getPointId()), String.valueOf(pointDateVo.getCreateTimeInt()));
+            }
         }
         return mDataset;
     }

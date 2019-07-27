@@ -11,7 +11,9 @@ public class ApplicationConsts {
 
     public static String SYS_DEMO_USAGE_EXPORT_IMG_BASE_PATH = "sys.demo.usage.export.img.base.path";
 
-    public static String SYS_DEMO_EXPORT_IMG_WIDTH = "sys.demo.export.img.width";
+    public static String SYS_DEMO_EXPORT_IMG_WIDTH = "sys.usage.demo.export.img.width";
+
+    public static String SYS_INSTANT_DEMO_EXPORT_IMG_WIDTH = "sys.instant.demo.export.img.width";
 
     public static String SYS_DEMO_EXPORT_IMG_HEIGHT = "sys.demo.export.img.height";
 
