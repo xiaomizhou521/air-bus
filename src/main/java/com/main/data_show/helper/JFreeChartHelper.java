@@ -18,6 +18,7 @@ import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.category.BarRenderer;
 import org.jfree.chart.renderer.category.BarRenderer3D;
+import org.jfree.chart.renderer.category.LineAndShapeRenderer;
 import org.jfree.chart.renderer.xy.XYItemRenderer;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.chart.title.TextTitle;
@@ -336,6 +337,21 @@ public class JFreeChartHelper {
         mPlot.setRangeGridlinePaint(Color.BLUE);//背景底部横虚线
         mPlot.setOutlinePaint(Color.RED);//边界线
         setCategoryPlot(mChart);
+        CategoryPlot plot=mChart.getCategoryPlot();
+// 获取渲染对象
+        LineAndShapeRenderer renderer = (LineAndShapeRenderer) plot.getRenderer();
+        renderer.setBaseItemLabelsVisible(true);
+//renderer.setDrawShapes(true);
+//renderer.setShapesFilled(true);
+//设置数据显示位置
+//ItemLabelPosition p = new ItemLabelPosition(ItemLabelAnchor.CENTER, TextAnchor.CENTER_LEFT,TextAnchor.CENTER_LEFT, -Math.PI / 2.0 );
+        renderer.setBasePositiveItemLabelPosition(new ItemLabelPosition(ItemLabelAnchor.OUTSIDE12, TextAnchor.BASELINE_CENTER));
+//显示折点相应数据
+        //StandardCategoryLabelGenerator st = new StandardCategoryLabelGenerator();
+       // renderer.setBaseLabelGenerator(new StandardCategoryLabelGenerator());
+        renderer.setBaseLinesVisible(true);
+        renderer.setBaseShapesFilled(true);
+        renderer.setBaseCreateEntities(true);
         return mChart;
     }
 
@@ -441,6 +457,10 @@ public class JFreeChartHelper {
         TextTitle textTitle = chart.getTitle();
         textTitle.setFont(new Font("宋体",Font.BOLD,20));
         CategoryPlot plot=chart.getCategoryPlot();//获取图形区域对象
+        //设置网格竖线颜色
+        plot.setDomainGridlinePaint(Color.black);
+        //设置网格横线颜色
+        plot.setRangeGridlinePaint(Color.black);
         //------------------------------------------获取X轴
         CategoryAxis domainAxis=plot.getDomainAxis();
         //设置X轴坐标上的文字
@@ -453,6 +473,7 @@ public class JFreeChartHelper {
         domainAxis.setTickMarkOutsideLength(3);//标记线向外长度
         domainAxis.setTickMarkInsideLength(3);//标记线向内长度
         domainAxis.setTickMarkPaint(Color.red);//标记线颜色
+        domainAxis.setTickLabelsVisible(true);//刻度数值是否显示
     /*    domainAxis.setUpperMargin(0.2);//设置距离图片左端距离
         domainAxis.setLowerMargin(0.2); //设置距离图片右端距离*/
         //横轴上的 Lable 是否完整显示
@@ -465,9 +486,7 @@ public class JFreeChartHelper {
         rAxis.setTickLabelFont(new Font("sans-serif", Font.PLAIN, 16));
 //设置Y轴的标题文字
         rAxis.setLabelFont(new Font("黑体", Font.PLAIN, 16));
-//Y轴取值范围（下面不能出现 rAxis.setAutoRange(true) 否则不起作用）
-// rAxis.setLowerBound(100); //Y轴以开始的最小值
-// rAxis.setUpperBound(600);//Y轴的最大值
+        rAxis.setAutoRange(true);
         rAxis.setLabelAngle(1.6);//标题内容显示角度（1.6时候水平）
         rAxis.setTickMarkInsideLength(3);//外刻度线向内长度
         rAxis.setTickLabelsVisible(true);//刻度数值是否显示
@@ -485,6 +504,7 @@ public class JFreeChartHelper {
         chart.getLegend().setItemFont(new Font("黑体",Font.BOLD ,15));
         //设置图形的标题
         chart.getTitle().setFont(new Font("宋体",Font.BOLD ,20));
+
     }
 
 }
