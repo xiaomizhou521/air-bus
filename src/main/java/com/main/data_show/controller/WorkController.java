@@ -80,6 +80,9 @@ public class WorkController {
     @Autowired
     private UsagePointDataMonHelper usagePointDataMonHelper;
 
+    @Autowired
+    private LoginHelper loginHelper;
+
 
     @RequestMapping(value = "work/toPointList")
     public String toPointList(HttpServletRequest request) {
@@ -172,6 +175,20 @@ public class WorkController {
         pointVo.setFileRelativePath(fileRelativePath);
         pointVo.setFilePrefixName(filePrefixName);
         taPointService.update(pointVo);
+        return JspPageConst.REDIRECT_TO_POINT_LIST_JSP_REDIRECT;
+    }
+
+    @RequestMapping(value = "work/deletePointDo")
+    public String deletePointDo(HttpServletRequest request) throws Exception {
+        String pointId = request.getParameter("pointId");
+        TaPoint pointVo = taPonitMapper.findPointByPointId(Integer.parseInt(pointId));
+        if(pointVo == null){
+            throw new Exception("点信息不存在");
+        }
+        String deletePointName = pointVo.getPointName()+"$!delete!$"+System.currentTimeMillis();
+        pointVo.setPointName(deletePointName);
+        pointVo.setModUser(loginHelper.getCurUserId(request));
+        taPointService.delete(pointVo);
         return JspPageConst.REDIRECT_TO_POINT_LIST_JSP_REDIRECT;
     }
 

@@ -12,6 +12,8 @@ public interface TaPonitMapper {
 
     public void updateTaPointByPointID(TaPoint taPoint);
 
+    public void deleteTaPointByPointId(TaPoint taPoint);
+
     public void updateTaPointByPointName(TaPoint taPoint);
 
     TaPoint findPointByPointName(@Param("point_name")String pointName);

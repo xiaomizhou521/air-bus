@@ -28,6 +28,10 @@ public class TaPointService {
         return taPonitMapper.insertTaPoint(taPoint);
     }
 
+    public void delete(TaPoint taPoint){
+         taPonitMapper.deleteTaPointByPointId(taPoint);
+    }
+
     public void update(TaPoint taPoint){
          taPonitMapper.updateTaPointByPointID(taPoint);
     }

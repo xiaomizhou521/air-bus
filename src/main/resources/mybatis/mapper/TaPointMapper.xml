@@ -40,6 +40,15 @@
                  where point_name =#{pointName}]]>
     </insert>
 
+    <update id="deleteTaPointByPointId"  parameterType="com.main.data_show.pojo.TaPoint" >
+        <![CDATA[update ta_point set
+                 point_name = #{pointName},
+                 mod_date=now(),
+                 state=-1,
+                 mod_user = #{modUser}
+                 where point_id = #{pointId}]]>
+    </update>
+
     <select id="findPointByPointName" resultType="com.main.data_show.pojo.TaPoint">
         select point_id as pointId,
         point_name as pointName,
