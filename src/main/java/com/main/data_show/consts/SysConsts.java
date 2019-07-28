@@ -1,6 +1,9 @@
 package com.main.data_show.consts;
 
+import com.main.data_show.pojo.TaPoint;
+
 import java.util.Date;
+import java.util.List;
 
 public class SysConsts {
 
@@ -36,4 +39,9 @@ public class SysConsts {
     public static Date YEAR_FIRT_WEEK_STRART_DATE = null;
     //当前计算周数 所用的年  为了每次比较用  放入内存  不用每次都算
     public static int DEF_YEAE = -1;
+
+    //点数据内存
+    public static List<TaPoint> INTERVAL_ALL_POINT_LIST = null;
+    public static List<TaPoint> INTERVAL_INSTANT_POINT_LIST = null;
+    public static List<TaPoint> INTERVAL_USAGE_POINT_LIST = null;
 }
