@@ -83,24 +83,33 @@ public class WorkController {
 
     @RequestMapping(value = "work/toPointList")
     public String toPointList(HttpServletRequest request) {
-        int pageNo = 1;
-        int pageSize = 3;
+        int pageNo = 0;
+        int pageSize = 20;
         String curPageNo = request.getParameter("pageNo");
         if(!toolHelper.isEmpty(curPageNo)){
             pageNo = Integer.parseInt(curPageNo);
         }
+        if(pageNo<0){
+            pageNo = 0;
+        }
         String searchPointName = request.getParameter("pointName");
         String searchRemarkName = request.getParameter("remarkName");
+        List<TaPoint> pointsByPagec = taPonitMapper.getPointsByPage(searchPointName,searchRemarkName,"");
         //取所有点的列表
         List<TaPoint> pointsByPage = taPointService.getPointsByPage(pageNo, pageSize,searchPointName,searchRemarkName);
         PageInfo<TaPoint> pageInfo=new PageInfo<>(pointsByPage);
         request.setAttribute("pointList", pointsByPage);
-        request.setAttribute("totalPage", pageInfo.getTotal());
-        request.setAttribute("lastPage", pageInfo.getLastPage());
-        request.setAttribute("pageNum", pageInfo.getPageNum());
+        request.setAttribute("totalPage", pointsByPagec.size());
+        if(pageNo==0){
+            request.setAttribute("lastPage", pageNo);
+            request.setAttribute("nextPage", pageNo+1);
+        }else{
+            request.setAttribute("lastPage", pageNo-1);
+            request.setAttribute("nextPage", pageNo+1);
+        }
+        request.setAttribute("pageNum", pageNo);
         request.setAttribute("pageSize", pageInfo.getPageSize());
         request.setAttribute("firstPage", pageInfo.getFirstPage());
-        request.setAttribute("nextPage", pageInfo.getNextPage());
         request.setAttribute("searchPointName", searchPointName);
         request.setAttribute("searchRemarkName", searchRemarkName);
 

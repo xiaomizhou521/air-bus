@@ -1,4 +1,3 @@
-<%@page import="cn.com.enorth.utility.app.web.strutsx.config.ConfigStrutsX"%>
 <%@ page language="java" import="java.util.*" pageEncoding="utf-8"%>
 <%@ page import="java.util.ArrayList"%>
 <%@ page import="java.util.List"%>

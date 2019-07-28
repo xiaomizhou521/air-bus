@@ -36,9 +36,11 @@ public class TaPointService {
          taPonitMapper.updateTaPointByPointName(taPoint);
     }
 
-    public List<TaPoint> getPointsByPage(Integer pageNo, Integer limit,String searchPointName,String searchRemarkName){
+    public List<TaPoint> getPointsByPage(int pageNo, int limit,String searchPointName,String searchRemarkName){
         PageHelper.startPage(pageNo,limit);
-        List<TaPoint> pointsByPage = taPonitMapper.getPointsByPage(searchPointName,searchRemarkName,"");
+        //List<TaPoint> pointsByPage = taPonitMapper.getPointsByPage(searchPointName,searchRemarkName,"");
+        pageNo = pageNo*limit;
+        List<TaPoint> pointsByPage = taPonitMapper.getPointsByPageParam(searchPointName,searchRemarkName,"",pageNo,limit);
 
         return pointsByPage;
     }

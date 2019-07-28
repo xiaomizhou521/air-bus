@@ -74,12 +74,12 @@
         <td colspan="6">
             <ul class="pagination" style="width: 100%;margin:0px">
                 <li class=""><a href="/work/toPointList?pageNo=0">首页</a></li>
-                <li class=""><a href="/work/toPointList?pageNo=${pageNum-1}">上一页</a></li>
-                <li class=""><a href="/work/toPointList?pageNo=${pageNum+1}">下一页</a></li>
-                <li class=""><a href="/work/toPointList?pageNo=${lastPage}">尾页</a></li>
+                <li class=""><a href="/work/toPointList?pageNo=${lastPage}">上一页</a></li>
+                <li class=""><a href="/work/toPointList?pageNo=${nextPage}">下一页</a></li>
+             <%--   <li class=""><a href="/work/toPointList?pageNo=${lastPage}">尾页</a></li>--%>
               <%--  <li class=""><input type="text" size="3" id="p2" value="${pageNum}" style="width:50px;height:35px;" onkeypress="javascript:return EnterPress_p2(event)" onkeydown="javascript:return EnterPress_p2()"></li>--%>
                 <%--<li class=""><input type="button" value="跳转" onclick="f_skip_page_p2();" class="btn btn-primary"></li>--%>
-                <li class="">第 ${pageNum} 页 每页 ${pageSize} 条 共 ${totalPage} 条</li>
+                <li class="">第 ${pageNum+1} 页 每页 ${pageSize} 条 共 ${totalPage} 条</li>
             </ul>
         </td>
     </tr>

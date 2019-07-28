@@ -84,6 +84,23 @@
         order by point_id desc
     </select>
 
+    <select id="getPointsByPageParam" resultMap="pointResult">
+        select *
+        from ta_point
+        where state = 1
+        <if test="point_name != null and point_name != ''">
+            and point_name like CONCAT('%',#{point_name},'%')
+        </if>
+        <if test="remarks_name != null and remarks_name != ''">
+            and remarks_name like CONCAT('%',#{remarks_name},'%')
+        </if>
+        <if test="point_type != null and point_type != ''">
+            and point_type = #{point_type}
+        </if>
+        order by point_id desc
+        limit  #{pageNum},#{pageSize}
+    </select>
+
     <select id="getPointsByPointIds" resultMap="pointResult" >
         select * from ta_point
         where state = 1
