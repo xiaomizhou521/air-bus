@@ -36,7 +36,7 @@
    <div style="height: 100%;    background: url(../static/images/ariplan.png);">
        <div style="width:400px;margin-left:60%;height: 200px;padding-top: 200px">
        <form action="/login/loginDo" method="post">
-           <table class="" style="width:400px;height: 300px;background: url(../static/images/bg.png);">
+           <table class="" style="width:400px;height: 300px;background:rgba(0,0,0,0.1);">
                <tr style="background-color: #428bca;height: 50px;">
                    <td style="vertical-align:middle;text-align: left;color: white;" colspan="2"><span style="font-size: 20px;font-weight:bold">&nbsp;&nbsp;&nbsp;&nbsp;用户登陆</span></td>
                </tr>
@@ -51,7 +51,7 @@
                    <td style="vertical-align: middle;">
                        <div style="width:100%">
                            <div style="width:370px;margin:auto;">
-                               <input type="text" placeholder="密码" class ="form-control" style="height: 50px;" placeholder="" id="passWord" name="passWord" value=""/>
+                               <input type="password" placeholder="密码" class ="form-control" style="height: 50px;" placeholder="" id="passWord" name="passWord" value=""/>
                            </div>
                        </div>
                    </td>
