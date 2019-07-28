@@ -41,10 +41,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
 
 @Service
 public class JFreeChartHelper {
@@ -56,13 +54,13 @@ public class JFreeChartHelper {
     //生成设备图表开始 折线图
     public String createDeviceChartStart(java.util.List<TaPoint> taPointList, List<TaInstantPointData> taPointDataList,String startTime,String endTime,String title,String xLabel,String yLabel,List<String> dateIntervalAllList) throws Exception {
          // 步骤1：创建CategoryDataset对象（准备数据）
-    /*    TimeSeriesCollection dataset = createDeviceChartDate(taPointList,taPointDataList);
+        TimeSeriesCollection dataset = createDeviceChartDate(taPointList,taPointDataList,dateIntervalAllList);
         // 步骤2：根据Dataset 生成JFreeChart对象，以及做相应的设置
-        JFreeChart freeChart = createChart(dataset,title,xLabel,yLabel);*/
-        // 步骤1：创建CategoryDataset对象（准备数据）
+        JFreeChart freeChart = createChart(dataset,title,xLabel,yLabel);
+       /* // 步骤1：创建CategoryDataset对象（准备数据）
         DefaultCategoryDataset dataset = createDeviceInstantChartDate(taPointList,taPointDataList,dateIntervalAllList);
         // 步骤2：根据Dataset 生成JFreeChart对象，以及做相应的设置
-        JFreeChart freeChart = createUsageChart(dataset,title,xLabel,yLabel);
+        JFreeChart freeChart = createUsageChart(dataset,title,xLabel,yLabel);*/
         // 步骤3：将JFreeChart对象输出到文件，Servlet输出流等
         //生成文件名
         String readBasePath = env.getProperty(ApplicationConsts.SYS_DEMO_INSTANT_EXPORT_IMG_BASE_PATH);
@@ -173,14 +171,55 @@ public class JFreeChartHelper {
         return exportFilePath;
     }
 
-    public TimeSeriesCollection createDeviceChartDate(java.util.List<TaPoint> taPointList, List<TaInstantPointData> taPointDataList){
+    public TimeSeriesCollection createDeviceChartDate(java.util.List<TaPoint> taPointList, List<TaInstantPointData> taPointDataList,List<String> hourIntervalAllList){
         Map<Integer,String> ponitMap = new HashMap<>();
         for(TaPoint pointVo : taPointList){
             ponitMap.put(pointVo.getPointId(),"点名："+pointVo.getPointName()+"("+pointVo.getRemarksName()+")"+",类型："+pointVo.getPointType()+",单位："+pointVo.getPointUnit());
         }
         Map<Integer,TimeSeries> pointDateMap = new HashMap<>();
+        for(TaPoint point : taPointList){
+            TimeSeries timeSeries = null;
+            int pointId = point.getPointId();
+            for(String str : hourIntervalAllList){
+                boolean flg = false;
+                for(TaInstantPointData pointDateVo : taPointDataList){
+                    String curCreateTime = String.valueOf(pointDateVo.getCreateTimeInt());
+                    if(pointId == pointDateVo.getPointId()&&str.equals(curCreateTime)){
+                        flg = true;
+                        if(pointDateMap.containsKey(pointDateVo.getPointId())){
+                            timeSeries = pointDateMap.get(pointDateVo.getPointId());
+                            if(toolHelper.isNumeric(pointDateVo.getPointData())){
+                                timeSeries.add(new Hour(pointDateVo.getCreateTime()), Double.valueOf(pointDateVo.getPointData()));
+                            }else{
+                                timeSeries.add(new Hour(pointDateVo.getCreateTime()), 0);
+                            }
+                        }else{
+                            timeSeries = new TimeSeries(ponitMap.get(pointDateVo.getPointId()), Hour.class);
+                            if(toolHelper.isNumeric(pointDateVo.getPointData())){
+                                timeSeries.add(new Hour(pointDateVo.getCreateTime()), Double.valueOf(pointDateVo.getPointData()));
+                            }else{
+                                timeSeries.add(new Hour(pointDateVo.getCreateTime()), 0);
+                            }
+                            pointDateMap.put(pointDateVo.getPointId(),timeSeries);
+                        }
+                    }
+                }
+                //每个日期都应该有记录 没有查到 就占位
+                if(!flg){
+                    Date date = toolHelper.StrToDate(str, SysConsts.DATE_FORMAT_3);
+                    if(pointDateMap.containsKey(pointId)){
+                        timeSeries = pointDateMap.get(pointId);
+                        timeSeries.add(new Hour(date), 0);
+                    }else{
+                        timeSeries = new TimeSeries(ponitMap.get(pointId), Hour.class);
+                        timeSeries.add(new Hour(date), 0);
+                        pointDateMap.put(pointId,timeSeries);
+                    }
+                }
+            }
+        }
         //创造图标数据
-        for(TaInstantPointData pointDateVo : taPointDataList){
+        /*for(TaInstantPointData pointDateVo : taPointDataList){
             TimeSeries timeSeries = null;
             if(pointDateMap.containsKey(pointDateVo.getPointId())){
                  timeSeries = pointDateMap.get(pointDateVo.getPointId());
@@ -198,7 +237,7 @@ public class JFreeChartHelper {
                 }
                 pointDateMap.put(pointDateVo.getPointId(),timeSeries);
             }
-        }
+        }*/
         //遍历 map 每个都是一条时间折线
         TimeSeriesCollection lineDataset = new TimeSeriesCollection();
         for(Map.Entry<Integer,TimeSeries> map : pointDateMap.entrySet()){
@@ -464,9 +503,9 @@ public class JFreeChartHelper {
         //------------------------------------------获取X轴
         CategoryAxis domainAxis=plot.getDomainAxis();
         //设置X轴坐标上的文字
-        domainAxis.setTickLabelFont(new Font("sans-serif", Font.PLAIN, 11));
+        domainAxis.setTickLabelFont(new Font("sans-serif", Font.PLAIN, 16));
 //设置X轴的标题文字
-        domainAxis.setLabelFont(new Font("宋体", Font.PLAIN, 12));
+        domainAxis.setLabelFont(new Font("宋体", Font.PLAIN, 16));
         domainAxis.setTickLabelsVisible(true);//X轴的标题文字是否显示
         domainAxis.setAxisLinePaint(Color.red);//X轴横线颜色
         domainAxis.setTickMarksVisible(true);//标记线是否显示

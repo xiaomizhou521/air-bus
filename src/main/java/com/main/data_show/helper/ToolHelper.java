@@ -446,7 +446,7 @@ public class ToolHelper {
             Date end = weekStrToDate(endTime);
             Calendar tempStart = Calendar.getInstance();
             tempStart.setTime(start);
-          //  tempStart.add(Calendar.WEEK_OF_YEAR, 1);// 日期加1(包含结束)
+            tempStart.add(Calendar.WEEK_OF_YEAR, 1);// 日期加1(包含结束)
             Calendar tempEnd = Calendar.getInstance();
             tempEnd.setTime(end);
             tempEnd.add(Calendar.WEEK_OF_YEAR, 2);// 日期加1(包含结束)
