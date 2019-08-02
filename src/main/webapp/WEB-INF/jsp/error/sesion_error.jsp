@@ -63,7 +63,7 @@
 
     <script>
         function jumpToLogin(){
-            top.location.href='/toLogin';
+            top.location.href='/';
         }
     </script>
     <title>访问失败提示页面</title>

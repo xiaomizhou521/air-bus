@@ -51,7 +51,7 @@ public class MainController {
     @Autowired
     private TaPointService taPointService;
 
-    @RequestMapping(value = "/toLogin")
+    @RequestMapping(value = "/")
     public String toLogin(HttpServletRequest request) throws Exception {
         TaUser curUser = loginHelper.getCurUser(request);
         if(curUser == null){

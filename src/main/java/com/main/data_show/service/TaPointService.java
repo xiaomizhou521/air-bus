@@ -2,6 +2,8 @@ package com.main.data_show.service;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.main.data_show.consts.SysConsts;
+import com.main.data_show.enums.EnumPointTypeDefine;
 import com.main.data_show.helper.ToolHelper;
 import com.main.data_show.mapper.TaPonitMapper;
 import com.main.data_show.pojo.TaPoint;
@@ -47,6 +49,32 @@ public class TaPointService {
         List<TaPoint> pointsByPage = taPonitMapper.getPointsByPageParam(searchPointName,searchRemarkName,"",pageNo,limit);
 
         return pointsByPage;
+    }
+   //从内存中取点数据 没没有才查
+    public List<TaPoint> getIntervalPointsList(String pointType){
+        if(EnumPointTypeDefine.instant.toString().equals(pointType)){
+            if(SysConsts.INTERVAL_INSTANT_POINT_LIST==null){
+                reloadIntervalPointsList();
+            }
+            return SysConsts.INTERVAL_INSTANT_POINT_LIST;
+        }else if(EnumPointTypeDefine.usage.toString().equals(pointType)){
+            if(SysConsts.INTERVAL_USAGE_POINT_LIST == null){
+                reloadIntervalPointsList();
+            }
+            return SysConsts.INTERVAL_USAGE_POINT_LIST;
+        }else{
+            if(SysConsts.INTERVAL_ALL_POINT_LIST == null){
+                reloadIntervalPointsList();
+            }
+            return SysConsts.INTERVAL_ALL_POINT_LIST;
+        }
+
+    }
+
+    public void reloadIntervalPointsList(){
+        SysConsts.INTERVAL_INSTANT_POINT_LIST = taPonitMapper.getPointsByPage("","", EnumPointTypeDefine.instant.toString());
+        SysConsts.INTERVAL_USAGE_POINT_LIST = taPonitMapper.getPointsByPage("","", EnumPointTypeDefine.usage.toString());
+        SysConsts.INTERVAL_ALL_POINT_LIST = taPonitMapper.getPointsByPage("","", "");
     }
 
     public List<TaPoint> getPointsByPointIds(String pointIds){

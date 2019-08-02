@@ -175,6 +175,8 @@ public class WorkController {
         pointVo.setFileRelativePath(fileRelativePath);
         pointVo.setFilePrefixName(filePrefixName);
         taPointService.update(pointVo);
+        //刷新缓存
+        taPointService.reloadIntervalPointsList();
         return JspPageConst.REDIRECT_TO_POINT_LIST_JSP_REDIRECT;
     }
 
@@ -189,6 +191,8 @@ public class WorkController {
         pointVo.setPointName(deletePointName);
         pointVo.setModUser(loginHelper.getCurUserId(request));
         taPointService.delete(pointVo);
+        //刷新缓存
+        taPointService.reloadIntervalPointsList();
         return JspPageConst.REDIRECT_TO_POINT_LIST_JSP_REDIRECT;
     }
 
@@ -218,14 +222,16 @@ public class WorkController {
         pointVo.setFilePrefixName(filePrefixName);
         pointVo.setState(1);
         taPointService.insert(pointVo);
+        //刷新缓存
+        taPointService.reloadIntervalPointsList();
         return JspPageConst.REDIRECT_TO_POINT_LIST_JSP_REDIRECT;
     }
 
     @RequestMapping(value = "work/toExportDataRecode")
     public String toExportDataRecode(HttpServletRequest request) {
         //取得所有点
-        List<TaPoint> pointList = taPonitMapper.getPointsByPage("","","");
-        request.setAttribute("pointList",pointList);
+       // List<TaPoint> pointList = taPonitMapper.getPointsByPage("","","");
+      //  request.setAttribute("pointList",pointList);
         return JspPageConst.EXPORT_DATA_RECODE_JSP_REDIRECT;
     }
     //导出数据记录
@@ -295,8 +301,8 @@ public class WorkController {
     @RequestMapping(value = "work/toExportUsageRecode")
     public String toExportUsageRecode(HttpServletRequest request) {
         //取得电表或者水表的点
-        List<TaPoint> pointList = taPonitMapper.getPointsByPage("","","");
-        request.setAttribute("pointList",pointList);
+       // List<TaPoint> pointList = taPonitMapper.getPointsByPage("","","");
+      //  request.setAttribute("pointList",pointList);
         return JspPageConst.EXPORT_USEAGE_RECODE_JSP_REDIRECT;
     }
 
@@ -345,6 +351,9 @@ public class WorkController {
         /*    List<TaUsagePointData> resultList = new ArrayList<>();*/
             for(TaPoint vo : taPointList){
                 List<TaUsagePointData> taInstantPointData = usagePointDataHelper.queryUsagePointDataSum(startExpDate, endExpDate, takeTime, vo.getPointId());
+                if(taInstantPointData.isEmpty()){
+                    continue;
+                }
                 //循环建出能写进文件的数据格式
                 //第一个时间分界点  当数据时间大于这个时  要重算分界点 分界点决定数据属于哪个key
                 Date firstIntervalTime = toolHelper.makeDateByDateAndHour(taInstantPointData.get(0).getDateShow(), takeTime);
@@ -411,8 +420,8 @@ public class WorkController {
     @RequestMapping(value = "work/toExportDeviceChart")
     public String toExportDeviceChart(HttpServletRequest request) throws Exception {
         //取得非 电表水表的点
-        List<TaPoint> pointList = taPonitMapper.getPointsByPage("","","");
-        request.setAttribute("pointList",pointList);
+       //List<TaPoint> pointList = taPonitMapper.getPointsByPage("","","");
+       // request.setAttribute("pointList",pointList);
         return JspPageConst.EXPORT_DEVICE_CHAER_JSP_REDIRECT;
     }
 
@@ -475,8 +484,8 @@ public class WorkController {
     @RequestMapping(value = "work/toExportUsageDeviceChart")
     public String toExportUsageDeviceChart(HttpServletRequest request) throws Exception {
         //取得非 电表水表的点
-        List<TaPoint> pointList = taPonitMapper.getPointsByPage("","","");
-        request.setAttribute("pointList",pointList);
+       // List<TaPoint> pointList = taPonitMapper.getPointsByPage("","","");
+       // request.setAttribute("pointList",pointList);
         return JspPageConst.EXPORT_USAGE_DEVICE_CHAER_JSP_REDIRECT;
     }
 
@@ -584,7 +593,8 @@ public class WorkController {
         String pointType = request.getParameter("pointType");
         request.setAttribute("selectId",data_recode);
         //取得所有点
-        List<TaPoint> pointList = taPonitMapper.getPointsByPage("","",pointType);
+       // List<TaPoint> pointList = taPonitMapper.getPointsByPage("","",pointType);
+        List<TaPoint> pointList = taPointService.getIntervalPointsList(pointType);
         request.setAttribute("pointList",pointList);
         return JspPageConst.LOAD__POINT_SELECT_JSP_REDIRECT;
     }
@@ -718,6 +728,65 @@ public class WorkController {
             }
         }
         return null;
+    }
+
+    /**
+     * 读取文件小工具
+     *
+     * @param request
+     * @param response
+     * @throws Exception
+     */
+    @RequestMapping(value = "work/readCSV")
+    public void readCSV(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        String filePath = request.getParameter("filePath");
+        if(toolHelper.isEmpty(filePath)){
+            throw new Exception("参数为空！！！！");
+        }
+        csvHelper.exportPointBaseRemarkData(filePath);
+    }
+
+    /**
+     * 读取文件小工具 重新计算数据
+     *
+     * @param request
+     * @param response
+     * @throws Exception
+     */
+    @RequestMapping(value = "work/reapeatAllSumCSV")
+    public void reapeatAllSumCSV(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        String filePath = request.getParameter("filePath");
+        if(toolHelper.isEmpty(filePath)){
+            throw new Exception("参数为空！！！！");
+        }
+        System.out.println("开始重算"+filePath+"统计数据！！！！！！！！");
+        System.out.println("开始重算"+filePath+"统计数据！！！！！！！！");
+        System.out.println("开始重算"+filePath+"统计数据！！！！！！！！");
+        System.out.println("开始重算"+filePath+"统计数据！！！！！！！！");
+        csvHelper.exportPointBaseData(filePath);
+        System.out.println("重算统计数据结束！！！！！！");
+    }
+
+    /**
+     * 读取文件小工具 重新计算数据
+     *
+     * @param request
+     * @param response
+     * @throws Exception
+     */
+    @RequestMapping(value = "work/sumDataCSV")
+    public void sumDataCSV(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        String dateStr = request.getParameter("dateStr");
+        if(toolHelper.isEmpty(dateStr)){
+            throw new Exception("参数为空！！！！");
+        }
+        System.out.println("开始重算"+dateStr+"统计数据！！！！！！！！");
+        System.out.println("开始重算"+dateStr+"统计数据！！！！！！！！");
+        System.out.println("开始重算"+dateStr+"统计数据！！！！！！！！");
+        System.out.println("开始重算"+dateStr+"统计数据！！！！！！！！");
+        System.out.println("开始重算"+dateStr+"统计数据！！！！！！！！");
+        csvHelper.startTimerImportCSVFile(dateStr);
+        System.out.println("重算"+dateStr+"统计数据结束！！！！！！！！");
     }
 
 }

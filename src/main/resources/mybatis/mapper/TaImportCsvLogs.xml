@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.main.data_show.mapper.TaImportCsvLogsMapper">
+   <resultMap type="com.main.data_show.pojo.TaImportCsvLogs" id="pointResult">
+        <id property="logId" column="log_id" />
+        <result property="filePath" column="file_path" />
+        <result property="state" column="state" />
+        <result property="initDate" column="init_date" />
+        <result property="detail" column="detail" />
+    </resultMap>
+
+    <insert id="insertLogs" keyProperty="logId" parameterType="com.main.data_show.pojo.TaImportCsvLogs"  useGeneratedKeys="true">
+        INSERT INTO ta_import_csv_logs (file_path, state, init_date,detail)
+        VALUES (#{filePath}, #{state}, now(),#{detail});
+    </insert>
+
+
+</mapper>

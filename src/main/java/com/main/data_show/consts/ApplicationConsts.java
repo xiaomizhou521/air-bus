@@ -22,4 +22,6 @@ public class ApplicationConsts {
     public static String SYS_POINT_USAGE_RECORD_DEF_HOUR = "sys.point.usage_record_def_hour";
 
     public static String SYS_POINT_USAGE_RECORD_DEF_WEEK_NUM = "sys.point.usage_record_def_week_num";
+
+    public static String SYS_DEMO_MV_NEW_PATH = "sys_demo_mv_new_path";
 }

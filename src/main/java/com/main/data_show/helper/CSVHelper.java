@@ -1,5 +1,6 @@
 package com.main.data_show.helper;
 
+import cn.com.enorth.utility.Beans;
 import com.csvreader.CsvReader;
 import com.csvreader.CsvWriter;
 import com.main.data_show.consts.ApplicationConsts;
@@ -18,8 +19,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.nio.charset.Charset;
 import java.util.*;
 
@@ -60,18 +60,19 @@ public class CSVHelper {
     @Autowired
     private UsagePointDataMonHelper usagePointDataMonHelper;
 
+    @Autowired
+    private ImportCsvLogsHelper importCsvLogsHelper;
+
     //导入点的基础数据
     //遍历文件夹读取所有文件
-    public  void exportPointBaseData() throws Exception {
+    public  void exportPointBaseData(String readBasePath) throws Exception {
         long startTime = System.currentTimeMillis();
-        String readBasePath = env.getProperty(ApplicationConsts.SYS_DEMO_IMPORT_DATA_BASE_PATH);
         File file=new File(readBasePath);
         if(!file.isDirectory()){
             //file不是文件夹
             System.out.println(file.getName()+"不是一个文件夹");
         }else{
             traversalFile(readBasePath,readBasePath,"basePointDate");
-            exportPointBaseRemarkData();
         }
         long endTime = System.currentTimeMillis();
         long useTime = endTime-startTime;
@@ -91,8 +92,7 @@ public class CSVHelper {
 
     //导入点的备注信息
     //遍历文件夹读取所有文件
-    public  void exportPointBaseRemarkData() throws Exception {
-        String readBasePath = env.getProperty(ApplicationConsts.SYS_DEMO_IMPORT_DATA_REMARK_BASE_PATH);
+    public  void exportPointBaseRemarkData(String readBasePath) throws Exception {
         File file=new File(readBasePath);
         if(!file.isDirectory()){
             //file不是文件夹
@@ -137,14 +137,14 @@ public class CSVHelper {
         //“.”和“|”都是转义字符,必须得加"\\"
         String[] str=fileName.split("\\.");
         String suffix=str[1];
-        if("CSV".equals(suffix)){
+        if("CSV".equals(suffix)||"csv".equals(suffix)){
             return true;
         }else{
             return false;
         }
     }
 
-    public void startTimerImportCSVFile(){
+    public void startTimerImportCSVFile(String dateStr){
         long startTime = System.currentTimeMillis();
         String readBasePath = env.getProperty(ApplicationConsts.SYS_DEMO_IMPORT_DATA_BASE_PATH);
         if(!readBasePath.endsWith(ParamConsts.SEPERRE_STR)){
@@ -152,22 +152,35 @@ public class CSVHelper {
         }
         //遍历所有的点  取相对路径和 文件名前缀 要去重
         List<TaPoint> allPointRelativePathList = taPointService.getAllPointRelativePath();
+        String allPath ="";
         for(TaPoint pointVo : allPointRelativePathList){
             try {
                 String relativePath = pointVo.getFileRelativePath();
+                //记录日志用
+                allPath=relativePath;
                 if(!relativePath.endsWith(ParamConsts.SEPERRE_STR)){
                     relativePath = relativePath + ParamConsts.SEPERRE_STR;
                 }
                 //计算文件名称
-                String dateStr = toolHelper.dateToStrDate(new Date(), SysConsts.DATE_FORMAT_6);
-                //String dateStr = "07-03-19";
+                if(toolHelper.isEmpty(dateStr)){
+                    dateStr = toolHelper.dateToStrDate(toolHelper.addSubDate(new Date(),-1), SysConsts.DATE_FORMAT_6);
+                }
                 String fileNamePrefix = pointVo.getFilePrefixName()+dateStr+".CSV";
-                String allPath = readBasePath + relativePath + fileNamePrefix;
+                allPath = readBasePath + relativePath + fileNamePrefix;
                 logger.info("当前读取的文件名全路径为:"+allPath);
                 readCSV(allPath,relativePath,fileNamePrefix);
+                importCsvLogsHelper.saveImportCsvLogs(allPath,1,"");
+                //读取完文件后 把文件搬到指定的地方
+                String mvBasePath = env.getProperty(ApplicationConsts.SYS_DEMO_MV_NEW_PATH);
+                if(!mvBasePath.endsWith(ParamConsts.SEPERRE_STR)){
+                    mvBasePath = mvBasePath+ParamConsts.SEPERRE_STR;
+                }
+                String mvNewPath= mvBasePath + relativePath + fileNamePrefix;
+                copyFile(allPath,mvNewPath);
             }catch (Exception e){
                 e.printStackTrace();
                 logger.error(e.getMessage());
+                importCsvLogsHelper.saveImportCsvLogs(allPath,-1,e.getMessage());
             }
         }
         long endTime = System.currentTimeMillis();
@@ -235,7 +248,7 @@ public class CSVHelper {
                         Date dateTime = toolHelper.makeDateByDateAndHour(dateStr, hourStr);
                         long dateTimeInt = toolHelper.dateToNumDate(dateTime,SysConsts.DATE_FORMAT_3);
                         logger.warn("-------------------pointName:"+ponitVo.getPointName()+",pointId:"+pointId+",dateTimeInt:"+dateTimeInt+" dateStr:"+dateStr+" hourStr:"+hourStr);
-                    //    allPointDataHelper.insertAllPoint(pointId,dateStr,hourStr,ponitValue,0,dateTime,dateTimeInt);
+                        allPointDataHelper.insertAllPoint(pointId,dateStr,hourStr,ponitValue,0,dateTime,dateTimeInt);
                         //每个小时的用量
                         double pointUsage = 0;
                         //用量时 需要保存上一小时的结果 算当前小时的用量
@@ -285,10 +298,10 @@ public class CSVHelper {
                 instantPointDataHelper.insertAllPoint(pointVo.getPointId(),dateStr,hourStr,pointData,0,dateTime,dateTimeInt);
            //点用量数据保存到 usagePointDate中
            }else if(EnumPointTypeDefine.usage.toString().equals(pointVo.getPointType())){
-             // usagePointDataHelper.insertAllPoint(pointVo.getPointId(),dateStr,hourStr,pointData,pointUsage,dateTime,dateTimeInt);
-           //    usagePointDataDateHelper.makeUsagePointDate(pointVo.getPointId(),pointUsage,dateTime);
-               usagePointDataWeekHelper.makeUsagePointWeek(pointVo.getPointId(),pointUsage,dateTime);
-           //    usagePointDataMonHelper.makeUsagePointMon(pointVo.getPointId(),pointUsage,dateTime);
+              usagePointDataHelper.insertAllPoint(pointVo.getPointId(),dateStr,hourStr,pointData,pointUsage,dateTime,dateTimeInt);
+              usagePointDataDateHelper.makeUsagePointDate(pointVo.getPointId(),pointUsage,dateTime);
+              usagePointDataWeekHelper.makeUsagePointWeek(pointVo.getPointId(),pointUsage,dateTime);
+              usagePointDataMonHelper.makeUsagePointMon(pointVo.getPointId(),pointUsage,dateTime);
            }else{
                System.out.println("错误的点类型啊！！！！！！！");
            }
@@ -306,23 +319,19 @@ public class CSVHelper {
             while (csvReader.readRecord()) {
                 // 读一整行
                 int length = csvReader.getRawRecord().length();
-                String result = csvReader.get(0);
-                if(result.startsWith("Point_")){
-                    String pointName = csvReader.get(1);
-                    String pointRemark = csvReader.get(2);
-                    //保存点的备注到数据库  根据点名查找
-                    TaPoint tapoint = new TaPoint();
-                    tapoint.setPointType("");
-                    tapoint.setPointUnit("");
-                    tapoint.setBlockNo("");
-                    tapoint.setState(1);
-                    tapoint.setFileRelativePath("");
-                    tapoint.setFilePrefixName("");
-                    tapoint.setPointName(pointName);
-                    tapoint.setRemarksName(pointRemark);
-                    tapoint.setModUser(-1);
-                    taPointService.updateTapointByName(tapoint);
-                }
+                String pointName = csvReader.get(0);
+                String pointRemark = csvReader.get(1);
+                String unit = csvReader.get(3);
+                String blockNo = csvReader.get(11);
+                //保存点的备注到数据库  根据点名查找
+                TaPoint tapoint = new TaPoint();
+                tapoint.setPointUnit(unit);
+                tapoint.setBlockNo(blockNo);
+                tapoint.setState(1);
+                tapoint.setPointName(pointName);
+                tapoint.setRemarksName(pointRemark);
+                tapoint.setModUser(-1);
+                taPointService.updateTapointByName(tapoint);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -553,6 +562,64 @@ public class CSVHelper {
             e.printStackTrace();
             throw e;
         }
+    }
+
+
+
+    /**
+    * 复制单个文件
+    * @param oldPath String 原文件路径 如：c:/fqf.txt
+    * @param newPath String 复制后路径 如：f:/fqf.txt
+    * @return boolean
+    */
+    public void copyFile(String oldPath, String newPath) throws Exception {
+        InputStream inStream = null;
+        FileOutputStream fs = null;
+        File oldfile = null;
+        try {
+            int bytesum = 0;
+            int byteread = 0;
+            oldfile = new File(oldPath);
+            if (oldfile.exists()) { //文件存在时
+                inStream = new FileInputStream(oldPath); //读入原文件
+                File newFile = new File(newPath);
+                File fileParent = newFile.getParentFile();
+                if(!fileParent.exists()){
+                    fileParent.mkdirs();
+                }
+                newFile.createNewFile();
+                fs = new FileOutputStream(newPath);
+                byte[] buffer = new byte[1444];
+                int length;
+                while ( (byteread = inStream.read(buffer)) != -1) {
+                    bytesum += byteread; //字节数 文件大小
+                    fs.write(buffer, 0, byteread);
+                }
+            }
+        }
+        catch (Exception e) {
+            System.out.println("复制单个文件操作出错");
+            e.printStackTrace();
+            throw e;
+        }finally {
+            if(inStream != null){
+                inStream.close();
+            }
+            if(fs != null){
+                fs.close();
+            }
+            //删除老文件
+            if(oldfile!=null&&oldfile.exists()){
+                if(oldfile.delete()){
+                    logger.info("删除成功,"+oldPath);
+                    System.out.println(oldPath+",删除成功");
+                }else{
+                    logger.error("删除失败,"+oldPath);
+                    System.out.println(oldPath+",删除失败");
+                }
+            }
+        }
+
     }
 }
 

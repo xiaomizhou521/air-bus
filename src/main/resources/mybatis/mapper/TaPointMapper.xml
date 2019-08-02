@@ -35,6 +35,8 @@
     <insert id="updateTaPointByPointName"  parameterType="com.main.data_show.pojo.TaPoint" >
         <![CDATA[update ta_point set
                  remarks_name = #{remarksName},
+                 point_unit = #{pointUnit},
+                 block_no = #{blockNo},
                  mod_date=now(),
                  mod_user = #{modUser}
                  where point_name =#{pointName}]]>
