@@ -36,6 +36,7 @@
                             <dd><a class="menuClass" href="javaScript:void(0);" url="/work/toExportUsageRecode">导出用量报告</a></dd>
                             <dd><a class="menuClass" href="javaScript:void(0);" url="/work/toExportDeviceChart">导出设备图表-设备</a></dd>
                             <dd><a class="menuClass" href="javaScript:void(0);" url="/work/toExportUsageDeviceChart">导出设备图表-用量</a></dd>
+                            <dd><a class="menuClass" href="javaScript:void(0);" url="/work/toReadCSVLogsList">CSV导入日志</a></dd>
                         </dl>
                     </li>
                   <%--  <li class="layui-nav-item">

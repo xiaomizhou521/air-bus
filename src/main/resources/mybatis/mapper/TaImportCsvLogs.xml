@@ -16,5 +16,19 @@
         VALUES (#{filePath}, #{state}, now(),#{detail});
     </insert>
 
+    <select id="getReadCsvLogByPageParam" resultMap="pointResult">
+    select *
+            from ta_import_csv_logs
+            where 1=1
+            <if test="file_path != null and file_path != ''">
+                and file_path like CONCAT('%',#{file_path},'%')
+            </if>
+            <if test="state != null and state != ''">
+                and state = #{state}
+            </if>
+            order by log_id desc
+            limit  #{pageNum},#{pageSize}
+    </select>
+
 
 </mapper>

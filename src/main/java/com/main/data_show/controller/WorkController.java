@@ -12,6 +12,7 @@ import com.main.data_show.mapper.TaPonitDataMapper;
 import com.main.data_show.mapper.TaPonitMapper;
 import com.main.data_show.mapper.TaUsagePonitDataDateMapper;
 import com.main.data_show.pojo.*;
+import com.main.data_show.service.TaImportCsvLogsService;
 import com.main.data_show.service.TaPointDataService;
 import com.main.data_show.service.TaPointService;
 import net.sf.json.JSONArray;
@@ -82,6 +83,9 @@ public class WorkController {
 
     @Autowired
     private LoginHelper loginHelper;
+
+    @Autowired
+    private TaImportCsvLogsService taImportCsvLogsService;
 
 
     @RequestMapping(value = "work/toPointList")
@@ -787,6 +791,57 @@ public class WorkController {
         System.out.println("开始重算"+dateStr+"统计数据！！！！！！！！");
         csvHelper.startTimerImportCSVFile(dateStr);
         System.out.println("重算"+dateStr+"统计数据结束！！！！！！！！");
+    }
+    //显示导入csv文件日志信息
+    @RequestMapping(value = "work/toReadCSVLogsList")
+    public String toReadCSVLogsList(HttpServletRequest request) throws Exception {
+        int pageNo = 0;
+        int pageSize = 20;
+        String curPageNo = request.getParameter("pageNo");
+        if(!toolHelper.isEmpty(curPageNo)){
+            pageNo = Integer.parseInt(curPageNo);
+        }
+        if(pageNo<0){
+            pageNo = 0;
+        }
+        String filePath = request.getParameter("filePath");
+        String state = request.getParameter("state");
+        String startExpDate = request.getParameter("startExpDate");
+        String endExpDate = request.getParameter("endExpDate");
+        if((!toolHelper.isEmpty(startExpDate))&&(!toolHelper.isEmpty(endExpDate))){
+            if(!toolHelper.compareStrDate(startExpDate,endExpDate,SysConsts.DATE_FORMAT_1)){
+                throw new Exception("结束时间要大于开始时间");
+            }
+        }
+        List<TaImportCsvLogs> readCsvLogByPageParam = taImportCsvLogsService.getReadCsvLogByPageParam(filePath, state, startExpDate, endExpDate, pageNo, pageSize);
+        JSONArray result = new JSONArray();
+        for(TaImportCsvLogs vo : readCsvLogByPageParam){
+            JSONObject json = new JSONObject();
+            json.put("logId",vo.getLogId());
+            json.put("initDate",toolHelper.dateToStrDate(vo.getInitDate(),SysConsts.DATE_FORMAT_1));
+            json.put("filePath",vo.getFilePath());
+            json.put("state",vo.getState());
+            json.put("detail",vo.getDetail());
+            result.add(json);
+        }
+        PageInfo<TaImportCsvLogs> pageInfo=new PageInfo<>(readCsvLogByPageParam);
+        request.setAttribute("csvLogs", result);
+        request.setAttribute("totalPage", readCsvLogByPageParam.size());
+        if(pageNo==0){
+            request.setAttribute("lastPage", pageNo);
+            request.setAttribute("nextPage", pageNo+1);
+        }else{
+            request.setAttribute("lastPage", pageNo-1);
+            request.setAttribute("nextPage", pageNo+1);
+        }
+        request.setAttribute("pageNum", pageNo);
+        request.setAttribute("pageSize", pageInfo.getPageSize());
+        request.setAttribute("firstPage", pageInfo.getFirstPage());
+        request.setAttribute("filePath", filePath);
+        request.setAttribute("state", state);
+        request.setAttribute("startExpDate", startExpDate);
+        request.setAttribute("endExpDate", endExpDate);
+        return JspPageConst.TO_CSV_LOGS_LIST_JSP_REDIRECT;
     }
 
 }

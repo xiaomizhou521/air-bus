@@ -8,14 +8,12 @@ import com.main.data_show.mapper.TaImportCsvLogsMapper;
 import com.main.data_show.mapper.TaPonitMapper;
 import com.main.data_show.pojo.TaImportCsvLogs;
 import com.main.data_show.pojo.TaPoint;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class TaImportCsvLogsService {
@@ -28,6 +26,12 @@ public class TaImportCsvLogsService {
 
     public int insert(TaImportCsvLogs taImportCsvLogs){
         return taImportCsvLogsMapper.insertLogs(taImportCsvLogs);
+    }
+
+    public List<TaImportCsvLogs> getReadCsvLogByPageParam(String file_path,String state,String startTime,String endTime,int pageNo, int limit){
+        PageHelper.startPage(pageNo,limit);
+        pageNo = pageNo*limit;
+        return taImportCsvLogsMapper.getReadCsvLogByPageParam(file_path,state,startTime,endTime,pageNo,limit);
     }
 
 

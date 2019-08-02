@@ -30,5 +30,7 @@ public class JspPageConst {
 
     public static String LOAD__POINT_SELECT_JSP_REDIRECT = "common/point_select";
 
+    public static String TO_CSV_LOGS_LIST_JSP_REDIRECT = "logs/csv_logs_list";
+
 
 }
