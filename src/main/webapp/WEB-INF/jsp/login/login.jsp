@@ -34,7 +34,10 @@
 </head>
 <body>
    <div style="height: 100%;    background: url(../static/images/ariplan.png);">
-       <div style="width:400px;margin-left:60%;height: 200px;padding-top: 200px">
+       <div>
+           <img src="../static/images/SiemensLogo.png">
+       </div>
+       <div style="width:400px;margin-left:60%;height: 200px;padding-top: 150px">
        <form action="/login/loginDo" method="post">
            <table class="" style="width:400px;height: 300px;background:rgba(0,0,0,0.1);">
                <tr style="background-color: #428bca;height: 50px;">

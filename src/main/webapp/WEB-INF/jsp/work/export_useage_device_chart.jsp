@@ -110,7 +110,7 @@
                         $("#showImg").attr("src",src);
                     }else if(code ==-1){
                         $("#showFilePath").html("");
-                        alert("报告生成失败:"+result);
+                        alert("报告生成失败:"+data.data);
                     }
                 }
             });

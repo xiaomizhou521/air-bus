@@ -29,4 +29,6 @@ public interface TaPonitMapper {
     List<TaPoint> getPointsByPointIds(@Param("pointIds") String pointIds);
 
     List<TaPoint> getAllPointRelativePath();
+
+    long getAllPointCount();
 }

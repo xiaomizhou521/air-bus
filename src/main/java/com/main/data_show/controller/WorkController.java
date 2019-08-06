@@ -101,12 +101,13 @@ public class WorkController {
         }
         String searchPointName = request.getParameter("pointName");
         String searchRemarkName = request.getParameter("remarkName");
-        List<TaPoint> pointsByPagec = taPonitMapper.getPointsByPage(searchPointName,searchRemarkName,"");
+        //List<TaPoint> pointsByPagec = taPonitMapper.getPointsByPage(searchPointName,searchRemarkName,"");
+        long count = taPonitMapper.getAllPointCount();
         //取所有点的列表
         List<TaPoint> pointsByPage = taPointService.getPointsByPage(pageNo, pageSize,searchPointName,searchRemarkName);
         PageInfo<TaPoint> pageInfo=new PageInfo<>(pointsByPage);
         request.setAttribute("pointList", pointsByPage);
-        request.setAttribute("totalPage", pointsByPagec.size());
+        request.setAttribute("totalPage", count);
         if(pageNo==0){
             request.setAttribute("lastPage", pageNo);
             request.setAttribute("nextPage", pageNo+1);
@@ -544,7 +545,7 @@ public class WorkController {
             List<TaPoint> taPointList = taPointService.getPointsByPointIds(pointsInStr);
             //取点数据
             List<TaUsagePointDataDate> taUsagePointDataDates = new ArrayList<>();
-            List<String> dateIntervalAllList = null;
+            List<String> dateIntervalAllList = new ArrayList<>();
             if(EnumUsageTimeTypeDefine.date.toString().equals(dateType)){
                 taUsagePointDataDates = usagePointDataDateHelper.queryUsagePointDataSum(startExpDate, endExpDate, pointsInStr);
                 //取得所有要显示的日期

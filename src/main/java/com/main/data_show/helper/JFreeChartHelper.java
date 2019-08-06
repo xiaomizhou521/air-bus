@@ -87,11 +87,15 @@ public class JFreeChartHelper {
         long time = System.currentTimeMillis();
         String fileName = "Instant("+startStr+"_"+endStr+")"+time+".png";
         String exportFilePath = readBasePath+fileName;
-        int showWidth = dateIntervalAllList.size()*Integer.parseInt(imgWidth);
+        int showWidth = dateIntervalAllList.size()*taPointList.size()*Integer.parseInt(imgWidth);
         if(showWidth<1000){
             showWidth = 1000;
         }
-        saveAsFile(freeChart, exportFilePath, showWidth, Integer.parseInt(imgHeight));
+        int showHeight = Integer.parseInt(imgHeight)+taPointList.size()*30;
+        if(showHeight<600){
+            showHeight = 600;
+        }
+        saveAsFile(freeChart, exportFilePath, showWidth, showHeight);
         return exportFilePath;
     }
 
@@ -125,11 +129,15 @@ public class JFreeChartHelper {
         long time = System.currentTimeMillis();
         String fileName = "Instant("+startTime+"_"+endTime+")"+time+".png";
         String exportFilePath = readBasePath+fileName;
-        int showWidth = dateIntervalAllList.size()*Integer.parseInt(imgWidth);
+        int showWidth = dateIntervalAllList.size()*taPointList.size()*Integer.parseInt(imgWidth);
         if(showWidth<1000){
             showWidth = 1000;
         }
-        saveAsFile(freeChart, exportFilePath, showWidth, Integer.parseInt(imgHeight));
+        int showHeight = Integer.parseInt(imgHeight)+taPointList.size()*30;
+        if(showHeight<600){
+            showHeight = 600;
+        }
+        saveAsFile(freeChart, exportFilePath, showWidth, showHeight);
         return exportFilePath;
     }
 
@@ -163,11 +171,15 @@ public class JFreeChartHelper {
         long time = System.currentTimeMillis();
         String fileName = "Usage("+startStr+"_"+endStr+")"+time+".png";
         String exportFilePath = readBasePath+fileName;
-        int showWidth = dateIntervalAllList.size()*Integer.parseInt(imgWidth);
+        int showWidth = dateIntervalAllList.size()*taPointList.size()*Integer.parseInt(imgWidth);
         if(showWidth<1000){
             showWidth = 1000;
         }
-        saveAsFile(freeChart, exportFilePath, showWidth, Integer.parseInt(imgHeight));
+        int showHeight = Integer.parseInt(imgHeight)+taPointList.size()*30;
+        if(showHeight<600){
+            showHeight = 600;
+        }
+        saveAsFile(freeChart, exportFilePath, showWidth, showHeight);
         return exportFilePath;
     }
 
@@ -353,7 +365,7 @@ public class JFreeChartHelper {
 		xyitem.setBasePositiveItemLabelPosition(new ItemLabelPosition(
 				ItemLabelAnchor.OUTSIDE12, TextAnchor.BASELINE_LEFT));
 		xyitem.setBaseItemLabelGenerator(new StandardXYItemLabelGenerator());
-		xyitem.setBaseItemLabelFont(new Font("Dialog", 1, 14));
+		xyitem.setBaseItemLabelFont(new Font("宋体", Font.PLAIN, 10));
 		plot.setRenderer(xyitem);
 
         return jfreechart;

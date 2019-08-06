@@ -138,4 +138,8 @@
                  where t.state = 1
                  order by t.file_relative_path,t.file_prefix_name]]>
     </select>
+
+    <select id="getAllPointCount" resultType="java.lang.Long">
+        select count(*) as count from ta_point
+    </select>
 </mapper>

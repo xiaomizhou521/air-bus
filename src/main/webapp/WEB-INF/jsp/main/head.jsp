@@ -5,7 +5,11 @@
 <header th:fragment="header">
     <div class="layui-layout layui-layout-admin">
         <div class="layui-header">
-            <a href="javascript:;" class="layui-hide-xs"><div class="layui-logo" style="font-size: 25px;">数据展示系统</div>
+            <a href="javascript:;" class="layui-hide-xs">
+                <div style="line-height: 50px;padding-top: 2px;">
+                    <img src="../static/images/SiemensLogo.png" style="width:200px;height:55px">
+                </div>
+              <%--  <div class="layui-logo" style="font-size: 25px;">数据展示系统</div>--%>
             </a>
             <a href="javascript:;" class="layui-hide-xs">
                 <div class="switchMenu" style="display: none;"><i class="fa fa-indent"></i></div>
