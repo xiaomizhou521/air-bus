@@ -72,9 +72,20 @@ public class TaPointService {
     }
 
     public void reloadIntervalPointsList(){
-        SysConsts.INTERVAL_INSTANT_POINT_LIST = taPonitMapper.getPointsByPage("","", EnumPointTypeDefine.instant.toString());
-        SysConsts.INTERVAL_USAGE_POINT_LIST = taPonitMapper.getPointsByPage("","", EnumPointTypeDefine.usage.toString());
+      /*  SysConsts.INTERVAL_INSTANT_POINT_LIST = taPonitMapper.getPointsByPage("","", EnumPointTypeDefine.instant.toString());
+        SysConsts.INTERVAL_USAGE_POINT_LIST = taPonitMapper.getPointsByPage("","", EnumPointTypeDefine.usage.toString());*/
         SysConsts.INTERVAL_ALL_POINT_LIST = taPonitMapper.getPointsByPage("","", "");
+        List<TaPoint> instantPointList = new ArrayList<TaPoint>();
+        List<TaPoint> usagePointList = new ArrayList<TaPoint>();
+        for(TaPoint vo : SysConsts.INTERVAL_ALL_POINT_LIST){
+              if(EnumPointTypeDefine.instant.toString().equals(vo.getPointType())){
+                  instantPointList.add(vo);
+              }else if(EnumPointTypeDefine.usage.toString().equals(vo.getPointType())){
+                  usagePointList.add(vo);
+              }
+        }
+        SysConsts.INTERVAL_INSTANT_POINT_LIST = instantPointList;
+        SysConsts.INTERVAL_USAGE_POINT_LIST = usagePointList;
     }
 
     public List<TaPoint> getPointsByPointIds(String pointIds){
