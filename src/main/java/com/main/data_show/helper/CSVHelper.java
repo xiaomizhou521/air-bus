@@ -199,6 +199,7 @@ public class CSVHelper {
 
     //具体读取某个csv文件
     public void readCSV(String filePath,String relativePath,String fileNamePrefix) throws Exception {
+        CsvReader csvReader =null;
         try {
             logger.warn(filePath);
             File file = new File(filePath);
@@ -213,7 +214,7 @@ public class CSVHelper {
             }
             //用量的点 需要保存上一小时的用量算差值，文档第一条需要查数据库取得 上一小时的抄表数据。如果没有给0
             Map<Integer,String> lastPointUsageMap = new HashMap<Integer,String>();
-            CsvReader csvReader = new CsvReader(filePath, ',', Charset.forName("GBK"));
+            csvReader = new CsvReader(filePath, ',', Charset.forName("GBK"));
             //保存所有点信息 保持顺序
             Map<Integer,TaPoint> resultMap = new HashMap<Integer,TaPoint>();
             int pointIndexFlg = 1;
@@ -287,6 +288,10 @@ public class CSVHelper {
             e.printStackTrace();
             logger.error("文件："+filePath+",导入时异常，原因："+e.getMessage());
             throw e;
+        } finally{
+            if(csvReader != null){
+                csvReader.close();
+            }
         }
     }
 
@@ -310,8 +315,9 @@ public class CSVHelper {
 
     //具体读取点的备注
     public void readPointRemarkCSV(String filePath){
+        CsvReader csvReader = null;
         try {
-            CsvReader csvReader = new CsvReader(filePath, ',', Charset.forName("GBK"));
+            csvReader = new CsvReader(filePath, ',', Charset.forName("GBK"));
             // 读表头
             int pointIndexFlg = 1;
             boolean dateIndexFlg = false;
@@ -336,11 +342,16 @@ public class CSVHelper {
         } catch (Exception e) {
             e.printStackTrace();
             logger.error("文件："+filePath+",导入时异常，原因："+e.getMessage());
+        } finally {
+            if(csvReader != null){
+                csvReader.close();
+            }
         }
     }
 
 
     public String writeCSV1(List<TaPoint> taPointList, Map<Long,Map<Integer, TaInstantPointData>> resultDateMap, String startTime, String endTime, HttpServletResponse response) throws Exception {
+        CsvWriter csvWriter = null;
         try {
             String readBasePath = env.getProperty(ApplicationConsts.SYS_DEMO_INSTANT_EXPORT_DATA_BASE_PATH);
             if(toolHelper.isEmpty(readBasePath)){
@@ -361,7 +372,7 @@ public class CSVHelper {
             if(!file.exists()){
                 file.createNewFile();
             }
-            CsvWriter csvWriter = new CsvWriter(file.getCanonicalPath(), ',', Charset.forName("GBK"));
+            csvWriter = new CsvWriter(file.getCanonicalPath(), ',', Charset.forName("GBK"));
             //通用部分
             writeCommon(csvWriter,taPointList);
             Map<Date,List> pointDateMap = new LinkedHashMap<Date,List>();
@@ -406,11 +417,14 @@ public class CSVHelper {
                 List<String> value = map.getValue();
                 csvWriter.writeRecord(value.toArray(new String[value.size()]));
             }
-            csvWriter.close();
             return exportFilePath;
         } catch (Exception e) {
             e.printStackTrace();
             throw e;
+        } finally {
+            if(csvWriter!=null){
+                csvWriter.close();
+            }
         }
     }
 
@@ -435,6 +449,7 @@ public class CSVHelper {
     }
 
     public String writeCSV2(List<TaPoint> taPointList,Map<Date,Map<Integer,Double>> exportResult,String takeTime,String startTime,String endTime) throws Exception {
+        CsvWriter csvWriter = null;
         try {
             String readBasePath = env.getProperty(ApplicationConsts.SYS_DEMO_USAGE_EXPORT_DATA_BASE_PATH);
             if(toolHelper.isEmpty(readBasePath)){
@@ -456,7 +471,7 @@ public class CSVHelper {
             if(!file.exists()){
                 file.createNewFile();
             }
-            CsvWriter csvWriter = new CsvWriter(file.getCanonicalPath(), ',', Charset.forName("GBK"));
+            csvWriter = new CsvWriter(file.getCanonicalPath(), ',', Charset.forName("GBK"));
             //通用部分
             writeCommon(csvWriter,taPointList);
             Map<Date,List> pointDateMap = new LinkedHashMap<Date,List>();
@@ -483,16 +498,20 @@ public class CSVHelper {
                 List<String> value = map.getValue();
                 csvWriter.writeRecord(value.toArray(new String[value.size()]));
             }
-            csvWriter.close();
             return exportFilePath;
         } catch (Exception e) {
             e.printStackTrace();
             throw e;
+        }finally {
+            if(csvWriter != null){
+                csvWriter.close();
+            }
         }
     }
 
     //用量图表报告   表格
     public String writeCSV3(List<TaPoint> taPointList, List<TaUsagePointDataDate> exportResult, List<String> dateIntervalAllList,String startTime,String endTime) throws Exception {
+        CsvWriter csvWriter = null;
         try {
             String readBasePath = env.getProperty(ApplicationConsts.SYS_DEMO_USAGE_EXPORT_DATA_BASE_PATH);
             if(toolHelper.isEmpty(readBasePath)){
@@ -513,7 +532,7 @@ public class CSVHelper {
             if(!file.exists()){
                 file.createNewFile();
             }
-            CsvWriter csvWriter = new CsvWriter(file.getCanonicalPath(), ',', Charset.forName("GBK"));
+            csvWriter = new CsvWriter(file.getCanonicalPath(), ',', Charset.forName("GBK"));
             List<String> title = new ArrayList<String>();
             title.add(" ");
             for(String str : dateIntervalAllList){
@@ -556,11 +575,14 @@ public class CSVHelper {
                 List<String> value = writeMap.getValue();
                 csvWriter.writeRecord(value.toArray(new String[value.size()]));
             }
-            csvWriter.close();
             return exportFilePath;
         } catch (Exception e) {
             e.printStackTrace();
             throw e;
+        } finally {
+            if(csvWriter!=null){
+                csvWriter.close();
+            }
         }
     }
 
