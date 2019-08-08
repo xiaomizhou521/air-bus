@@ -603,7 +603,7 @@ public class CSVHelper {
             int byteread = 0;
             oldfile = new File(oldPath);
             if (oldfile.exists()) { //文件存在时
-                inStream = new FileInputStream(oldPath); //读入原文件
+              /*  inStream = new FileInputStream(oldPath); //读入原文件
                 File newFile = new File(newPath);
                 File fileParent = newFile.getParentFile();
                 if(!fileParent.exists()){
@@ -616,7 +616,7 @@ public class CSVHelper {
                 while ( (byteread = inStream.read(buffer)) != -1) {
                     bytesum += byteread; //字节数 文件大小
                     fs.write(buffer, 0, byteread);
-                }
+                }*/
             }
         }
         catch (Exception e) {
@@ -632,6 +632,7 @@ public class CSVHelper {
             }
             //删除老文件
             if(oldfile!=null&&oldfile.exists()){
+                System.gc();
                 if(oldfile.delete()){
                     logger.info("删除成功,"+oldPath);
                     System.out.println(oldPath+",删除成功");
