@@ -12,10 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class TaPointService {
@@ -63,10 +60,14 @@ public class TaPointService {
             }
             return SysConsts.INTERVAL_USAGE_POINT_LIST;
         }else{
-            if(SysConsts.INTERVAL_ALL_POINT_LIST == null){
+            if(SysConsts.INTERVAL_ALL_POINT_MAP.isEmpty()){
                 reloadIntervalPointsList();
             }
-            return SysConsts.INTERVAL_ALL_POINT_LIST;
+            List<TaPoint> pointList = new ArrayList<TaPoint>();
+            for(Map.Entry<String,TaPoint> map : SysConsts.INTERVAL_ALL_POINT_MAP.entrySet()){
+                pointList.add(map.getValue());
+            }
+            return pointList;
         }
 
     }
@@ -74,16 +75,19 @@ public class TaPointService {
     public void reloadIntervalPointsList(){
       /*  SysConsts.INTERVAL_INSTANT_POINT_LIST = taPonitMapper.getPointsByPage("","", EnumPointTypeDefine.instant.toString());
         SysConsts.INTERVAL_USAGE_POINT_LIST = taPonitMapper.getPointsByPage("","", EnumPointTypeDefine.usage.toString());*/
-        SysConsts.INTERVAL_ALL_POINT_LIST = taPonitMapper.getPointsByPage("","", "");
+        List<TaPoint> pointsByPage = taPonitMapper.getPointsByPage("", "", "");
         List<TaPoint> instantPointList = new ArrayList<TaPoint>();
         List<TaPoint> usagePointList = new ArrayList<TaPoint>();
-        for(TaPoint vo : SysConsts.INTERVAL_ALL_POINT_LIST){
+        Map<String,TaPoint> resultMap = new HashMap<String,TaPoint>();
+        for(TaPoint vo : pointsByPage){
+              resultMap.put(vo.getPointName(),vo);
               if(EnumPointTypeDefine.instant.toString().equals(vo.getPointType())){
                   instantPointList.add(vo);
               }else if(EnumPointTypeDefine.usage.toString().equals(vo.getPointType())){
                   usagePointList.add(vo);
               }
         }
+        SysConsts.INTERVAL_ALL_POINT_MAP = resultMap;
         SysConsts.INTERVAL_INSTANT_POINT_LIST = instantPointList;
         SysConsts.INTERVAL_USAGE_POINT_LIST = usagePointList;
     }
@@ -103,11 +107,13 @@ public class TaPointService {
 
     //取点的所有 路径
     public List<TaPoint> getAllPointRelativePath(){
-        List<TaPoint> allPointRelativePath = taPonitMapper.getAllPointRelativePath();
+      /*  List<TaPoint> allPointRelativePath = taPonitMapper.getAllPointRelativePath();*/
+        //变成从缓存取
         List<TaPoint> result  = new ArrayList<>();
         Set<String> checkSet = new HashSet<>();
         //去重
-        for(TaPoint vo : allPointRelativePath){
+        for(Map.Entry<String,TaPoint> map : SysConsts.INTERVAL_ALL_POINT_MAP.entrySet()){
+            TaPoint vo = map.getValue();
             StringBuffer sb = new StringBuffer();
             sb.append(vo.getFileRelativePath()).append(vo.getFilePrefixName());
             String checkPath = sb.toString();

@@ -152,6 +152,10 @@ public class CSVHelper {
         }
         //遍历所有的点  取相对路径和 文件名前缀 要去重
         List<TaPoint> allPointRelativePathList = taPointService.getAllPointRelativePath();
+        //计算文件名称 每次定时任务只取一次文件名称的后缀 就可以
+        if(toolHelper.isEmpty(dateStr)){
+            dateStr = toolHelper.dateToStrDate(toolHelper.addSubDate(new Date(),-1), SysConsts.DATE_FORMAT_6);
+        }
         String allPath ="";
         for(TaPoint pointVo : allPointRelativePathList){
             try {
@@ -161,22 +165,18 @@ public class CSVHelper {
                 if(!relativePath.endsWith(ParamConsts.SEPERRE_STR)){
                     relativePath = relativePath + ParamConsts.SEPERRE_STR;
                 }
-                //计算文件名称
-                if(toolHelper.isEmpty(dateStr)){
-                    dateStr = toolHelper.dateToStrDate(toolHelper.addSubDate(new Date(),-1), SysConsts.DATE_FORMAT_6);
-                }
                 String fileNamePrefix = pointVo.getFilePrefixName()+dateStr+".CSV";
                 allPath = readBasePath + relativePath + fileNamePrefix;
                 logger.info("当前读取的文件名全路径为:"+allPath);
                 readCSV(allPath,relativePath,fileNamePrefix);
                 importCsvLogsHelper.saveImportCsvLogs(allPath,1,"");
-                //读取完文件后 把文件搬到指定的地方
-                String mvBasePath = env.getProperty(ApplicationConsts.SYS_DEMO_MV_NEW_PATH);
+                //读取完文件后 把文件搬到指定的地方  刘工说不需要了
+                /*String mvBasePath = env.getProperty(ApplicationConsts.SYS_DEMO_MV_NEW_PATH);
                 if(!mvBasePath.endsWith(ParamConsts.SEPERRE_STR)){
                     mvBasePath = mvBasePath+ParamConsts.SEPERRE_STR;
                 }
-                String mvNewPath= mvBasePath + relativePath + fileNamePrefix;
-                copyFile(allPath,mvNewPath);
+                String mvNewPath= mvBasePath + relativePath + fileNamePrefix;*/
+                copyFile(allPath,"");
             }catch (Exception e){
                 e.printStackTrace();
                 logger.error(e.getMessage());
@@ -595,41 +595,8 @@ public class CSVHelper {
     * @return boolean
     */
     public void copyFile(String oldPath, String newPath) throws Exception {
-        InputStream inStream = null;
-        FileOutputStream fs = null;
-        File oldfile = null;
         try {
-            int bytesum = 0;
-            int byteread = 0;
-            oldfile = new File(oldPath);
-            if (oldfile.exists()) { //文件存在时
-              /*  inStream = new FileInputStream(oldPath); //读入原文件
-                File newFile = new File(newPath);
-                File fileParent = newFile.getParentFile();
-                if(!fileParent.exists()){
-                    fileParent.mkdirs();
-                }
-                newFile.createNewFile();
-                fs = new FileOutputStream(newPath);
-                byte[] buffer = new byte[1444];
-                int length;
-                while ( (byteread = inStream.read(buffer)) != -1) {
-                    bytesum += byteread; //字节数 文件大小
-                    fs.write(buffer, 0, byteread);
-                }*/
-            }
-        }
-        catch (Exception e) {
-            System.out.println("复制单个文件操作出错");
-            e.printStackTrace();
-            throw e;
-        }finally {
-            if(inStream != null){
-                inStream.close();
-            }
-            if(fs != null){
-                fs.close();
-            }
+            File oldfile = new File(oldPath);
             //删除老文件
             if(oldfile!=null&&oldfile.exists()){
                 System.gc();
@@ -641,6 +608,12 @@ public class CSVHelper {
                     System.out.println(oldPath+",删除失败");
                 }
             }
+        }
+        catch (Exception e) {
+            System.out.println("复制单个文件操作出错");
+            e.printStackTrace();
+            throw e;
+        }finally {
         }
 
     }

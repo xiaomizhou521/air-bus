@@ -2,8 +2,7 @@ package com.main.data_show.consts;
 
 import com.main.data_show.pojo.TaPoint;
 
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 public class SysConsts {
 
@@ -41,7 +40,8 @@ public class SysConsts {
     public static int DEF_YEAE = -1;
 
     //点数据内存
-    public static List<TaPoint> INTERVAL_ALL_POINT_LIST = null;
+    //public static List<TaPoint> INTERVAL_ALL_POINT_LIST = null;
     public static List<TaPoint> INTERVAL_INSTANT_POINT_LIST = null;
     public static List<TaPoint> INTERVAL_USAGE_POINT_LIST = null;
+    public static Map<String,TaPoint> INTERVAL_ALL_POINT_MAP = new LinkedHashMap<String,TaPoint>();
 }
