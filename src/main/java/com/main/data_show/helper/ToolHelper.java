@@ -3,6 +3,7 @@ package com.main.data_show.helper;
 import com.main.data_show.consts.ApplicationConsts;
 import com.main.data_show.consts.SysConsts;
 import com.main.data_show.enums.EnumUsageTimeTypeDefine;
+import com.main.data_show.init.Startup;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
@@ -15,10 +16,7 @@ import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -190,7 +188,8 @@ public class ToolHelper {
             }else if(EnumUsageTimeTypeDefine.week.toString().equals(type)){
                 return getWeekNumByDate(checkDate);
             }else if(EnumUsageTimeTypeDefine.mon.toString().equals(type)){
-                return dateToNumDate(checkDate,SysConsts.DATE_FORMAT_5);
+                //return dateToNumDate(checkDate,SysConsts.DATE_FORMAT_5);
+                return getMonNumByDate(checkDate);
             }
         }else if(defHour>0){
             SimpleDateFormat sdf=new SimpleDateFormat("HH");
@@ -213,13 +212,14 @@ public class ToolHelper {
                     return getWeekNumByDate(addDate);
                 }*/
             }else if(EnumUsageTimeTypeDefine.mon.toString().equals(type)){
-                if(c<=defHour){
+               /* if(c<=defHour){
                     return dateToNumDate(checkDate,SysConsts.DATE_FORMAT_5);
                 }else {
                     //加一天
                     Date addDate = addSubDate(checkDate, 1);
                     return dateToNumDate(addDate,SysConsts.DATE_FORMAT_5);
-                }
+                }*/
+                return getMonNumByDate(checkDate);
             }
         }else{
             throw new Exception("时间间隔不能是负数！！！");
@@ -234,6 +234,17 @@ public class ToolHelper {
         int checkYear = cal.get(Calendar.YEAR);
         return Long.parseLong(dateToWeekLong(date,checkYear));
     }
+
+    //取月数
+    public long getMonNumByDate(Date date) throws Exception {
+        return Long.parseLong(dateToMonLong(date));
+    }
+
+/*    public static void main(String[] args) throws Exception {
+            ToolHelper toolHelper = new ToolHelper();
+        String s = toolHelper.dateToWeekLong(toolHelper.StrToDate("2020-12-31 16:00:01",SysConsts.DATE_FORMAT_1), -1);
+        System.out.println(s);
+    }*/
 
     //通过日期取周数
     public String dateToWeekLong(Date date,int checkYear) throws Exception {
@@ -251,14 +262,10 @@ public class ToolHelper {
         if(SysConsts.DEF_YEAE!=checkYear){
             throw new Exception("当前系统内存中的用来计算的年份异常");
         }
-        //如果时间12月份
-       /* Date date1 = addSubDate(date, 7);
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(date1);
-        int newCheckYear = cal.get(Calendar.YEAR);
-        if(checkYear < newCheckYear){
-            return newCheckYear+"01";
-        }*/
+        //如果时间小于等于这一年的 最后一个周几  应该算下一年的第一周
+        if(compareDate(SysConsts.NEXT_YEAR_FIRST_WEEK_DATE_MAP.get(checkYear),date)){
+             return (checkYear+1)+"01";
+        }
         //计算周数规则  小于SysConsts.YEAR_FIRT_WEEK_STRART_DATE 的为第一周
         //(验证时间 - SysConsts.YEAR_FIRT_WEEK_STRART_DATE)/7  + 1 为真正的周数
         long betweenLong = date.getTime() - SysConsts.YEAR_FIRT_WEEK_STRART_DATE.getTime();
@@ -277,10 +284,47 @@ public class ToolHelper {
         return checkYear+""+weekStr;
     }
 
-    public static void main(String[] args) {
-        for(int i=0;i<=14;i++){
-            System.out.println(i/7);
+/*    public static void main(String[] args) throws Exception {
+        ToolHelper toolHelper = new ToolHelper();
+        String s = toolHelper.dateToMonLong(toolHelper.StrToDate("2019-1-20 16:00:00",SysConsts.DATE_FORMAT_1));
+        System.out.println(s);
+    }*/
+
+    //通过日期取月数
+    public String dateToMonLong(Date date) throws Exception {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        int checkYear = cal.get(Calendar.YEAR);
+        int checkMon = cal.get(Calendar.MONTH);
+        //取得配置的小时数
+        int defHour = Integer.parseInt(env.getProperty(ApplicationConsts.SYS_POINT_USAGE_RECORD_DEF_HOUR));
+        //取配置的月的开始日期
+        int defMonStartDate = Integer.parseInt(env.getProperty(ApplicationConsts.SYS_POINT_USAGE_RECORD_DEF_MON_DATE));
+        //计算每月的临界时间
+        Calendar checkCalcendar = new GregorianCalendar();//定义一个日历，变量作为年末
+        checkCalcendar.set(Calendar.YEAR, checkYear);
+        checkCalcendar.set(Calendar.MONTH, checkMon);
+        checkCalcendar.set(Calendar.DAY_OF_MONTH, defMonStartDate);//设置年初的日期为1月1日
+        checkCalcendar.set(Calendar.HOUR_OF_DAY,defHour);
+        checkCalcendar.set(Calendar.MINUTE,0);
+        checkCalcendar.set(Calendar.SECOND,0);
+        checkCalcendar.set(Calendar.MILLISECOND,0);
+//Calendar 中月份是  0 到 11 所以需要加1
+        checkMon = checkMon+1;
+        //比较当前时间与 临界时间  小于为当前月  大于为下一月  如果当前月份为12月则大于时是下一年的一月
+        if(compareDate(checkCalcendar.getTime(),date)){
+             if(checkMon == 12){
+                  checkYear = checkYear+1;
+                 checkMon = 1;
+             }else{
+                 checkMon = checkMon+1;
+             }
         }
+        String monStr = checkMon + "";
+        if (monStr.length() < 2) {
+            monStr = "0" + monStr;
+        }
+        return checkYear+""+monStr;
     }
 
     //取文件的相对路径

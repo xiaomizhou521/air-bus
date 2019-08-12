@@ -38,8 +38,8 @@ public class SysConsts {
     public static Date YEAR_FIRT_WEEK_STRART_DATE = null;
     //当前计算周数 所用的年  为了每次比较用  放入内存  不用每次都算
     public static int DEF_YEAE = -1;
-    //一年中 应该归为下一年第一周的 某几天
-    public static Map<Date,Date> NEXT_YEAR_FIRST_WEEK = new HashMap<Date,Date>();
+    //一年中 应该归为下一年第一周的 最后一个周几的时间 大于这个时间的都算下一年第一周的
+    public static Map<Integer,Date> NEXT_YEAR_FIRST_WEEK_DATE_MAP = new HashMap<Integer,Date>();
 
     //点数据内存
     //public static List<TaPoint> INTERVAL_ALL_POINT_LIST = null;

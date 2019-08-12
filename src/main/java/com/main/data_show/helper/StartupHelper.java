@@ -17,14 +17,10 @@ public class StartupHelper {
 
     //取今年的第一个周间隔的日期
     public void initYearFirstWeekDate(int year){
-       /* //取得配置的小时数
+        //取得配置的小时数
         int defHour = Integer.parseInt(env.getProperty(ApplicationConsts.SYS_POINT_USAGE_RECORD_DEF_HOUR));
         //星期几
-        int defWeek = Integer.parseInt(env.getProperty(ApplicationConsts.SYS_POINT_USAGE_RECORD_DEF_WEEK_NUM));*/
-        //取得配置的小时数
-        int defHour = 16;
-        //星期几
-        int defWeek = 5;
+        int defWeek = Integer.parseInt(env.getProperty(ApplicationConsts.SYS_POINT_USAGE_RECORD_DEF_WEEK_NUM));
         Calendar calendar = new GregorianCalendar();//定义一个日历，变量作为年初
         Calendar calendarEnd = new GregorianCalendar();//定义一个日历，变量作为年末
         calendar.set(Calendar.YEAR, year);

@@ -23,5 +23,7 @@ public class ApplicationConsts {
 
     public static String SYS_POINT_USAGE_RECORD_DEF_WEEK_NUM = "sys.point.usage_record_def_week_num";
 
+    public static String SYS_POINT_USAGE_RECORD_DEF_MON_DATE = "sys.point.usage_recored_def_mon_date";
+
     public static String SYS_DEMO_MV_NEW_PATH = "sys_demo_mv_new_path";
 }
