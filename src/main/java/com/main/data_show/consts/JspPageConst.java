@@ -32,5 +32,7 @@ public class JspPageConst {
 
     public static String TO_CSV_LOGS_LIST_JSP_REDIRECT = "logs/csv_logs_list";
 
+    public static String EXPORT_FIX_POINT_USAGE_RECODE_JSP_REDIRECT = "work/export_fix_usage_recode";
+
 
 }
