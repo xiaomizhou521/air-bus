@@ -154,7 +154,8 @@ public class CSVHelper {
         List<TaPoint> allPointRelativePathList = taPointService.getAllPointRelativePath();
         //计算文件名称 每次定时任务只取一次文件名称的后缀 就可以
         if(toolHelper.isEmpty(dateStr)){
-            dateStr = toolHelper.dateToStrDate(toolHelper.addSubDate(new Date(),-1), SysConsts.DATE_FORMAT_6);
+            //例： 生成的文件   文件名叫  xxxx-08-12-19.CSV      里面的数据是  19年8月11日的
+            dateStr = toolHelper.dateToStrDate(new Date(), SysConsts.DATE_FORMAT_6);
         }
         String allPath ="";
         for(TaPoint pointVo : allPointRelativePathList){

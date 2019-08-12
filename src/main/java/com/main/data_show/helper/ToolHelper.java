@@ -251,15 +251,36 @@ public class ToolHelper {
         if(SysConsts.DEF_YEAE!=checkYear){
             throw new Exception("当前系统内存中的用来计算的年份异常");
         }
+        //如果时间12月份
+       /* Date date1 = addSubDate(date, 7);
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date1);
+        int newCheckYear = cal.get(Calendar.YEAR);
+        if(checkYear < newCheckYear){
+            return newCheckYear+"01";
+        }*/
         //计算周数规则  小于SysConsts.YEAR_FIRT_WEEK_STRART_DATE 的为第一周
         //(验证时间 - SysConsts.YEAR_FIRT_WEEK_STRART_DATE)/7  + 1 为真正的周数
-        long betweenDate = (date.getTime() - SysConsts.YEAR_FIRT_WEEK_STRART_DATE.getTime())/(60*60*24*1000);
-        long weekNum = (betweenDate/7)+1;
-        String weekStr = weekNum+"";
-        if(weekStr.length()<2){
-            weekStr = "0"+weekStr;
+        long betweenLong = date.getTime() - SysConsts.YEAR_FIRT_WEEK_STRART_DATE.getTime();
+        //小于0说明是 一年中的 周开始日的前几天
+        long weekNum = 0;
+        if(betweenLong < 0){
+            weekNum = 1;
+        }else {
+            long betweenDate = betweenLong / (60 * 60 * 24 * 1000);
+            weekNum = (betweenDate / 7) + 2;
+        }
+        String weekStr = weekNum + "";
+        if (weekStr.length() < 2) {
+            weekStr = "0" + weekStr;
         }
         return checkYear+""+weekStr;
+    }
+
+    public static void main(String[] args) {
+        for(int i=0;i<=14;i++){
+            System.out.println(i/7);
+        }
     }
 
     //取文件的相对路径
@@ -442,7 +463,7 @@ public class ToolHelper {
         // 返回的日期集合
         List<String> days = new ArrayList<String>();
         try {
-            Date start = weekStrToDate(startTime);
+/*            Date start = weekStrToDate(startTime);
             Date end = weekStrToDate(endTime);
             Calendar tempStart = Calendar.getInstance();
             tempStart.setTime(start);
@@ -453,7 +474,15 @@ public class ToolHelper {
             while (tempStart.before(tempEnd)) {
                 days.add(dateToWeekLong(tempStart.getTime(),-1));
                 tempStart.add(Calendar.WEEK_OF_YEAR, 1);
+            }*/
+            int startDateNum = Integer.parseInt(startTime);
+            int endDateNum = Integer.parseInt(endTime);
+            days.add(String.valueOf(startDateNum));
+            while(startDateNum<endDateNum){
+                startDateNum = startDateNum + 1;
+                days.add(String.valueOf(startDateNum));
             }
+            days.add(String.valueOf(endDateNum));
         } catch (Exception e) {
             e.printStackTrace();
         }
