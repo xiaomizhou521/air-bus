@@ -33,6 +33,8 @@ public class SysConsts {
 //路径中包含这个的是 用量的点
     public static String POINT_USAGE_DEF_FILE_PATH = "REPORTS/POWER/KWH";
 
+    public static String POINT_USAGE_DEF_FILE_PATH_2 = "REPORTS/HAVC/WEMS";
+
     //按照配置的 周间隔从周几开始的系统参数  先计算出一年中第一个这个周几的日期
     //为了计算周数用 每年都应该重新算一个
     public static Date YEAR_FIRT_WEEK_STRART_DATE = null;

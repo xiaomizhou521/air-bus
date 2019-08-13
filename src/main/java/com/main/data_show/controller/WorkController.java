@@ -845,4 +845,12 @@ public class WorkController {
         return JspPageConst.TO_CSV_LOGS_LIST_JSP_REDIRECT;
     }
 
+    @RequestMapping(value = "work/toExportFixPointUsageRecode")
+    public String toExportFixPointUsageRecode(HttpServletRequest request) {
+        //取得所有点
+        // List<TaPoint> pointList = taPonitMapper.getPointsByPage("","","");
+        //  request.setAttribute("pointList",pointList);
+        return JspPageConst.EXPORT_DATA_RECODE_JSP_REDIRECT;
+    }
+
 }

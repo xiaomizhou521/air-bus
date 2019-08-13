@@ -210,7 +210,7 @@ public class CSVHelper {
             }
             //取当前点的类型 路径中包含 "REPORTS/POWER/KWH"的是 用量的点
             String pointType = EnumPointTypeDefine.instant.toString();
-            if(filePath.indexOf(SysConsts.POINT_USAGE_DEF_FILE_PATH)>-1){
+            if(filePath.indexOf(SysConsts.POINT_USAGE_DEF_FILE_PATH)>-1||filePath.indexOf(SysConsts.POINT_USAGE_DEF_FILE_PATH_2)>-1){
                 pointType = EnumPointTypeDefine.usage.toString();
             }
             //用量的点 需要保存上一小时的用量算差值，文档第一条需要查数据库取得 上一小时的抄表数据。如果没有给0
