@@ -532,4 +532,12 @@ public class ToolHelper {
         }
         return days;
     }
+
+
+    public String strConct(int str1,String str2){
+        StringBuffer sb = new StringBuffer();
+        sb.append(str1).append("_").append(str2);
+        return sb.toString();
+    }
+
 }

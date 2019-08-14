@@ -2,6 +2,7 @@ package com.main.data_show.service;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.main.data_show.consts.PointConst;
 import com.main.data_show.consts.SysConsts;
 import com.main.data_show.enums.EnumPointTypeDefine;
 import com.main.data_show.helper.ToolHelper;
@@ -127,6 +128,18 @@ public class TaPointService {
 
     public TaPoint findPointByPointId(int pointId){
         return taPonitMapper.findPointByPointId(pointId);
+    }
+
+    //取得固定的用于计算的点的信息
+    public List<TaPoint> getAllSumTapointList(){
+        List<TaPoint> taPointList = new ArrayList<TaPoint>();
+        String[] split = PointConst.ALL_SUM_POINT_NAME_STR.split(",");
+        for(String str : split){
+            if(SysConsts.INTERVAL_ALL_POINT_MAP.containsKey(str)){
+                taPointList.add(SysConsts.INTERVAL_ALL_POINT_MAP.get(str));
+            }
+        }
+        return taPointList;
     }
 
 }

@@ -44,4 +44,10 @@ public class PointHelper {
             return pointByUserNamenew;
         }
     }
+
+    //通过点的名字得到id
+    public int getPointIdByPointName(String pointName){
+        TaPoint point = SysConsts.INTERVAL_ALL_POINT_MAP.get(pointName);
+        return point.getPointId();
+    }
 }

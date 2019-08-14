@@ -4,6 +4,7 @@ import cn.com.enorth.utility.Beans;
 import com.github.pagehelper.PageInfo;
 import com.main.data_show.consts.JspPageConst;
 import com.main.data_show.consts.ParamConsts;
+import com.main.data_show.consts.PointConst;
 import com.main.data_show.consts.SysConsts;
 import com.main.data_show.enums.EnumImgReportTypeDefine;
 import com.main.data_show.enums.EnumUsageTimeTypeDefine;
@@ -850,7 +851,88 @@ public class WorkController {
         //取得所有点
         // List<TaPoint> pointList = taPonitMapper.getPointsByPage("","","");
         //  request.setAttribute("pointList",pointList);
-        return JspPageConst.EXPORT_DATA_RECODE_JSP_REDIRECT;
+        return JspPageConst.EXPORT_FIX_POINT_USAGE_RECODE_JSP_REDIRECT;
+    }
+
+    @RequestMapping(value = "work/exportFixPointUsageRecodeDo")
+    public void exportFixPointUsageRecodeDo(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        response.setCharacterEncoding(Beans.UTF_8);
+        JSONObject result = new JSONObject();
+        try {
+            String dateType = request.getParameter("type");
+            String startExpDate = request.getParameter("startExpDate");
+            String endExpDate = request.getParameter("endExpDate");
+            String reportType = request.getParameter("reportType");
+            if(toolHelper.isEmpty(startExpDate)){
+                throw new Exception("请选择导出开始时间");
+            }
+            if(toolHelper.isEmpty(endExpDate)){
+                throw new Exception("请选择导出结束时间");
+            }
+           if(EnumUsageTimeTypeDefine.mon.toString().equals(dateType)){
+                if(!toolHelper.compareStrDate(startExpDate,endExpDate,SysConsts.DATE_FORMAT_8)){
+                    throw new Exception("结束时间要大于开始时间");
+                }
+            }else if(EnumUsageTimeTypeDefine.week.toString().equals(dateType)){
+                int startDateNum = Integer.parseInt(startExpDate);
+                int endDateNum = Integer.parseInt(endExpDate);
+                if(startDateNum>endDateNum){
+                    throw new Exception("结束时间要大于开始时间");
+                }
+            }
+            //取点信息
+            String pointsInStr = "";
+            List<TaPoint> taPointList = taPointService.getAllSumTapointList();
+            for(TaPoint vo : taPointList){
+                if(toolHelper.isEmpty(pointsInStr)){
+                    pointsInStr = String.valueOf(vo.getPointId());
+                }else{
+                    pointsInStr = pointsInStr+","+String.valueOf(vo.getPointId());
+                }
+            }
+            //取点数据
+            List<TaUsagePointDataDate> taUsagePointDataDates = new ArrayList<>();
+            List<String> dateIntervalAllList = new ArrayList<>();
+           if(EnumUsageTimeTypeDefine.mon.toString().equals(dateType)){
+                List<TaUsagePointDataMon> taUsagePointDataWeek = usagePointDataMonHelper.queryUsagePointDataMonSum(startExpDate, endExpDate,pointsInStr);
+                for(TaUsagePointDataMon vo : taUsagePointDataWeek){
+                    TaUsagePointDataDate dateVo = new TaUsagePointDataDate();
+                    dateVo.setPointId(vo.getPointId());
+                    dateVo.setDateShow(vo.getDateShow());
+                    dateVo.setPointData(vo.getPointData());
+                    taUsagePointDataDates.add(dateVo);
+                }
+                dateIntervalAllList = toolHelper.getMonIntervalAllList(startExpDate, endExpDate);
+            }else if(EnumUsageTimeTypeDefine.week.toString().equals(dateType)){
+                List<TaUsagePointDataWeek> taUsagePointDataMon = usagePointDataWeekHelper.queryUsagePointDataWeekSum(startExpDate, endExpDate, pointsInStr);
+                for(TaUsagePointDataWeek vo : taUsagePointDataMon){
+                    TaUsagePointDataDate dateVo = new TaUsagePointDataDate();
+                    dateVo.setPointId(vo.getPointId());
+                    dateVo.setDateShow(vo.getDateShow());
+                    dateVo.setPointData(vo.getPointData());
+                    taUsagePointDataDates.add(dateVo);
+                }
+                dateIntervalAllList = toolHelper.getWeekIntervalAllList(startExpDate, endExpDate);
+            }
+            String path ="";
+            if(EnumImgReportTypeDefine.bar.toString().equals(reportType)){
+                path = jFreeChartHelper.createUsageDeviceBarChartStart(taPointList, taUsagePointDataDates, startExpDate, endExpDate,"水电用量","日期","用量",dateIntervalAllList);
+            }else if(EnumImgReportTypeDefine.series.toString().equals(reportType)){
+                path = jFreeChartHelper.createUsageDeviceSeriesChartStart(taPointList, taUsagePointDataDates, startExpDate, endExpDate,"水电用量","日期","用量",dateIntervalAllList);
+            }
+            String csvPath = csvHelper.writeCSV4(taUsagePointDataDates, dateIntervalAllList, startExpDate, endExpDate);
+            result.put("code",1);
+            result.put("imgPath",path);
+            result.put("csvPath",csvPath);
+        }catch (Exception e) {
+            e.printStackTrace();
+            result.put("code",-1);
+            result.put("data",e.getMessage());
+        } finally {
+            response.getWriter().print(result);
+            response.getWriter().flush();
+            response.getWriter().close();
+        }
     }
 
 }

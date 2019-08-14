@@ -5,6 +5,7 @@ import com.csvreader.CsvReader;
 import com.csvreader.CsvWriter;
 import com.main.data_show.consts.ApplicationConsts;
 import com.main.data_show.consts.ParamConsts;
+import com.main.data_show.consts.PointConst;
 import com.main.data_show.consts.SysConsts;
 import com.main.data_show.enums.EnumPointTypeDefine;
 import com.main.data_show.pojo.TaInstantPointData;
@@ -14,6 +15,7 @@ import com.main.data_show.pojo.TaUsagePointDataDate;
 import com.main.data_show.service.TaPointService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.aop.Pointcut;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
@@ -616,7 +618,131 @@ public class CSVHelper {
             throw e;
         }finally {
         }
+    }
 
+    //固定点固定的计算规则，
+    public String writeCSV4(List<TaUsagePointDataDate> exportResult, List<String> dateIntervalAllList,String startTime,String endTime) throws Exception {
+        CsvWriter csvWriter = null;
+        try {
+            String readBasePath = env.getProperty(ApplicationConsts.SYS_DEMO_USAGE_EXPORT_DATA_BASE_PATH);
+            if(toolHelper.isEmpty(readBasePath)){
+                throw new Exception(ApplicationConsts.SYS_DEMO_USAGE_EXPORT_DATA_BASE_PATH+",基础路径为空!");
+            }
+            if(!readBasePath.endsWith(ParamConsts.SEPERRE_STR)){
+                readBasePath = readBasePath+ParamConsts.SEPERRE_STR;
+            }
+            File file1 = new File(readBasePath);
+            if(!file1.exists()){
+                file1.mkdir();
+            }
+            //生成文件名
+            long curSysTime = System.currentTimeMillis();
+            String fileName = "fixPointUsage("+startTime+"_"+endTime+")"+curSysTime+".CSV";
+            String exportFilePath = readBasePath+fileName;
+            File file = new File(exportFilePath);
+            if(!file.exists()){
+                file.createNewFile();
+            }
+            csvWriter = new CsvWriter(file.getCanonicalPath(), ',', Charset.forName("GBK"));
+            List<String> title = new ArrayList<String>();
+            title.add(" ");
+            for(String str : dateIntervalAllList){
+                title.add(str);
+            }
+            Map<String,Double> resultMap = new HashMap<String,Double>();
+            //数据放入map
+            for(TaUsagePointDataDate dataDateVo : exportResult){
+                resultMap.put(dataDateVo.getPointId()+"_"+dataDateVo.getDateShow(),dataDateVo.getPointData());
+            }
+
+            Map<String,List<String>> pointDateMap = new HashMap<String,List<String>>();
+            Map<Integer,String> map = new LinkedHashMap<Integer,String>();
+            for(String str : dateIntervalAllList){
+            //第一个点计算 21.2  需要 WH.LV11.M1:KWH     WH.WAP.M1:KWH
+                String key212a = toolHelper.strConct(pointHelper.getPointIdByPointName("WH.LV11.M1:KWH"), str);
+                String key212b = toolHelper.strConct(pointHelper.getPointIdByPointName("WH.WAP.M1:KWH"), str);
+                String aDouble = "-";
+                if(resultMap.containsKey(key212a)&&resultMap.containsKey(key212b)){
+                    aDouble = String.valueOf(toolHelper.doubleSum(resultMap.get(key212a),resultMap.get(key212b)));
+                }else if(resultMap.containsKey(key212b)){
+                    aDouble = String.valueOf(resultMap.get(key212b));
+                }else if(resultMap.containsKey(key212a)){
+                    aDouble = String.valueOf(resultMap.get(key212a));
+                }
+                if(pointDateMap.containsKey(PointConst.DIAN_212)){
+                    pointDateMap.get(PointConst.DIAN_212).add(aDouble);
+                }else{
+                    List<String> list =new ArrayList<String>();
+                    list.add(PointConst.DIAN_212);
+                    list.add(aDouble);
+                    pointDateMap.put(PointConst.DIAN_212,list);
+                }
+            //第二个点计算  22.2   DL.LV2.M1:KWH    DL.L2R.M1:KWH
+                String key222a = toolHelper.strConct(pointHelper.getPointIdByPointName("DL.LV2.M1:KWH"), str);
+                String key222b = toolHelper.strConct(pointHelper.getPointIdByPointName("DL.L2R.M1:KWH"), str);
+                String a222Double = "-";
+                if(resultMap.containsKey(key222a)&&resultMap.containsKey(key222b)){
+                    a222Double = String.valueOf(toolHelper.doubleSum(resultMap.get(key222a),resultMap.get(key222b)));
+                }else if(resultMap.containsKey(key222b)){
+                    a222Double = String.valueOf(resultMap.get(key222b));
+                }else if(resultMap.containsKey(key222a)){
+                    a222Double = String.valueOf(resultMap.get(key222a));
+                }
+                if(pointDateMap.containsKey(PointConst.DIAN_222)){
+                    pointDateMap.get(PointConst.DIAN_222).add(a222Double);
+                }else{
+                    List<String> list =new ArrayList<String>();
+                    list.add(PointConst.DIAN_222);
+                    list.add(a222Double);
+                    pointDateMap.put(PointConst.DIAN_222,list);
+                }
+                //第三个点 112 CC.LV34.M9:KWH   CC.LV35.M5:KWH    CC.LV35.M9:KWH  CC.LV45.M8:KWH
+                String key112a = toolHelper.strConct(pointHelper.getPointIdByPointName("CC.LV34.M9:KWH"), str);
+                String key112b = toolHelper.strConct(pointHelper.getPointIdByPointName("CC.LV35.M5:KWH"), str);
+                String key112c = toolHelper.strConct(pointHelper.getPointIdByPointName("CC.LV35.M9:KWH"), str);
+                String key112d = toolHelper.strConct(pointHelper.getPointIdByPointName("CC.LV45.M8:KWH"), str);
+                String a112Double = "-";
+                if(resultMap.containsKey(key112a)||resultMap.containsKey(key112b)
+                        ||resultMap.containsKey(key112c)||resultMap.containsKey(key112d)){
+                    double d1 = 0;
+                    if(resultMap.containsKey(key112a)){
+                        d1 = toolHelper.doubleSum(d1, resultMap.get(key112a));
+                    }
+                    if(resultMap.containsKey(key112b)){
+                        d1 = toolHelper.doubleSum(d1, resultMap.get(key112b));
+                    }
+                    if(resultMap.containsKey(key112c)){
+                        d1 = toolHelper.doubleSum(d1, resultMap.get(key112c));
+                    }
+                    if(resultMap.containsKey(key112d)){
+                        d1 = toolHelper.doubleSum(d1, resultMap.get(key112d));
+                    }
+                    a112Double =  String.valueOf(d1);
+                }
+                if(pointDateMap.containsKey(PointConst.DIAN_112)){
+                    pointDateMap.get(PointConst.DIAN_112).add(a112Double);
+                }else{
+                    List<String> list =new ArrayList<String>();
+                    list.add(PointConst.DIAN_112);
+                    list.add(a112Double);
+                    pointDateMap.put(PointConst.DIAN_112,list);
+                }
+                //第四个点   100    CC.LV52.M1:KWH    CC.LV62.M1:KWH   CC.LV12.M1:KWH   CC.LV22.M1:KWH   CC.LV33.M1:KWH    CC.LV42.M1:KWH
+            }
+            csvWriter.writeRecord(title.toArray(new String[title.size()]));
+            for(Map.Entry<String,List<String>> writeMap : pointDateMap.entrySet()){
+                List<String> value = writeMap.getValue();
+                csvWriter.writeRecord(value.toArray(new String[value.size()]));
+            }
+            return exportFilePath;
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
+        } finally {
+            if(csvWriter!=null){
+                csvWriter.close();
+            }
+        }
     }
 }
 

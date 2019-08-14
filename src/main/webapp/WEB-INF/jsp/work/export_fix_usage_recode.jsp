@@ -22,8 +22,7 @@
             // $("#useDownBtn").hide();
             $("#showImg").hide();
 
-            $("#date_mod").show();
-            $("#week_mod").hide();
+            $("#week_mod").show();
             $("#mon_mod").hide();
             //统计周期下拉框 绑定事件
             $("#intervalTypeId").on('change',function(){
@@ -38,11 +37,6 @@
         })
 
         function makeReport(reportType){
-            var pointIds = $("#data-recode-pointIds").val();
-            if(pointIds==null||pointIds==''){
-                alert("请选择点！");
-                return;
-            }
             var startExpDate;
             var endExpDate;
             var intervalTypeId = $("#intervalTypeId").val();
@@ -61,23 +55,14 @@
                 alert("请选择结束时间！");
                 return;
             }
-            var takeTime = $("#takeTimeId").val();
-            var words = (pointIds+'').split(',');
-            var pointIdsValue = "";
-            for(var i=0 ;i < words.length; i++){
-                if(pointIdsValue == ""){
-                    pointIdsValue = words[i];
-                }else{
-                    pointIdsValue = pointIdsValue +";"+ words[i];
-                }
-            }
+
             $.ajax({
                 type:"POST",
-                url:'/work/exportUsageChartDo',
+                url:'/work/exportFixPointUsageRecodeDo',
                 dataType:'json',
                 async:false,
                 traditional: true,
-                data:{'startExpDate':startExpDate,'endExpDate':endExpDate,'pointIds':pointIdsValue,'type':intervalTypeId,'reportType':reportType},
+                data:{'startExpDate':startExpDate,'endExpDate':endExpDate,'type':intervalTypeId,'reportType':reportType},
                 success: function(data) {
                     $("#makeReportId").attr("disabled",false);
                     var code = data.code;
@@ -169,6 +154,7 @@
 
             </table>
             <div style="    height: 80px;">
+                <div style="float:left;"><input type="button" id="makeReportId" class="btn btn-default btn-success" onclick="makeReport()" value="生成CSV报告"></div>
                 <div style="float:left;margin-left:20px;">
                     <input id="useDownBtn1" type="button" class="btn btn-default btn-success" onclick="downLoadFCSVile()" value="下载CSV报告">
                 </div>
