@@ -170,6 +170,12 @@ public class ToolHelper {
      BigDecimal bd2 = new BigDecimal(Double.toString(d2));
      return bd1.add(bd2).doubleValue();
    }
+    //double乘法
+    public double doubleMultiply(double d1, double d2) {
+     BigDecimal bd1 = new BigDecimal(Double.toString(d1));
+     BigDecimal bd2 = new BigDecimal(Double.toString(d2));
+     return bd1.add(bd2).doubleValue();
+   }
 
     //判断某个时间属于哪一天
     // 根据配置的时间点来决定  数据库存的时间应该就是 年月日

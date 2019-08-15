@@ -36,7 +36,8 @@
             })
         })
 
-        function makeReport(reportType){
+        function makeReport(){
+            var reportType  = $("#reportType").val();
             var startExpDate;
             var endExpDate;
             var intervalTypeId = $("#intervalTypeId").val();
@@ -118,6 +119,16 @@
     <div style="width: 100%">
         <div style="width:1100px;margin:auto;margin-top:20px;">
             <table>
+                <tr style="height: 80px;">
+                    <td style="width: 200px">请选择统计类型:</td>
+                    <td>
+                        <select class="form-control" style="width:200px" id="reportType" name="reportType" />
+                        <option value="dian">电表统计</option>
+                        <option value="hot">热水表统计</option>
+                        <option value="cole">冷水表统计</option>
+                        </select>
+                    </td>
+                </tr>
                 <tr style="height: 80px;">
                     <td style="width: 200px">请选择统计周期:</td>
                     <td>

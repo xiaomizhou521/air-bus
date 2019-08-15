@@ -621,7 +621,7 @@ public class CSVHelper {
         }
     }
 
-    //固定点固定的计算规则，
+    //固定电表 点固定的计算规则，
     public String writeCSV4(List<TaUsagePointDataDate> exportResult, List<String> dateIntervalAllList,String startTime,String endTime) throws Exception {
         CsvWriter csvWriter = null;
         try {
@@ -638,7 +638,7 @@ public class CSVHelper {
             }
             //生成文件名
             long curSysTime = System.currentTimeMillis();
-            String fileName = "fixPointUsage("+startTime+"_"+endTime+")"+curSysTime+".CSV";
+            String fileName = "fixDianPointUsage("+startTime+"_"+endTime+")"+curSysTime+".CSV";
             String exportFilePath = readBasePath+fileName;
             File file = new File(exportFilePath);
             if(!file.exists()){
@@ -873,6 +873,222 @@ public class CSVHelper {
                     list.add(a120Double);
                     pointDateMap.put(PointConst.DIAN_120,list);
                 }
+            }
+            csvWriter.writeRecord(title.toArray(new String[title.size()]));
+            for(Map.Entry<String,List<String>> writeMap : pointDateMap.entrySet()){
+                List<String> value = writeMap.getValue();
+                csvWriter.writeRecord(value.toArray(new String[value.size()]));
+            }
+            return exportFilePath;
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
+        } finally {
+            if(csvWriter!=null){
+                csvWriter.close();
+            }
+        }
+    }
+    //固定热水表 点固定的计算规则，
+    public String writeCSV5(List<TaUsagePointDataDate> exportResult, List<String> dateIntervalAllList,String startTime,String endTime) throws Exception {
+        CsvWriter csvWriter = null;
+        try {
+            String readBasePath = env.getProperty(ApplicationConsts.SYS_DEMO_USAGE_EXPORT_DATA_BASE_PATH);
+            if(toolHelper.isEmpty(readBasePath)){
+                throw new Exception(ApplicationConsts.SYS_DEMO_USAGE_EXPORT_DATA_BASE_PATH+",基础路径为空!");
+            }
+            if(!readBasePath.endsWith(ParamConsts.SEPERRE_STR)){
+                readBasePath = readBasePath+ParamConsts.SEPERRE_STR;
+            }
+            File file1 = new File(readBasePath);
+            if(!file1.exists()){
+                file1.mkdir();
+            }
+            //生成文件名
+            long curSysTime = System.currentTimeMillis();
+            String fileName = "fixHotPointUsage("+startTime+"_"+endTime+")"+curSysTime+".CSV";
+            String exportFilePath = readBasePath+fileName;
+            File file = new File(exportFilePath);
+            if(!file.exists()){
+                file.createNewFile();
+            }
+            csvWriter = new CsvWriter(file.getCanonicalPath(), ',', Charset.forName("GBK"));
+            List<String> title = new ArrayList<String>();
+            title.add(" ");
+            for(String str : dateIntervalAllList){
+                title.add(str);
+            }
+            Map<String,Double> resultMap = new HashMap<String,Double>();
+            //数据放入map
+            for(TaUsagePointDataDate dataDateVo : exportResult){
+                resultMap.put(dataDateVo.getPointId()+"_"+dataDateVo.getDateShow(),dataDateVo.getPointData());
+            }
+
+            Map<String,List<String>> pointDateMap = new HashMap<String,List<String>>();
+            Map<Integer,String> map = new LinkedHashMap<Integer,String>();
+            for(String str : dateIntervalAllList){
+               //第一个点  212   WH.ENMS:M1 HOT TOT
+                String key212a = toolHelper.strConct(pointHelper.getPointIdByPointName("WH.ENMS:M1 HOT TOT"), str);
+                String a212Double = "-";
+                if(resultMap.containsKey(key212a)){
+                    a212Double = String.valueOf(resultMap.get(key212a));
+                }
+                if(pointDateMap.containsKey(PointConst.HOT_212)){
+                    pointDateMap.get(PointConst.HOT_212).add(a212Double);
+                }else{
+                    List<String> list =new ArrayList<String>();
+                    list.add(PointConst.HOT_212);
+                    list.add(a212Double);
+                    pointDateMap.put(PointConst.HOT_212,list);
+                }
+                //第二个点  222   DL.ISP2.EM:M1 HOT TOT
+                String key222a = toolHelper.strConct(pointHelper.getPointIdByPointName("DL.ISP2.EM:M1 HOT TOT"), str);
+                String a222Double = "-";
+                if(resultMap.containsKey(key222a)){
+                    a222Double = String.valueOf(resultMap.get(key222a));
+                }
+                if(pointDateMap.containsKey(PointConst.HOT_222)){
+                    pointDateMap.get(PointConst.HOT_222).add(a222Double);
+                }else{
+                    List<String> list =new ArrayList<String>();
+                    list.add(PointConst.HOT_222);
+                    list.add(a222Double);
+                    pointDateMap.put(PointConst.HOT_222,list);
+                }
+                //第三个点 1001   CC1.EMS:M1 HOT TOT
+                String key1001a = toolHelper.strConct(pointHelper.getPointIdByPointName("CC1.EMS:M1 HOT TOT"), str);
+                String a1001Double = "-";
+                if(resultMap.containsKey(key1001a)){
+                    a1001Double = String.valueOf(resultMap.get(key1001a));
+                }
+                if(pointDateMap.containsKey(PointConst.HOT_1001)){
+                    pointDateMap.get(PointConst.HOT_1001).add(a1001Double);
+                }else{
+                    List<String> list =new ArrayList<String>();
+                    list.add(PointConst.HOT_1001);
+                    list.add(a1001Double);
+                    pointDateMap.put(PointConst.HOT_1001,list);
+                }
+                //第四个点 1002   CC2.EMS:M1 HOT TOT
+                String key1002a = toolHelper.strConct(pointHelper.getPointIdByPointName("CC2.EMS:M1 HOT TOT"), str);
+                String a1002Double = "-";
+                if(resultMap.containsKey(key1002a)){
+                    a1002Double = String.valueOf(resultMap.get(key1002a));
+                }
+                if(pointDateMap.containsKey(PointConst.HOT_1002)){
+                    pointDateMap.get(PointConst.HOT_1002).add(a1002Double);
+                }else{
+                    List<String> list =new ArrayList<String>();
+                    list.add(PointConst.HOT_1002);
+                    list.add(a1002Double);
+                    pointDateMap.put(PointConst.HOT_1002,list);
+                }
+                //第五个点 114   BAC_50020_AI_2001
+                String key114a = toolHelper.strConct(pointHelper.getPointIdByPointName("BAC_50020_AI_2001"), str);
+                String a114Double = "-";
+                if(resultMap.containsKey(key114a)){
+                    a114Double = String.valueOf(resultMap.get(key114a));
+                }
+                if(pointDateMap.containsKey(PointConst.HOT_114)){
+                    pointDateMap.get(PointConst.HOT_114).add(a114Double);
+                }else{
+                    List<String> list =new ArrayList<String>();
+                    list.add(PointConst.HOT_114);
+                    list.add(a114Double);
+                    pointDateMap.put(PointConst.HOT_114,list);
+                }
+                //第6个点 116  M-HE ROOM:M4 HOT TOT    M-CRM:M2 HOT TOT
+                String key116a = toolHelper.strConct(pointHelper.getPointIdByPointName("M-HE ROOM:M4 HOT TOT"), str);
+                String key116b = toolHelper.strConct(pointHelper.getPointIdByPointName("M-CRM:M2 HOT TOT"), str);
+                String a116Double = "-";
+                if(resultMap.containsKey(key116a)||resultMap.containsKey(key116b)){
+                    double b1 = 0;
+                    if(resultMap.containsKey(key116a)){
+                        b1 = toolHelper.doubleMultiply(resultMap.get(key116a),0.275);
+                    }
+                    if(resultMap.containsKey(key116b)){
+                        b1 =toolHelper.doubleSum(resultMap.get(key116b),b1);
+                    }
+                    a116Double = String.valueOf(b1);
+                }
+                if(pointDateMap.containsKey(PointConst.HOT_116)){
+                    pointDateMap.get(PointConst.HOT_116).add(a116Double);
+                }else{
+                    List<String> list =new ArrayList<String>();
+                    list.add(PointConst.HOT_116);
+                    list.add(a116Double);
+                    pointDateMap.put(PointConst.HOT_116,list);
+                }
+
+                //第七个点 118   WM-118:M1 HOT TOT
+                String key118a = toolHelper.strConct(pointHelper.getPointIdByPointName("WM-118:M1 HOT TOT"), str);
+                String a118Double = "-";
+                if(resultMap.containsKey(key118a)){
+                    a118Double = String.valueOf(resultMap.get(key118a));
+                }
+                if(pointDateMap.containsKey(PointConst.HOT_118)){
+                    pointDateMap.get(PointConst.HOT_118).add(a118Double);
+                }else{
+                    List<String> list =new ArrayList<String>();
+                    list.add(PointConst.HOT_118);
+                    list.add(a118Double);
+                    pointDateMap.put(PointConst.HOT_118,list);
+                }
+            }
+            csvWriter.writeRecord(title.toArray(new String[title.size()]));
+            for(Map.Entry<String,List<String>> writeMap : pointDateMap.entrySet()){
+                List<String> value = writeMap.getValue();
+                csvWriter.writeRecord(value.toArray(new String[value.size()]));
+            }
+            return exportFilePath;
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
+        } finally {
+            if(csvWriter!=null){
+                csvWriter.close();
+            }
+        }
+    }
+    //固定冷水表 点固定的计算规则，
+    public String writeCSV6(List<TaUsagePointDataDate> exportResult, List<String> dateIntervalAllList,String startTime,String endTime) throws Exception {
+        CsvWriter csvWriter = null;
+        try {
+            String readBasePath = env.getProperty(ApplicationConsts.SYS_DEMO_USAGE_EXPORT_DATA_BASE_PATH);
+            if(toolHelper.isEmpty(readBasePath)){
+                throw new Exception(ApplicationConsts.SYS_DEMO_USAGE_EXPORT_DATA_BASE_PATH+",基础路径为空!");
+            }
+            if(!readBasePath.endsWith(ParamConsts.SEPERRE_STR)){
+                readBasePath = readBasePath+ParamConsts.SEPERRE_STR;
+            }
+            File file1 = new File(readBasePath);
+            if(!file1.exists()){
+                file1.mkdir();
+            }
+            //生成文件名
+            long curSysTime = System.currentTimeMillis();
+            String fileName = "fixColdPointUsage("+startTime+"_"+endTime+")"+curSysTime+".CSV";
+            String exportFilePath = readBasePath+fileName;
+            File file = new File(exportFilePath);
+            if(!file.exists()){
+                file.createNewFile();
+            }
+            csvWriter = new CsvWriter(file.getCanonicalPath(), ',', Charset.forName("GBK"));
+            List<String> title = new ArrayList<String>();
+            title.add(" ");
+            for(String str : dateIntervalAllList){
+                title.add(str);
+            }
+            Map<String,Double> resultMap = new HashMap<String,Double>();
+            //数据放入map
+            for(TaUsagePointDataDate dataDateVo : exportResult){
+                resultMap.put(dataDateVo.getPointId()+"_"+dataDateVo.getDateShow(),dataDateVo.getPointData());
+            }
+
+            Map<String,List<String>> pointDateMap = new HashMap<String,List<String>>();
+            Map<Integer,String> map = new LinkedHashMap<Integer,String>();
+            for(String str : dateIntervalAllList){
+
             }
             csvWriter.writeRecord(title.toArray(new String[title.size()]));
             for(Map.Entry<String,List<String>> writeMap : pointDateMap.entrySet()){

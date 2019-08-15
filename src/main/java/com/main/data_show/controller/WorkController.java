@@ -7,6 +7,7 @@ import com.main.data_show.consts.ParamConsts;
 import com.main.data_show.consts.PointConst;
 import com.main.data_show.consts.SysConsts;
 import com.main.data_show.enums.EnumImgReportTypeDefine;
+import com.main.data_show.enums.EnumPointReportTypeDefine;
 import com.main.data_show.enums.EnumUsageTimeTypeDefine;
 import com.main.data_show.helper.*;
 import com.main.data_show.mapper.TaPonitDataMapper;
@@ -882,7 +883,7 @@ public class WorkController {
             }
             //取点信息
             String pointsInStr = "";
-            List<TaPoint> taPointList = taPointService.getAllSumTapointList();
+            List<TaPoint> taPointList = taPointService.getAllSumTapointList(reportType);
             for(TaPoint vo : taPointList){
                 if(toolHelper.isEmpty(pointsInStr)){
                     pointsInStr = String.valueOf(vo.getPointId());
@@ -915,12 +916,19 @@ public class WorkController {
                 dateIntervalAllList = toolHelper.getWeekIntervalAllList(startExpDate, endExpDate);
             }
             String path ="";
-            if(EnumImgReportTypeDefine.bar.toString().equals(reportType)){
+   /*         if(EnumImgReportTypeDefine.bar.toString().equals(reportType)){*/
                 path = jFreeChartHelper.createUsageDeviceBarChartStart(taPointList, taUsagePointDataDates, startExpDate, endExpDate,"水电用量","日期","用量",dateIntervalAllList);
-            }else if(EnumImgReportTypeDefine.series.toString().equals(reportType)){
+       /*      }else if(EnumImgReportTypeDefine.series.toString().equals(reportType)){
                 path = jFreeChartHelper.createUsageDeviceSeriesChartStart(taPointList, taUsagePointDataDates, startExpDate, endExpDate,"水电用量","日期","用量",dateIntervalAllList);
+            }*/
+            String csvPath = "";
+            if(EnumPointReportTypeDefine.dian.toString().equals(reportType)){
+                csvPath = csvHelper.writeCSV4(taUsagePointDataDates, dateIntervalAllList, startExpDate, endExpDate);
+            }else if(EnumPointReportTypeDefine.hot.toString().equals(reportType)){
+                csvPath = csvHelper.writeCSV5(taUsagePointDataDates, dateIntervalAllList, startExpDate, endExpDate);
+            }else if(EnumPointReportTypeDefine.cold.toString().equals(reportType)){
+                csvPath = csvHelper.writeCSV6(taUsagePointDataDates, dateIntervalAllList, startExpDate, endExpDate);
             }
-            String csvPath = csvHelper.writeCSV4(taUsagePointDataDates, dateIntervalAllList, startExpDate, endExpDate);
             result.put("code",1);
             result.put("imgPath",path);
             result.put("csvPath",csvPath);

@@ -4,6 +4,7 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.main.data_show.consts.PointConst;
 import com.main.data_show.consts.SysConsts;
+import com.main.data_show.enums.EnumPointReportTypeDefine;
 import com.main.data_show.enums.EnumPointTypeDefine;
 import com.main.data_show.helper.ToolHelper;
 import com.main.data_show.mapper.TaPonitMapper;
@@ -131,9 +132,18 @@ public class TaPointService {
     }
 
     //取得固定的用于计算的点的信息
-    public List<TaPoint> getAllSumTapointList(){
+    public List<TaPoint> getAllSumTapointList(String pointReportType) throws Exception {
         List<TaPoint> taPointList = new ArrayList<TaPoint>();
-        String[] split = PointConst.ALL_SUM_POINT_NAME_STR.split(",");
+        String[] split = null;
+        if(EnumPointReportTypeDefine.dian.toString().equals(pointReportType)){
+            split = PointConst.ALL_SUM_POINT_NAME_STR.split(",");
+        }else if(EnumPointReportTypeDefine.hot.toString().equals(pointReportType)){
+            split = PointConst.ALL_SUM_HOT_POINT_NAME_STR.split(",");
+        }else if(EnumPointReportTypeDefine.cold.toString().equals(pointReportType)){
+            split = PointConst.ALL_SUM_COLD_POINT_NAME_STR.split(",");
+        }else{
+            throw new Exception("错误的点报告类型");
+        }
         for(String str : split){
             if(SysConsts.INTERVAL_ALL_POINT_MAP.containsKey(str)){
                 taPointList.add(SysConsts.INTERVAL_ALL_POINT_MAP.get(str));
