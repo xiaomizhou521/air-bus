@@ -1088,7 +1088,102 @@ public class CSVHelper {
             Map<String,List<String>> pointDateMap = new HashMap<String,List<String>>();
             Map<Integer,String> map = new LinkedHashMap<Integer,String>();
             for(String str : dateIntervalAllList){
+                //第1个点  222   DL.ISP2.EM:M2 HOT TOT
+                String key222a = toolHelper.strConct(pointHelper.getPointIdByPointName("DL.ISP2.EM:M2 HOT TOT"), str);
+                String a222Double = "-";
+                if(resultMap.containsKey(key222a)){
+                    a222Double = String.valueOf(resultMap.get(key222a));
+                }
+                if(pointDateMap.containsKey(PointConst.COLD_222)){
+                    pointDateMap.get(PointConst.COLD_222).add(a222Double);
+                }else{
+                    List<String> list =new ArrayList<String>();
+                    list.add(PointConst.COLD_222);
+                    list.add(a222Double);
+                    pointDateMap.put(PointConst.COLD_222,list);
+                }
 
+                //第2个点  1001   CC1.EMS:M2 HOT TOT
+                String key1001a = toolHelper.strConct(pointHelper.getPointIdByPointName("CC1.EMS:M2 HOT TOT"), str);
+                String a1001Double = "-";
+                if(resultMap.containsKey(key1001a)){
+                    a1001Double = String.valueOf(resultMap.get(key1001a));
+                }
+                if(pointDateMap.containsKey(PointConst.COLD_1001)){
+                    pointDateMap.get(PointConst.COLD_1001).add(a1001Double);
+                }else{
+                    List<String> list =new ArrayList<String>();
+                    list.add(PointConst.COLD_1001);
+                    list.add(a1001Double);
+                    pointDateMap.put(PointConst.COLD_1001,list);
+                }
+                //第3个点  1002   CC2.EMS:M2 HOT TOT
+                String key1002a = toolHelper.strConct(pointHelper.getPointIdByPointName("CC2.EMS:M2 HOT TOT"), str);
+                String a1002Double = "-";
+                if(resultMap.containsKey(key1002a)){
+                    a1002Double = String.valueOf(resultMap.get(key1002a));
+                }
+                if(pointDateMap.containsKey(PointConst.COLD_1002)){
+                    pointDateMap.get(PointConst.COLD_1002).add(a1002Double);
+                }else{
+                    List<String> list =new ArrayList<String>();
+                    list.add(PointConst.COLD_1002);
+                    list.add(a1002Double);
+                    pointDateMap.put(PointConst.COLD_1002,list);
+                }
+
+                //第4个点  114   BAC_50020_AI_3001
+                String key114a = toolHelper.strConct(pointHelper.getPointIdByPointName("BAC_50020_AI_3001"), str);
+                String a114Double = "-";
+                if(resultMap.containsKey(key114a)){
+                    a114Double = String.valueOf(resultMap.get(key114a));
+                }
+                if(pointDateMap.containsKey(PointConst.COLD_114)){
+                    pointDateMap.get(PointConst.COLD_114).add(a114Double);
+                }else{
+                    List<String> list =new ArrayList<String>();
+                    list.add(PointConst.COLD_114);
+                    list.add(a114Double);
+                    pointDateMap.put(PointConst.COLD_114,list);
+                }
+
+                //第5个点 116  M-HE ROOM:M3 HOT TOT   M-CRM:M3 HOT TOT
+                String key116a = toolHelper.strConct(pointHelper.getPointIdByPointName("M-HE ROOM:M3 HOT TOT"), str);
+                String key116b = toolHelper.strConct(pointHelper.getPointIdByPointName("M-CRM:M3 HOT TOT"), str);
+                String a116Double = "-";
+                if(resultMap.containsKey(key116a)||resultMap.containsKey(key116b)){
+                    double b1 = 0;
+                    if(resultMap.containsKey(key116a)){
+                        b1 = toolHelper.doubleMultiply(resultMap.get(key116a),0.275);
+                    }
+                    if(resultMap.containsKey(key116b)){
+                        b1 =toolHelper.doubleSum(resultMap.get(key116b),b1);
+                    }
+                    a116Double = String.valueOf(b1);
+                }
+                if(pointDateMap.containsKey(PointConst.COLD_116)){
+                    pointDateMap.get(PointConst.COLD_116).add(a116Double);
+                }else{
+                    List<String> list =new ArrayList<String>();
+                    list.add(PointConst.COLD_116);
+                    list.add(a116Double);
+                    pointDateMap.put(PointConst.COLD_116,list);
+                }
+
+                //第6个点 118   WM-118:M1 HOT TOT
+                String key118a = toolHelper.strConct(pointHelper.getPointIdByPointName("WM-118:M1 HOT TOT"), str);
+                String a118Double = "-";
+                if(resultMap.containsKey(key118a)){
+                    a118Double = String.valueOf(resultMap.get(key118a));
+                }
+                if(pointDateMap.containsKey(PointConst.COLD_118)){
+                    pointDateMap.get(PointConst.COLD_118).add(a118Double);
+                }else{
+                    List<String> list =new ArrayList<String>();
+                    list.add(PointConst.COLD_118);
+                    list.add(a118Double);
+                    pointDateMap.put(PointConst.COLD_118,list);
+                }
             }
             csvWriter.writeRecord(title.toArray(new String[title.size()]));
             for(Map.Entry<String,List<String>> writeMap : pointDateMap.entrySet()){
