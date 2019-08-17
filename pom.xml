@@ -179,14 +179,14 @@
             <classifier>jdk15</classifier>
         </dependency>
 
-        <!--引入本地jar-->
-        <dependency>
-            <groupId>com.ckfinder</groupId>
-            <artifactId>json-lib</artifactId>
-            <version>2.3</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/src/main/resources/jar/enorth-utility-jdk7-1.0.0.alpha.6.jar</systemPath>
-        </dependency>
+        <!--引入本地jar-->        <dependency>
+        <groupId>com.ckfinder</groupId>
+        <artifactId>json-lib</artifactId>
+        <version>2.3</version>
+        <scope>system</scope>
+        <systemPath>${project.basedir}/src/main/resources/jar/enorth-utility-jdk7-1.0.0.alpha.6.jar</systemPath>
+    </dependency>
+
     </dependencies>
 
     <build>

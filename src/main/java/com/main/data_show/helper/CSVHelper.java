@@ -1,6 +1,5 @@
 package com.main.data_show.helper;
 
-import cn.com.enorth.utility.Beans;
 import com.csvreader.CsvReader;
 import com.csvreader.CsvWriter;
 import com.main.data_show.consts.ApplicationConsts;
@@ -15,13 +14,13 @@ import com.main.data_show.pojo.TaUsagePointDataDate;
 import com.main.data_show.service.TaPointService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.aop.Pointcut;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletResponse;
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.charset.Charset;
 import java.util.*;
@@ -173,6 +172,10 @@ public class CSVHelper {
                 allPath = readBasePath + relativePath + fileNamePrefix;
                 logger.info("当前读取的文件名全路径为:"+allPath);
                 readCSV(allPath,relativePath,fileNamePrefix);
+                //一个文件读完 要把缓存的数据插入到数据库
+                usagePointDataDateHelper.doIntervalDateCsv();
+                usagePointDataWeekHelper.doIntervalWeekCsv();
+                usagePointDataMonHelper.doIntervalMonCsv();
                 importCsvLogsHelper.saveImportCsvLogs(allPath,1,"");
                 //读取完文件后 把文件搬到指定的地方  刘工说不需要了
                 /*String mvBasePath = env.getProperty(ApplicationConsts.SYS_DEMO_MV_NEW_PATH);
@@ -185,6 +188,11 @@ public class CSVHelper {
                 e.printStackTrace();
                 logger.error(e.getMessage());
                 importCsvLogsHelper.saveImportCsvLogs(allPath,-1,e.getMessage());
+            } finally {
+                //每个文件读完 都要清空记录数据的缓存  三个统计表的数据 就不向数据库插入了 直接清空掉
+                usagePointDataDateHelper.INTERVAL_CUR_FILE_DATA_DATE.clear();
+                usagePointDataWeekHelper.INTERVAL_CUR_FILE_WEEK_DATE.clear();
+                usagePointDataMonHelper.INTERVAL_CUR_FILE_MON_DATE.clear();
             }
         }
         long endTime = System.currentTimeMillis();
@@ -253,7 +261,7 @@ public class CSVHelper {
                         Date dateTime = toolHelper.makeDateByDateAndHour(dateStr, hourStr);
                         long dateTimeInt = toolHelper.dateToNumDate(dateTime,SysConsts.DATE_FORMAT_3);
                         logger.warn("-------------------pointName:"+ponitVo.getPointName()+",pointId:"+pointId+",dateTimeInt:"+dateTimeInt+" dateStr:"+dateStr+" hourStr:"+hourStr);
-                        allPointDataHelper.insertAllPoint(pointId,dateStr,hourStr,ponitValue,0,dateTime,dateTimeInt);
+                        //allPointDataHelper.insertAllPoint(pointId,dateStr,hourStr,ponitValue,0,dateTime,dateTimeInt);
                         //每个小时的用量
                         double pointUsage = 0;
                         //用量时 需要保存上一小时的结果 算当前小时的用量
@@ -281,7 +289,7 @@ public class CSVHelper {
                             }
                         }
                         pointDataFlg ++;
-                        insertToDateBase(ponitVo,ponitValue,dateStr,hourStr,pointUsage,dateTime,dateTimeInt);
+                        insertToDateBase(ponitVo,ponitValue,dateStr,hourStr,pointUsage,dateTime,dateTimeInt,filePath);
                     }
                 }
                 if("<>Date".equals(result)){
@@ -300,7 +308,7 @@ public class CSVHelper {
     }
 
     //读取csv数据后要放入到数据库中
-    public void insertToDateBase(TaPoint pointVo,String pointData,String dateStr,String hourStr,double pointUsage,Date dateTime, long dateTimeInt) throws Exception {
+    public void insertToDateBase(TaPoint pointVo,String pointData,String dateStr,String hourStr,double pointUsage,Date dateTime, long dateTimeInt,String filePath) throws Exception {
            
            //点瞬时数据保存到 instantPointDate中
            if(EnumPointTypeDefine.instant.toString().equals(pointVo.getPointType())){
@@ -308,9 +316,9 @@ public class CSVHelper {
            //点用量数据保存到 usagePointDate中
            }else if(EnumPointTypeDefine.usage.toString().equals(pointVo.getPointType())){
               usagePointDataHelper.insertAllPoint(pointVo.getPointId(),dateStr,hourStr,pointData,pointUsage,dateTime,dateTimeInt);
-              usagePointDataDateHelper.makeUsagePointDate(pointVo.getPointId(),pointUsage,dateTime);
-              usagePointDataWeekHelper.makeUsagePointWeek(pointVo.getPointId(),pointUsage,dateTime);
-              usagePointDataMonHelper.makeUsagePointMon(pointVo.getPointId(),pointUsage,dateTime);
+              usagePointDataDateHelper.makeUsagePointDate(pointVo.getPointId(),pointUsage,dateTime,filePath);
+              usagePointDataWeekHelper.makeUsagePointWeek(pointVo.getPointId(),pointUsage,dateTime,filePath);
+              usagePointDataMonHelper.makeUsagePointMon(pointVo.getPointId(),pointUsage,dateTime,filePath);
            }else{
                System.out.println("错误的点类型啊！！！！！！！");
            }

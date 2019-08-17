@@ -3,8 +3,6 @@ package com.main.data_show.controller;
 import cn.com.enorth.utility.Beans;
 import com.github.pagehelper.PageInfo;
 import com.main.data_show.consts.JspPageConst;
-import com.main.data_show.consts.ParamConsts;
-import com.main.data_show.consts.PointConst;
 import com.main.data_show.consts.SysConsts;
 import com.main.data_show.enums.EnumImgReportTypeDefine;
 import com.main.data_show.enums.EnumPointReportTypeDefine;
@@ -19,7 +17,6 @@ import com.main.data_show.service.TaPointDataService;
 import com.main.data_show.service.TaPointService;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
-import net.sf.json.JsonConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -31,15 +28,11 @@ import sun.misc.BASE64Encoder;
 
 import javax.annotation.Resource;
 import javax.imageio.ImageIO;
-import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.jsp.JspPage;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.*;
-
-import static org.apache.logging.log4j.message.MapMessage.MapFormat.JSON;
 
 @Controller
 public class WorkController {
