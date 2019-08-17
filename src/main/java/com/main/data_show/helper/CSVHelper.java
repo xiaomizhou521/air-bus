@@ -650,13 +650,14 @@ public class CSVHelper {
             for(String str : dateIntervalAllList){
                 title.add(str);
             }
+            title.add("Total");
             Map<String,Double> resultMap = new HashMap<String,Double>();
             //数据放入map
             for(TaUsagePointDataDate dataDateVo : exportResult){
                 resultMap.put(dataDateVo.getPointId()+"_"+dataDateVo.getDateShow(),dataDateVo.getPointData());
             }
 
-            Map<String,List<String>> pointDateMap = new HashMap<String,List<String>>();
+            Map<String,List<String>> pointDateMap = new LinkedHashMap<String,List<String>>();
             Map<Integer,String> map = new LinkedHashMap<Integer,String>();
             for(String str : dateIntervalAllList){
             //第一个点计算 21.2  需要 WH.LV11.M1:KWH     WH.WAP.M1:KWH
@@ -874,11 +875,7 @@ public class CSVHelper {
                     pointDateMap.put(PointConst.DIAN_120,list);
                 }
             }
-            csvWriter.writeRecord(title.toArray(new String[title.size()]));
-            for(Map.Entry<String,List<String>> writeMap : pointDateMap.entrySet()){
-                List<String> value = writeMap.getValue();
-                csvWriter.writeRecord(value.toArray(new String[value.size()]));
-            }
+            makeFixCsvDo(csvWriter,pointDateMap,title);
             return exportFilePath;
         } catch (Exception e) {
             e.printStackTrace();
@@ -918,13 +915,14 @@ public class CSVHelper {
             for(String str : dateIntervalAllList){
                 title.add(str);
             }
+            title.add("Total");
             Map<String,Double> resultMap = new HashMap<String,Double>();
             //数据放入map
             for(TaUsagePointDataDate dataDateVo : exportResult){
                 resultMap.put(dataDateVo.getPointId()+"_"+dataDateVo.getDateShow(),dataDateVo.getPointData());
             }
 
-            Map<String,List<String>> pointDateMap = new HashMap<String,List<String>>();
+            Map<String,List<String>> pointDateMap = new LinkedHashMap<String,List<String>>();
             Map<Integer,String> map = new LinkedHashMap<Integer,String>();
             for(String str : dateIntervalAllList){
                //第一个点  212   WH.ENMS:M1 HOT TOT
@@ -1035,11 +1033,7 @@ public class CSVHelper {
                     pointDateMap.put(PointConst.HOT_118,list);
                 }
             }
-            csvWriter.writeRecord(title.toArray(new String[title.size()]));
-            for(Map.Entry<String,List<String>> writeMap : pointDateMap.entrySet()){
-                List<String> value = writeMap.getValue();
-                csvWriter.writeRecord(value.toArray(new String[value.size()]));
-            }
+            makeFixCsvDo(csvWriter,pointDateMap,title);
             return exportFilePath;
         } catch (Exception e) {
             e.printStackTrace();
@@ -1079,13 +1073,14 @@ public class CSVHelper {
             for(String str : dateIntervalAllList){
                 title.add(str);
             }
+            title.add("Total");
             Map<String,Double> resultMap = new HashMap<String,Double>();
             //数据放入map
             for(TaUsagePointDataDate dataDateVo : exportResult){
                 resultMap.put(dataDateVo.getPointId()+"_"+dataDateVo.getDateShow(),dataDateVo.getPointData());
             }
 
-            Map<String,List<String>> pointDateMap = new HashMap<String,List<String>>();
+            Map<String,List<String>> pointDateMap = new LinkedHashMap<String,List<String>>();
             Map<Integer,String> map = new LinkedHashMap<Integer,String>();
             for(String str : dateIntervalAllList){
                 //第1个点  222   DL.ISP2.EM:M2 HOT TOT
@@ -1185,11 +1180,7 @@ public class CSVHelper {
                     pointDateMap.put(PointConst.COLD_118,list);
                 }
             }
-            csvWriter.writeRecord(title.toArray(new String[title.size()]));
-            for(Map.Entry<String,List<String>> writeMap : pointDateMap.entrySet()){
-                List<String> value = writeMap.getValue();
-                csvWriter.writeRecord(value.toArray(new String[value.size()]));
-            }
+            makeFixCsvDo(csvWriter,pointDateMap,title);
             return exportFilePath;
         } catch (Exception e) {
             e.printStackTrace();
@@ -1198,6 +1189,64 @@ public class CSVHelper {
             if(csvWriter!=null){
                 csvWriter.close();
             }
+        }
+}
+
+    public void makeFixCsvDo(CsvWriter csvWriter,Map<String,List<String>> pointDateMap,List<String> title) throws IOException {
+        //计算纵向 total
+        Map<Integer,String> verTotal = new LinkedHashMap<Integer,String>();
+        verTotal.put(0,"Total");
+        for(Map.Entry<String,List<String>> writeMap : pointDateMap.entrySet()){
+            List<String> value = writeMap.getValue();
+            double d = 0;
+            //第一位时 点名 跳过 不计算
+            for(int i=0;i<value.size();i++){
+                if(i == 0 ){
+                    continue;
+                }
+                String str  = value.get(i);
+                //计算纵向
+                if(!verTotal.containsKey(i)){
+                    if(toolHelper.isNumeric(str)) {
+                        verTotal.put(i,str);
+                    }else{
+                        verTotal.put(i,"0");
+                    }
+                }else{
+                    String s = verTotal.get(i);
+                    if(toolHelper.isNumeric(str)){
+                        double v = toolHelper.doubleSum(new BigDecimal(str).doubleValue(), new BigDecimal(s).doubleValue());
+                        verTotal.put(i,String.valueOf(v));
+                    }
+                }
+            }
+        }
+        List<String> str = new ArrayList<String>();
+        for(Map.Entry<Integer,String> map1 : verTotal.entrySet()){
+            str.add(map1.getValue());
+        }
+        pointDateMap.put("",str);
+        //横向 total
+        for(Map.Entry<String,List<String>> writeMap : pointDateMap.entrySet()){
+            List<String> value = writeMap.getValue();
+            double d = 0;
+            //第一位时 点名 跳过 不计算
+            for(int i=0;i<value.size();i++){
+                if(i == 0 ){
+                    continue;
+                }
+                String str1  = value.get(i);
+                //计算横向
+                if(toolHelper.isNumeric(str1)){
+                    d = toolHelper.doubleSum(d,new BigDecimal(str1).doubleValue());
+                }
+            }
+            value.add(String.valueOf(d));
+        }
+        csvWriter.writeRecord(title.toArray(new String[title.size()]));
+        for(Map.Entry<String,List<String>> writeMap : pointDateMap.entrySet()){
+            List<String> value = writeMap.getValue();
+            csvWriter.writeRecord(value.toArray(new String[value.size()]));
         }
     }
 }

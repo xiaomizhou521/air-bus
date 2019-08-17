@@ -532,7 +532,7 @@ public class ToolHelper {
                 startDateNum = startDateNum + 1;
                 days.add(String.valueOf(startDateNum));
             }
-            days.add(String.valueOf(endDateNum));
+            //days.add(String.valueOf(endDateNum));
         } catch (Exception e) {
             e.printStackTrace();
         }

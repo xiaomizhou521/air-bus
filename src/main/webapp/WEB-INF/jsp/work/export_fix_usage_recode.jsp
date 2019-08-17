@@ -125,7 +125,7 @@
                         <select class="form-control" style="width:200px" id="reportType" name="reportType" />
                         <option value="dian">电表统计</option>
                         <option value="hot">热水表统计</option>
-                        <option value="cole">冷水表统计</option>
+                        <option value="cold">冷水表统计</option>
                         </select>
                     </td>
                 </tr>
