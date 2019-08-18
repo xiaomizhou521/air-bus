@@ -174,7 +174,7 @@ public class ToolHelper {
     public double doubleMultiply(double d1, double d2) {
      BigDecimal bd1 = new BigDecimal(Double.toString(d1));
      BigDecimal bd2 = new BigDecimal(Double.toString(d2));
-     return bd1.add(bd2).doubleValue();
+     return bd1.multiply(bd2).doubleValue();
    }
 
     //判断某个时间属于哪一天
