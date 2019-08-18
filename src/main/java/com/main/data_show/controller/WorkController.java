@@ -269,7 +269,8 @@ public class WorkController {
             for(TaPoint point : taPointList){
                 //单个取每个点的数据
                 long startExportTimeNum = toolHelper.dateToNumDate(toolHelper.StrToDate(startExpDate, SysConsts.DATE_FORMAT_7), SysConsts.DATE_FORMAT_3);
-                long endExportTimeNum = toolHelper.dateToNumDate(toolHelper.StrToDate(endExpDate, SysConsts.DATE_FORMAT_7), SysConsts.DATE_FORMAT_3);
+                //选的日期 应该时到当前日期的 23 点
+                long endExportTimeNum = toolHelper.dateToNumDate(toolHelper.addSubDate(toolHelper.StrToDate(endExpDate, SysConsts.DATE_FORMAT_7),1), SysConsts.DATE_FORMAT_3);
                 List<TaInstantPointData> instntPointVoList = instantPointDataHelper.findInstantPointByPointIdAndTime(startExportTimeNum, endExportTimeNum, point.getPointId());
                 //循环建出能写进文件的数据格式
                 for(TaInstantPointData vo : instntPointVoList){

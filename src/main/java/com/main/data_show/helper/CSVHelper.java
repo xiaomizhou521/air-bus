@@ -388,7 +388,7 @@ public class CSVHelper {
             //通用部分
             writeCommon(csvWriter,taPointList);
             Map<Date,List> pointDateMap = new LinkedHashMap<Date,List>();
-            List<String> hourIntervalAllList = toolHelper.getHourIntervalAllList(startTime, endTime, SysConsts.DATE_FORMAT_7, SysConsts.DATE_FORMAT_3);
+            List<String> hourIntervalAllList = toolHelper.getHourIntervalAllList2(startTime, endTime, SysConsts.DATE_FORMAT_7, SysConsts.DATE_FORMAT_3);
             for(String str : hourIntervalAllList){
                 long longTime = Long.parseLong(str);
                 if(resultDateMap.containsKey(longTime)) {
@@ -868,7 +868,7 @@ public class CSVHelper {
                     list.add(a116Double);
                     pointDateMap.put(PointConst.DIAN_116,list);
                 }
-                //第七个点  120   OUT.LV11:KWH
+                //第九个点  120   OUT.LV11:KWH
                 String key120a = toolHelper.strConct(pointHelper.getPointIdByPointName("OUT.LV11:KWH"), str);
                 String a120Double = "-";
                 if(resultMap.containsKey(key120a)){

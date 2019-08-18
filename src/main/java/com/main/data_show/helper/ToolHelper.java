@@ -455,7 +455,34 @@ public class ToolHelper {
 
             Calendar tempEnd = Calendar.getInstance();
             tempEnd.setTime(end);
-            tempEnd.add(Calendar.HOUR_OF_DAY, +1);// 日期加1(包含结束)
+          //  tempEnd.add(Calendar.HOUR_OF_DAY, +1);// 日期加1(包含结束)
+            while (tempStart.before(tempEnd)) {
+                days.add(resultDateFormat.format(tempStart.getTime()));
+                tempStart.add(Calendar.HOUR_OF_DAY, 1);
+            }
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return days;
+    }
+
+    //取某个日期间隔的所有月份 可以按天  按周  按月
+    public List<String> getHourIntervalAllList2(String startTime,String endTime,String jinFormat,String chuFormat){
+        // 返回的日期集合
+        List<String> days = new ArrayList<String>();
+        try {
+            DateFormat dateFormat = new SimpleDateFormat(jinFormat);
+            DateFormat resultDateFormat = new SimpleDateFormat(chuFormat);
+            Date start = dateFormat.parse(startTime);
+            Date end = dateFormat.parse(endTime);
+            end = addSubDate(end,1);
+
+            Calendar tempStart = Calendar.getInstance();
+            tempStart.setTime(start);
+
+            Calendar tempEnd = Calendar.getInstance();
+            tempEnd.setTime(end);
+           // tempEnd.add(Calendar.HOUR_OF_DAY, +1);// 日期加1(包含结束)
             while (tempStart.before(tempEnd)) {
                 days.add(resultDateFormat.format(tempStart.getTime()));
                 tempStart.add(Calendar.HOUR_OF_DAY, 1);
