@@ -261,7 +261,7 @@ public class CSVHelper {
                         Date dateTime = toolHelper.makeDateByDateAndHour(dateStr, hourStr);
                         long dateTimeInt = toolHelper.dateToNumDate(dateTime,SysConsts.DATE_FORMAT_3);
                         logger.warn("-------------------pointName:"+ponitVo.getPointName()+",pointId:"+pointId+",dateTimeInt:"+dateTimeInt+" dateStr:"+dateStr+" hourStr:"+hourStr);
-                        allPointDataHelper.insertAllPoint(pointId,dateStr,hourStr,ponitValue,0,dateTime,dateTimeInt);
+                       //allPointDataHelper.insertAllPoint(pointId,dateStr,hourStr,ponitValue,0,dateTime,dateTimeInt);
                         //每个小时的用量
                         double pointUsage = 0;
                         //用量时 需要保存上一小时的结果 算当前小时的用量
