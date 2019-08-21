@@ -272,7 +272,7 @@ public class CSVHelper {
                                 if(toolHelper.isNumeric(ponitValue)&&toolHelper.isNumeric(lastHourData)){
                                     pointUsage = toolHelper.doubleSubtract(ponitValue,lastHourData);
                                 }else{
-                                   logger.error("数据格式错误，ponitValue:"+ponitValue+",lastHourData:"+lastHourData);
+                                   logger.error("数据格式错误，PointID:"+pointId+" ponitValue:"+ponitValue+" lastHourData:"+lastHourData);
                                 }
                             }else{
                                 //如果没有 数据库查上次的时间
