@@ -706,6 +706,20 @@ public class CSVHelper {
                     list.add(a222Double);
                     pointDateMap.put(PointConst.DIAN_222,list);
                 }
+                //第五个点   99   PW.LV23.M7:KWH
+                String key99a = toolHelper.strConct(pointHelper.getPointIdByPointName("PW.LV23.M7:KWH"), str);
+                String a99Double = "-";
+                if(resultMap.containsKey(key99a)){
+                    a99Double = String.valueOf(resultMap.get(key99a));
+                }
+                if(pointDateMap.containsKey(PointConst.DIAN_99)){
+                    pointDateMap.get(PointConst.DIAN_99).add(a99Double);
+                }else{
+                    List<String> list =new ArrayList<String>();
+                    list.add(PointConst.DIAN_99);
+                    list.add(a99Double);
+                    pointDateMap.put(PointConst.DIAN_99,list);
+                }
                 //第三个点 112 CC.LV34.M9:KWH   CC.LV35.M5:KWH    CC.LV35.M9:KWH  CC.LV45.M8:KWH
                 String key112a = toolHelper.strConct(pointHelper.getPointIdByPointName("CC.LV34.M9:KWH"), str);
                 String key112b = toolHelper.strConct(pointHelper.getPointIdByPointName("CC.LV35.M5:KWH"), str);
@@ -728,14 +742,6 @@ public class CSVHelper {
                         d1 = toolHelper.doubleSum(d1, resultMap.get(key112d));
                     }
                     a112Double =  String.valueOf(d1);
-                }
-                if(pointDateMap.containsKey(PointConst.DIAN_112)){
-                    pointDateMap.get(PointConst.DIAN_112).add(a112Double);
-                }else{
-                    List<String> list =new ArrayList<String>();
-                    list.add(PointConst.DIAN_112);
-                    list.add(a112Double);
-                    pointDateMap.put(PointConst.DIAN_112,list);
                 }
                 //第四个点   100    CC.LV52.M1:KWH    CC.LV62.M1:KWH   CC.LV12.M1:KWH   CC.LV22.M1:KWH   CC.LV33.M1:KWH    CC.LV42.M1:KWH
                 //减去  112
@@ -782,19 +788,14 @@ public class CSVHelper {
                     list.add(a100Double);
                     pointDateMap.put(PointConst.DIAN_100,list);
                 }
-                //第五个点   99   PW.LV23.M7:KWH
-                String key99a = toolHelper.strConct(pointHelper.getPointIdByPointName("PW.LV23.M7:KWH"), str);
-                String a99Double = "-";
-                if(resultMap.containsKey(key99a)){
-                    a99Double = String.valueOf(resultMap.get(key99a));
-                }
-                if(pointDateMap.containsKey(PointConst.DIAN_99)){
-                    pointDateMap.get(PointConst.DIAN_99).add(a99Double);
+                // 112 点为了顺序 在100 之后放到map里
+                if(pointDateMap.containsKey(PointConst.DIAN_112)){
+                    pointDateMap.get(PointConst.DIAN_112).add(a112Double);
                 }else{
                     List<String> list =new ArrayList<String>();
-                    list.add(PointConst.DIAN_99);
-                    list.add(a99Double);
-                    pointDateMap.put(PointConst.DIAN_99,list);
+                    list.add(PointConst.DIAN_112);
+                    list.add(a112Double);
+                    pointDateMap.put(PointConst.DIAN_112,list);
                 }
                 //第六个点  114    PS1.LV11.M1:KWH    PS1.LV21.M1:KWH
                 String key114a = toolHelper.strConct(pointHelper.getPointIdByPointName("PS1.LV11.M1:KWH"), str);
