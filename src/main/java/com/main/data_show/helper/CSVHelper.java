@@ -668,7 +668,16 @@ public class CSVHelper {
             Map<String,List<String>> pointDateMap = new LinkedHashMap<String,List<String>>();
             Map<Integer,String> map = new LinkedHashMap<Integer,String>();
             for(String str : dateIntervalAllList){
-            //第一个点计算 21.2  需要 WH.LV11.M1:KWH     WH.WAP.M1:KWH
+                //第一个点计算52  没数据的 占位一行用
+                if(pointDateMap.containsKey(PointConst.DIAN_52)){
+                    pointDateMap.get(PointConst.DIAN_52).add("");
+                }else{
+                    List<String> list =new ArrayList<String>();
+                    list.add(PointConst.DIAN_52);
+                    list.add("");
+                    pointDateMap.put(PointConst.DIAN_52,list);
+                }
+            //第二个点计算 21.2  需要 WH.LV11.M1:KWH     WH.WAP.M1:KWH
                 String key212a = toolHelper.strConct(pointHelper.getPointIdByPointName("WH.LV11.M1:KWH"), str);
                 String key212b = toolHelper.strConct(pointHelper.getPointIdByPointName("WH.WAP.M1:KWH"), str);
                 String aDouble = "-";
@@ -687,7 +696,7 @@ public class CSVHelper {
                     list.add(aDouble);
                     pointDateMap.put(PointConst.DIAN_212,list);
                 }
-            //第二个点计算  22.2   DL.LV2.M1:KWH    DL.L2R.M1:KWH
+            //第三个点计算  22.2   DL.LV2.M1:KWH    DL.L2R.M1:KWH
                 String key222a = toolHelper.strConct(pointHelper.getPointIdByPointName("DL.LV2.M1:KWH"), str);
                 String key222b = toolHelper.strConct(pointHelper.getPointIdByPointName("DL.L2R.M1:KWH"), str);
                 String a222Double = "-";
@@ -706,6 +715,15 @@ public class CSVHelper {
                     list.add(a222Double);
                     pointDateMap.put(PointConst.DIAN_222,list);
                 }
+                //第四个点计算25  没数据的 占位一行用
+                if(pointDateMap.containsKey(PointConst.DIAN_25)){
+                    pointDateMap.get(PointConst.DIAN_25).add("");
+                }else{
+                    List<String> list =new ArrayList<String>();
+                    list.add(PointConst.DIAN_25);
+                    list.add("");
+                    pointDateMap.put(PointConst.DIAN_25,list);
+                }
                 //第五个点   99   PW.LV23.M7:KWH
                 String key99a = toolHelper.strConct(pointHelper.getPointIdByPointName("PW.LV23.M7:KWH"), str);
                 String a99Double = "-";
@@ -720,7 +738,7 @@ public class CSVHelper {
                     list.add(a99Double);
                     pointDateMap.put(PointConst.DIAN_99,list);
                 }
-                //第三个点 112 CC.LV34.M9:KWH   CC.LV35.M5:KWH    CC.LV35.M9:KWH  CC.LV45.M8:KWH
+                //第七个点 112 在100点之后存数据  为了位置排序  CC.LV34.M9:KWH   CC.LV35.M5:KWH    CC.LV35.M9:KWH  CC.LV45.M8:KWH
                 String key112a = toolHelper.strConct(pointHelper.getPointIdByPointName("CC.LV34.M9:KWH"), str);
                 String key112b = toolHelper.strConct(pointHelper.getPointIdByPointName("CC.LV35.M5:KWH"), str);
                 String key112c = toolHelper.strConct(pointHelper.getPointIdByPointName("CC.LV35.M9:KWH"), str);
@@ -743,7 +761,7 @@ public class CSVHelper {
                     }
                     a112Double =  String.valueOf(d1);
                 }
-                //第四个点   100    CC.LV52.M1:KWH    CC.LV62.M1:KWH   CC.LV12.M1:KWH   CC.LV22.M1:KWH   CC.LV33.M1:KWH    CC.LV42.M1:KWH
+                //第六个点   100    CC.LV52.M1:KWH    CC.LV62.M1:KWH   CC.LV12.M1:KWH   CC.LV22.M1:KWH   CC.LV33.M1:KWH    CC.LV42.M1:KWH
                 //减去  112
                 String key100a = toolHelper.strConct(pointHelper.getPointIdByPointName("CC.LV52.M1:KWH"), str);
                 String key100b = toolHelper.strConct(pointHelper.getPointIdByPointName("CC.LV62.M1:KWH"), str);
@@ -788,7 +806,7 @@ public class CSVHelper {
                     list.add(a100Double);
                     pointDateMap.put(PointConst.DIAN_100,list);
                 }
-                // 112 点为了顺序 在100 之后放到map里
+                //第七个点保存 已在上面100之前计算数据  为了位置排序 112 点为了顺序 在100 之后放到map里
                 if(pointDateMap.containsKey(PointConst.DIAN_112)){
                     pointDateMap.get(PointConst.DIAN_112).add(a112Double);
                 }else{
@@ -797,7 +815,7 @@ public class CSVHelper {
                     list.add(a112Double);
                     pointDateMap.put(PointConst.DIAN_112,list);
                 }
-                //第六个点  114    PS1.LV11.M1:KWH    PS1.LV21.M1:KWH
+                //第八个点  114    PS1.LV11.M1:KWH    PS1.LV21.M1:KWH
                 String key114a = toolHelper.strConct(pointHelper.getPointIdByPointName("PS1.LV11.M1:KWH"), str);
                 String key114b = toolHelper.strConct(pointHelper.getPointIdByPointName("PS1.LV21.M1:KWH"), str);
                 String a114Double = "-";
@@ -819,7 +837,7 @@ public class CSVHelper {
                     list.add(a114Double);
                     pointDateMap.put(PointConst.DIAN_114,list);
                 }
-                //第七个点  118  PW.LV13.M7:KWH   PW.LV25B.M5:KWH
+                //第十个点  118 在116后保存数据 为了排序  PW.LV13.M7:KWH   PW.LV25B.M5:KWH
                 String key118a = toolHelper.strConct(pointHelper.getPointIdByPointName("PW.LV13.M7:KWH"), str);
                 String key118b = toolHelper.strConct(pointHelper.getPointIdByPointName("PW.LV25B.M5:KWH"), str);
                 String a118Double = "-";
@@ -833,15 +851,8 @@ public class CSVHelper {
                     }
                     a118Double = String.valueOf(d1);
                 }
-                if(pointDateMap.containsKey(PointConst.DIAN_118)){
-                    pointDateMap.get(PointConst.DIAN_118).add(a118Double);
-                }else{
-                    List<String> list =new ArrayList<String>();
-                    list.add(PointConst.DIAN_118);
-                    list.add(a118Double);
-                    pointDateMap.put(PointConst.DIAN_118,list);
-                }
-                //第八个点  116  PW.LV11.M1:KWH   PW.LV22B.M1:KWH
+
+                //第九个点  116  PW.LV11.M1:KWH   PW.LV22B.M1:KWH
                 String key116a = toolHelper.strConct(pointHelper.getPointIdByPointName("PW.LV11.M1:KWH"), str);
                 String key116b = toolHelper.strConct(pointHelper.getPointIdByPointName("PW.LV22B.M1:KWH"), str);
                 String a116Double = "-";
@@ -869,7 +880,18 @@ public class CSVHelper {
                     list.add(a116Double);
                     pointDateMap.put(PointConst.DIAN_116,list);
                 }
-                //第九个点  120   OUT.LV11:KWH
+
+                //118的数据  在 116 之后保存 为了位置排序
+                if(pointDateMap.containsKey(PointConst.DIAN_118)){
+                    pointDateMap.get(PointConst.DIAN_118).add(a118Double);
+                }else{
+                    List<String> list =new ArrayList<String>();
+                    list.add(PointConst.DIAN_118);
+                    list.add(a118Double);
+                    pointDateMap.put(PointConst.DIAN_118,list);
+                }
+
+                //第十一个点  120   OUT.LV11:KWH
                 String key120a = toolHelper.strConct(pointHelper.getPointIdByPointName("OUT.LV11:KWH"), str);
                 String a120Double = "-";
                 if(resultMap.containsKey(key120a)){
@@ -1004,9 +1026,9 @@ public class CSVHelper {
                     list.add(a114Double);
                     pointDateMap.put(PointConst.HOT_114,list);
                 }
-                //第6个点 116  M-HE ROOM:M4 HOT TOT    M-CRM:M2 HOT TOT
+                //第6个点 116  M-HE ROOM:M4 HOT TOT    M-HE ROOM:M1 HOT TOT
                 String key116a = toolHelper.strConct(pointHelper.getPointIdByPointName("M-HE ROOM:M4 HOT TOT"), str);
-                String key116b = toolHelper.strConct(pointHelper.getPointIdByPointName("M-CRM:M2 HOT TOT"), str);
+                String key116b = toolHelper.strConct(pointHelper.getPointIdByPointName("M-HE ROOM:M1 HOT TOT"), str);
                 String a116Double = "-";
                 if(resultMap.containsKey(key116a)||resultMap.containsKey(key116b)){
                     double b1 = 0;
@@ -1018,12 +1040,29 @@ public class CSVHelper {
                     }
                     a116Double = String.valueOf(b1);
                 }
+                if(pointDateMap.containsKey(PointConst.HOT_116All)){
+                    pointDateMap.get(PointConst.HOT_116All).add(a116Double);
+                }else{
+                    List<String> list =new ArrayList<String>();
+                    list.add(PointConst.HOT_116All);
+                    list.add(a116Double);
+                    pointDateMap.put(PointConst.HOT_116All,list);
+                }
+
+                //第6个点 116 分表展示  M-HE ROOM:M4 HOT TOT
+                String key116aAll = toolHelper.strConct(pointHelper.getPointIdByPointName("M-HE ROOM:M4 HOT TOT"), str);
+                String a116DoubleAll = "-";
+                if(resultMap.containsKey(key116aAll)){
+                    double b1 = 0;
+                    b1 = toolHelper.doubleMultiply(resultMap.get(key116aAll),0.275);
+                    a116DoubleAll = String.valueOf(b1);
+                }
                 if(pointDateMap.containsKey(PointConst.HOT_116)){
-                    pointDateMap.get(PointConst.HOT_116).add(a116Double);
+                    pointDateMap.get(PointConst.HOT_116).add(a116DoubleAll);
                 }else{
                     List<String> list =new ArrayList<String>();
                     list.add(PointConst.HOT_116);
-                    list.add(a116Double);
+                    list.add(a116DoubleAll);
                     pointDateMap.put(PointConst.HOT_116,list);
                 }
 
@@ -1151,7 +1190,7 @@ public class CSVHelper {
                     pointDateMap.put(PointConst.COLD_114,list);
                 }
 
-                //第5个点 116  M-HE ROOM:M3 HOT TOT   M-CRM:M3 HOT TOT
+                //第5个点 116总  M-HE ROOM:M3 HOT TOT   M-CRM:M3 HOT TOT
                 String key116a = toolHelper.strConct(pointHelper.getPointIdByPointName("M-HE ROOM:M3 HOT TOT"), str);
                 String key116b = toolHelper.strConct(pointHelper.getPointIdByPointName("M-CRM:M3 HOT TOT"), str);
                 String a116Double = "-";
@@ -1165,12 +1204,29 @@ public class CSVHelper {
                     }
                     a116Double = String.valueOf(b1);
                 }
+                if(pointDateMap.containsKey(PointConst.COLD_116All)){
+                    pointDateMap.get(PointConst.COLD_116All).add(a116Double);
+                }else{
+                    List<String> list =new ArrayList<String>();
+                    list.add(PointConst.COLD_116All);
+                    list.add(a116Double);
+                    pointDateMap.put(PointConst.COLD_116All,list);
+                }
+
+                //第六个点 116 单个点统计  M-HE ROOM:M3 HOT TOT
+                String key116aAll = toolHelper.strConct(pointHelper.getPointIdByPointName("M-HE ROOM:M3 HOT TOT"), str);
+                String a116DoubleAll = "-";
+                if(resultMap.containsKey(key116aAll)){
+                    double b1 = 0;
+                    b1 = toolHelper.doubleMultiply(resultMap.get(key116aAll),0.275);
+                    a116DoubleAll = String.valueOf(b1);
+                }
                 if(pointDateMap.containsKey(PointConst.COLD_116)){
-                    pointDateMap.get(PointConst.COLD_116).add(a116Double);
+                    pointDateMap.get(PointConst.COLD_116).add(a116DoubleAll);
                 }else{
                     List<String> list =new ArrayList<String>();
                     list.add(PointConst.COLD_116);
-                    list.add(a116Double);
+                    list.add(a116DoubleAll);
                     pointDateMap.put(PointConst.COLD_116,list);
                 }
 

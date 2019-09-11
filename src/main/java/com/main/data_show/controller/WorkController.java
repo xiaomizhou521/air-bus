@@ -911,7 +911,7 @@ public class WorkController {
             }
             String path ="";
    /*         if(EnumImgReportTypeDefine.bar.toString().equals(reportType)){*/
-                path = jFreeChartHelper.createUsageDeviceBarChartStart(taPointList, taUsagePointDataDates, startExpDate, endExpDate,"水电用量","日期","用量",dateIntervalAllList);
+              //  path = jFreeChartHelper.createUsageDeviceBarChartStart(taPointList, taUsagePointDataDates, startExpDate, endExpDate,"水电用量","日期","用量",dateIntervalAllList);
        /*      }else if(EnumImgReportTypeDefine.series.toString().equals(reportType)){
                 path = jFreeChartHelper.createUsageDeviceSeriesChartStart(taPointList, taUsagePointDataDates, startExpDate, endExpDate,"水电用量","日期","用量",dateIntervalAllList);
             }*/
