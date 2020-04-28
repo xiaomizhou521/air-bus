@@ -55,7 +55,7 @@ public class MainController {
     public String toLogin(HttpServletRequest request) throws Exception {
         TaUser curUser = loginHelper.getCurUser(request);
         if(curUser == null){
-            //去登陆页面
+            //去登陆页面1
             return JspPageConst.LOGIN_JSP_REDIRECT;
         }else{
             //去主页面
